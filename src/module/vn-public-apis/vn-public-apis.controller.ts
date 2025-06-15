@@ -4,10 +4,10 @@ import { CustomBadRequestException } from 'src/shared/exception/custom-exception
 import { VnPublicApisService } from './vn-public-apis.service';
 import { FormatResponseInterceptor } from 'src/shared/interceptors/format_response.interceptor';
 import { CustomLoggerService } from 'src/module/custom_logger/custom_logger.service';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
 
 @Controller('vn-public-apis')
-@UseGuards(AuthGuard)
+@UseGuards(LocalAuthGuard)
 @UseInterceptors(FormatResponseInterceptor)
 export class VnPublicApisController {
   constructor(

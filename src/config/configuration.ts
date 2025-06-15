@@ -56,7 +56,18 @@ export default () => {
     port: Number(process.env.VN_PUBLIC_API_PORT) || 443,
   }
 
+  const authenticationProvider = {
+    google: {
+      clientID: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || ''
+    },
+    facebook: {
+      appId: process.env.FACEBOOK_APP_ID || '',
+      appSecret: process.env.FACEBOOK_APP_SECRET || ''
+    }
+  }
+
   const config = process.env.NODE_ENV?.trim() === 'pro' ? pro : dev;
 
-  return { ...config, folder, vnPublicApi };
+  return { ...config, folder, vnPublicApi, authenticationProvider };
 }

@@ -15,8 +15,8 @@ export class AuthService {
   ) { }
 
   createAccessToken(account: AccountDocument): string {
-    const { username, role } = account;
-    const payload = { username, role };
+    const { email, name, avatar } = account;
+    const payload = { email, name, avatar };
 
     const token = this.jwtService.sign(payload, {
       secret: process.env.ACCESS_TOKEN_SECRET,
@@ -27,8 +27,8 @@ export class AuthService {
   }
 
   async createRefreshToken(account: AccountDocument): Promise<string> {
-    const { username, role } = account;
-    const payload = { username, role };
+    const { email, name, avatar } = account;
+    const payload = { email, name, avatar };
 
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.REFRESH_TOKEN_SECRET,

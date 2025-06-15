@@ -9,11 +9,11 @@ import { IFooterTemplate, Template } from 'src/shared/interface/template.interfa
 import { ConfigService } from '@nestjs/config';
 import { OrderStatus } from 'src/constant/status.constant';
 import { OrderUtil } from 'src/shared/util/order.util';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
 import { CustomBadRequestException } from 'src/shared/exception/custom-exception';
 
 @Controller('order')
-@UseGuards(AuthGuard)
+@UseGuards(LocalAuthGuard)
 @UseInterceptors(FormatResponseInterceptor)
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 export class OrderController {

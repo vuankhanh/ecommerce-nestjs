@@ -7,10 +7,10 @@ import { FormatResponseInterceptor } from 'src/shared/interceptors/format_respon
 import { SupplierLocationService } from '../supplier_location/supplier_location.service';
 import { CustomBadRequestException } from 'src/shared/exception/custom-exception';
 import { ObjectId } from 'mongodb';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
 
 @Controller('supplier_product')
-// @UseGuards(AuthGuard)
+@UseGuards(LocalAuthGuard)
 @UseInterceptors(FormatResponseInterceptor)
 @UsePipes(ValidationPipe)
 export class SupplierProductController {

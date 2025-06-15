@@ -48,6 +48,9 @@ lerna-debug.log*
 /ALBUM
 /TEMPORARY
 
+# Firebase
+/config-firebase
+
 # Runtime data
 pids
 *.pid

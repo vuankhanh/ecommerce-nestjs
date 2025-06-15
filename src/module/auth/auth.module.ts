@@ -4,14 +4,17 @@ import { AuthService } from './auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Account, accountSchema } from './schemas/account.schema';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthGuard } from '../../shared/guards/auth.guard';
+import { LocalAuthGuard } from '../../shared/guards/auth.guard';
 import { RefreshToken, refreshTokenSchema } from './schemas/refresh_token.schema';
 import { AccountService } from 'src/shared/service/account.service';
 import { RefreshTokenService } from 'src/shared/service/refresh_token.service';
-
+import { ConfigModule } from '@nestjs/config';
+import { FirebaseAuthGuard } from 'src/shared/guards/firebase-auth.guard';
 @Module({
   imports: [
-    JwtModule.register({ global: true }),
+    JwtModule.register({
+      global: true,
+    }),
     MongooseModule.forFeature([
       {
         name: Account.name,
@@ -24,13 +27,15 @@ import { RefreshTokenService } from 'src/shared/service/refresh_token.service';
         collection: RefreshToken.name.toLowerCase()
       }
     ]),
+    ConfigModule
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     AccountService,
     RefreshTokenService,
-    AuthGuard
+    LocalAuthGuard,
+    FirebaseAuthGuard
   ]
 })
 export class AuthModule { }

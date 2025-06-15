@@ -25,8 +25,15 @@ export class AccountService {
     return newUser.save();
   }
 
-  async validateAccount(username: string, password: string): Promise<AccountDocument | null> {
-    const account = await this.accountModel.findOne({ username });
+  async createNonePasswordAccount(account: Account): Promise<AccountDocument> {
+    this.logger.log('Creating user without password.');
+
+    const newUser = new this.accountModel(account);
+    return newUser.save();
+  }
+
+  async validateAccount(email: string, password: string): Promise<AccountDocument | null> {
+    const account = await this.accountModel.findOne({ email });
     if (!account) {
       return Promise.resolve(null);
     }

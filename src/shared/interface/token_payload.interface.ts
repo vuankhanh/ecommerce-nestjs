@@ -1,7 +1,8 @@
-export type UserRole = "admin" | "user";
+import { UserRole } from "src/constant/user.constant";
+
 export interface ITokenPayload {
   username: string,
-  role: UserRole,
+  role: `${UserRole}`,
   iat: number,
   exp: number
 }

@@ -10,8 +10,8 @@ import { ITokenPayload } from '../interface/token_payload.interface';
 import { CustomUnauthorizedException } from '../exception/custom-exception';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
-  logger: Logger = new Logger(AuthGuard.name);
+export class LocalAuthGuard implements CanActivate {
+  logger: Logger = new Logger(LocalAuthGuard.name);
   constructor(private jwtService: JwtService) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

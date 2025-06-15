@@ -7,14 +7,14 @@ import { ParseObjectIdPipe } from 'src/shared/pipes/parse_objectId_array.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorageMulterOptions } from 'src/constant/file.constanst';
 import { CsvUtil } from 'src/shared/util/csv.util';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
 import { PhoneNumberInputPipe } from 'src/shared/pipes/string.pipe';
 
 //1. Guards: Được sử dụng để bảo vệ các route.
 //2.Interceptors: Được sử dụng để thay đổi hoặc mở rộng hành vi của các method.
 //3. Pipes: Được sử dụng để biến đổi hoặc xác thực dữ liệu.
 @Controller('customer')
-@UseGuards(AuthGuard)
+@UseGuards(LocalAuthGuard)
 @UseInterceptors(FormatResponseInterceptor)
 @UsePipes(ValidationPipe)
 export class CustomerController {

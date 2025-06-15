@@ -6,7 +6,7 @@ import { AlbumDto } from './dto/album.dto';
 import { FilesProccedInterceptor } from 'src/shared/interceptors/files_procced.interceptor';
 import { Album } from './schema/album.schema';
 import { FormatResponseInterceptor } from 'src/shared/interceptors/format_response.interceptor';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
 import { ValidateModifyAlbumGuard } from './guards/validate_modify_album.guard';
 import { Request } from 'express';
 import { ChangeUploadfilesNamePipe } from 'src/shared/pipes/change-uploadfile-name.pipe';
@@ -19,7 +19,7 @@ import { memoryStorageMulterOptions } from 'src/constant/file.constanst';
 
 @Controller('album')
 @UseInterceptors(FormatResponseInterceptor)
-@UseGuards(AuthGuard)
+@UseGuards(LocalAuthGuard)
 @UsePipes(ValidationPipe)
 export class AlbumController {
   constructor(

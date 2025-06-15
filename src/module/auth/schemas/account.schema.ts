@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
-const roleEnums = ['user', 'admin'];
+import { AuthenticationProvider, UserRole } from "src/constant/user.constant";
+import { IUser } from "src/shared/interface/user.interface";
 
 export type AccountDocument = HydratedDocument<Account>;
 
@@ -8,47 +9,70 @@ export type AccountDocument = HydratedDocument<Account>;
   collection: 'account',
   timestamps: true
 })
-export class Account {
+export class Account implements IUser {
   @Prop({
-    unique: [true, 'Username must be unique'],
-    required: [true, 'Username is required']
+    type: String,
+    unique: true,
+    required: true,
   })
-  username: string;
-
-  @Prop({
-    required: [true, 'Password is required']
-  })
-  password: string;
-
-  @Prop()
-  firstName: string;
-
-  @Prop()
-  lastName: string;
-
-  @Prop({ unique: [true, 'Email must be unique'] })
   email: string;
 
+  @Prop()
+  password?: string;
+
+  @Prop({ unique: true, sparse: true })
+  googleId?: string;
+
+  @Prop({ unique: true, sparse: true })
+  facebookId?: string;
+
   @Prop({
-    enum: roleEnums, default: roleEnums[0],
-    required: [true, 'Role is required']
+    type: String,
+    required: true,
   })
-  role: string;
+  name: string;
+
+  @Prop({ type: String })
+  avatar?: string;
+
+  @Prop({
+    type: String,
+    enum: UserRole,
+    default: UserRole.CLIENT,
+  })
+  role: `${UserRole}`;
+
+  @Prop({
+    type: String,
+    enum: AuthenticationProvider,
+    default: AuthenticationProvider.LOCAL,
+  })
+  createdByProvider: `${AuthenticationProvider}`;
 
   constructor(
-    username: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-    role: 'user' | 'admin',
-    email: string
+    email: string,
+    name: string,
+    avatar: string = '',
   ) {
-    this.username = username;
-    this.password = password;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.role = role;
     this.email = email;
+    this.name = name;
+    this.avatar = avatar;
+    this.role = 'client';
+    this.createdByProvider = 'local';
+  }
+
+  set updatePassword(password: string) {
+    this.password = password;
+  }
+
+  set updateGoogleId(googleId: string) {
+    this.googleId = googleId;
+    this.createdByProvider = AuthenticationProvider.GOOGLE;
+  }
+
+  set updateFacebookId(facebookId: string) {
+    this.facebookId = facebookId;
+    this.createdByProvider = AuthenticationProvider.FACEBOOK;
   }
 }
 

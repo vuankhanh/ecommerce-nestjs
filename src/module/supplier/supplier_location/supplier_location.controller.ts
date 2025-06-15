@@ -3,13 +3,13 @@ import { SupplierLocationService } from './supplier_location.service';
 import { SupplierLocationDto, UpdateSupplierLocationDto } from './dto/supplier_location.dto';
 import { FormatResponseInterceptor } from 'src/shared/interceptors/format_response.interceptor';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse_objectId_array.pipe';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
 import { Supplier_Location } from './schema/supplier_location.schema';
 import { SupplierDebtDto } from './dto/supplier_debt.dto';
 import { ISupplierDebt } from 'src/shared/interface/supplier_location.interface';
 
 @Controller('supplier')
-@UseGuards(AuthGuard)
+@UseGuards(LocalAuthGuard)
 @UseInterceptors(FormatResponseInterceptor)
 @UsePipes(ValidationPipe)
 export class SupplierLocationController {

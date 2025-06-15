@@ -5,10 +5,10 @@ import { PurchaseOrderItem } from './schema/purchase_order_item.schema';
 import { Purchase_Order } from './schema/purchase_order.schema';
 import { FormatResponseInterceptor } from 'src/shared/interceptors/format_response.interceptor';
 import { ParseObjectIdPipe } from 'src/shared/pipes/parse_objectId_array.pipe';
-import { AuthGuard } from 'src/shared/guards/auth.guard';
+import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
 
 @Controller('purchase-order')
-@UseGuards(AuthGuard)
+@UseGuards(LocalAuthGuard)
 @UsePipes(ValidationPipe)
 @UseInterceptors(FormatResponseInterceptor, )
 export class PurchaseOrderController {
