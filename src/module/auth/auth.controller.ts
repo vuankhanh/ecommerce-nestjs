@@ -90,10 +90,6 @@ export class AuthController {
     @Req() req: Request
   ) {
     const user: DecodedIdToken = req['user'];
-    console.log('user: ');
-
-    console.log(user);
-
     const email = user.email;
     const name = user.name;
     const avatar = user.picture;
@@ -104,8 +100,6 @@ export class AuthController {
     try {
       const query = { email };
       let account: AccountDocument = await this.accountService.findOne(query);
-
-      console.log(`Checking if user exists: ${account ? 'Yes' : 'No'}`);
 
       if (!account) {
         this.logger.log('Creating new user from Firebase authentication.');
@@ -138,8 +132,6 @@ export class AuthController {
         await account.save();
         this.logger.log('User updated:', account);
       }
-      console.log('account: ', account);
-
 
       const accessToken = this.authService.createAccessToken(account);
       const refreshToken = await this.authService.createRefreshToken(account);
@@ -153,6 +145,7 @@ export class AuthController {
   }
 
   @Post('config')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   config() {
     const config = {

@@ -18,7 +18,6 @@ export class FirebaseAuthGuard implements CanActivate {
     try {
       // Xác thực token với Firebase Admin SDK
       const decodedToken = await adminFirebase.auth().verifyIdToken(idToken);
-      console.log(decodedToken);
       if (decodedToken.firebase.sign_in_provider === 'facebook.com') {
         if (!email || email.trim() === '') {
           throw new CustomUnauthorizedException('Email không được để trống khi đăng nhập bằng Facebook');

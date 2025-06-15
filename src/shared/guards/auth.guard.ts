@@ -35,7 +35,7 @@ export class LocalAuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const token = request.body.token || request.query.token || request.headers["x-access-token"] || request.headers['authorization']?.replace('Bearer ', '');
+    const token = request.body?.token || request.query.token || request.headers["x-access-token"] || request.headers['authorization']?.replace('Bearer ', '');
     return token;
   }
 }
