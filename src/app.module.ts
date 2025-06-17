@@ -20,6 +20,7 @@ import { VnPublicApisModule } from './module/vn-public-apis/vn-public-apis.modul
 import { PurchaseOrderModule } from './module/purchase_order/purchase_order.module';
 import { SocketGateway } from './gateway/socket/socket.gateway';
 import { ServerConfigModule } from './module/server-config/server-config.module';
+import { AdminModule } from './module/admin/admin.module';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { ServerConfigModule } from './module/server-config/server-config.module'
     SupplierProductModule,
     VnPublicApisModule,
     PurchaseOrderModule,
-    ServerConfigModule
+    ServerConfigModule,
+    AdminModule
   ],
   providers: [
     {

@@ -7,40 +7,48 @@ export class ProductDto implements IProduct {
   @IsString({ message: 'Tên sản phẩm phải là chuỗi' })
   name: string;
 
-  @IsNotEmpty({ message: 'Giá không được để trống' })
-  @IsNumber({}, { message: 'Giá phải là số' })
-  price: number;
+  @IsNotEmpty({ message: 'Mã sản phẩm không được để trống' })
+  @IsString({ message: 'Mã sản phẩm phải là chuỗi' })
+  slug: string; // Chuẩn SEO, có thể để trống khi tạo mới
 
-  @IsNotEmpty({ message: 'Còn hàng được để trống' })
-  @IsBoolean({ message: 'Còn hàng phải là boolean' })
-  availability: boolean;
+  @IsNotEmpty({ message: 'Mô tả không được để trống' })
+  @IsString({ message: 'Mô tả phải là chuỗi' })
+  description: string;
 
-  @IsNotEmpty({ message: 'Đơn vị không được để trống' })
-  @IsString({ message: 'Đơn vị phải là chuỗi' })
-  unit: string;
+  @IsOptional()
+  @IsString({ message: 'Mô tả ngắn phải là chuỗi' })
+  shortDescription?: string;
 
   @IsMongoId({ message: 'Id album phải là chuỗi ObjectId' })
   albumId: string;
 
-  @IsOptional()
-  @IsString({ message: 'Mô tả phải là chuỗi' })
-  description?: string;
+  @IsNotEmpty({ message: 'Giá không được để trống' })
+  @IsNumber({}, { message: 'Giá phải là số' })
+  price: number;
+
+  @IsNotEmpty({ message: 'Danh mục không được để trống' })
+  @IsString({ message: 'Danh mục phải là chuỗi' })
+  category: string;
+
+  @IsNotEmpty({ message: 'Còn hàng được để trống' })
+  @IsBoolean({ message: 'Còn hàng phải là số' })
+  stock: number;
 
   @IsOptional()
-  @IsString({ message: 'Hướng dẫn sử dụng phải là chuỗi' })
-  usageInstructions: string;
+  @IsString({ message: 'Từ khóa hoặc nhãn phải là chuỗi' })
+  tags?: string[];
 
   @IsOptional()
-  @IsString({ message: 'Thương hiệu phải là chuỗi' })
-  brand?: string;
+  @IsString({ message: 'Tiêu đề SEO phải là chuỗi' }) 
+  metaTitle?: string;
 
   @IsOptional()
-  @IsNumber({}, { message: 'Điểm đánh giá trung bình phải là số' })
-  rating?: number;
+  @IsString({ message: 'Mô tả SEO phải là chuỗi' })
+  metaDescription?: string;
 
   @IsOptional()
-  @IsNumber({}, { message: 'Số lượt đánh giá phải là số' })
-  reviews?: number;
+  @IsString({ each: true, message: 'Từ khóa SEO phải là chuỗi' })
+  metaKeywords?: string[];
 }
 
 export class UpdateProductDto extends PartialType(ProductDto) { }
