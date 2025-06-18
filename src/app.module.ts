@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
-import { ProductModule } from './module/product/product.module';
 import { CustomerModule } from './module/customer/customer.module';
 import { OrderModule } from './module/order/order.module';
 import { PaymentModule } from './module/payment/payment.module';
@@ -13,7 +12,7 @@ import { AuthModule } from './module/auth/auth.module';
 
 import { LoggerMiddleware } from './shared/middleware/logger.middleware';
 import { CustomLoggerModule } from './module/custom_logger/custom_logger.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, RouterModule } from '@nestjs/core';
 import { HttpExceptionFilter } from './shared/exception/http_exception.filter';
 import { SupplierProductModule } from './module/supplier/supplier_product/supplier_product.module';
 import { VnPublicApisModule } from './module/vn-public-apis/vn-public-apis.module';
@@ -32,8 +31,13 @@ import { AdminModule } from './module/admin/admin.module';
       useClass: MongodbProvider,
     }),
     JwtModule.register({ global: true }),
+    RouterModule.register([
+      {
+        path: 'admin',
+        module: AdminModule,
+      }
+    ]),
     AlbumModule,
-    ProductModule,
     CustomerModule,
     OrderModule,
     PaymentModule,
@@ -43,7 +47,6 @@ import { AdminModule } from './module/admin/admin.module';
     VnPublicApisModule,
     PurchaseOrderModule,
     ServerConfigModule,
-    AdminModule
   ],
   providers: [
     {

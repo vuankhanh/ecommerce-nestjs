@@ -4,7 +4,7 @@ import { IProduct, IProductReview } from '../interface/product.interface';
 import { Album } from 'src/module/album/schema/album.schema';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
-import { VietnameseAccentUtil } from '../util/vietnamese-accent.util';
+import { ProductCategory } from './product-category.schema';
 
 export type ProductDocument = HydratedDocument<Product>;
 
@@ -22,14 +22,14 @@ export class Product implements IProduct {
   })
   code: string;
 
-  @Prop({ required: true, unique: true })
-  slug: string;
+  @Prop({ type: Types.ObjectId, ref: ProductCategory.name })
+  productCategoryId?: Types.ObjectId | string;
 
   @Prop({ required: true })
   description: string;
 
-  @Prop()
-  shortDescription?: string;
+  @Prop({ required: true })
+  shortDescription: string;
 
   @Prop({ type: Types.ObjectId, required: true, ref: Album.name })
   albumId: Types.ObjectId | string;
@@ -48,9 +48,6 @@ export class Product implements IProduct {
 
   @Prop({ required: true })
   stock: number;
-
-  @Prop()
-  sku?: string;
 
   @Prop({ type: [String], default: [] })
   tags?: string[];
@@ -86,7 +83,6 @@ export class Product implements IProduct {
     this.name = product.name;
     this.code = this.generateProductCode();
     this.price = product.price;
-    this.slug = this.generateSlug();
     this.description = product.description;
     this.shortDescription = product.shortDescription;
     this.category = product.category;
@@ -108,12 +104,12 @@ export class Product implements IProduct {
     return productCode;
   }
 
-  private generateSlug(): string {
-    return VietnameseAccentUtil.toNonAccentVietnamese(this.name)
-  }
-
   set updateAlbumId(albumId: string) {
     this.albumId = albumId ? ObjectId.createFromHexString(albumId.toString()) : null;;
+  }
+
+  set updateProductCategoryId(productCategoryId: string) {
+    this.productCategoryId = productCategoryId ? ObjectId.createFromHexString(productCategoryId.toString()) : null;
   }
 }
 

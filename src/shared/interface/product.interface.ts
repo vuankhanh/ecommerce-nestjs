@@ -1,5 +1,13 @@
 import { Types } from "mongoose";
 
+export interface IProductCategory {
+  name: string;
+  description?: string;
+  parentId?: Types.ObjectId | string; // ID của danh mục cha
+  metaTitle?: string;       // SEO
+  metaDescription?: string; // SEO
+  metaKeywords?: string[];  // SEO
+}
 export interface IProductReview {
   userId: string;
   rating: number; // 1-5
@@ -8,9 +16,8 @@ export interface IProductReview {
 
 export interface IProduct {
   name: string;
-  slug: string; // Chuẩn SEO
   description: string;
-  shortDescription?: string;
+  shortDescription: string;
   albumId: Types.ObjectId | string; // ID của album chứa ảnh sản phẩm
   price: number;
   category: string;

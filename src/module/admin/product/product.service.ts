@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
-import { Product, ProductDocument } from '../../shared/schema/product.schema';
-import { Document, Types, FilterQuery, FlattenMaps, Model, HydratedDocument } from 'mongoose';
+import { Product, ProductDocument } from '../../../shared/schema/product.schema';
+import { FilterQuery, FlattenMaps, Model } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { Album } from '../album/schema/album.schema';
+import { Album } from '../../album/schema/album.schema';
 
 @Injectable()
 export class ProductService implements IBasicService<Product> {

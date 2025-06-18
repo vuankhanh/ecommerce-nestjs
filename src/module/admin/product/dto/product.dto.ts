@@ -7,17 +7,13 @@ export class ProductDto implements IProduct {
   @IsString({ message: 'Tên sản phẩm phải là chuỗi' })
   name: string;
 
-  @IsNotEmpty({ message: 'Mã sản phẩm không được để trống' })
-  @IsString({ message: 'Mã sản phẩm phải là chuỗi' })
-  slug: string; // Chuẩn SEO, có thể để trống khi tạo mới
-
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
   @IsString({ message: 'Mô tả phải là chuỗi' })
   description: string;
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'Mô tả ngắn không được để trống' })
   @IsString({ message: 'Mô tả ngắn phải là chuỗi' })
-  shortDescription?: string;
+  shortDescription: string;
 
   @IsMongoId({ message: 'Id album phải là chuỗi ObjectId' })
   albumId: string;
