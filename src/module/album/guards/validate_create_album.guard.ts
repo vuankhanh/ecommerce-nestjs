@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AlbumService } from '../album.service';
 import { ConfigService } from '@nestjs/config';
 import { VietnameseAccentUtil } from 'src/shared/util/vietnamese-accent.util';
-import { CustomConflictException } from 'src/shared/exception/custom-exception';
+import { CustomConflictException } from 'src/shared/core/exception/custom-exception';
 
 @Injectable()
 export class ValidateCreateAlbumGuard implements CanActivate {

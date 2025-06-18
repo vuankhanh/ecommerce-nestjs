@@ -2,10 +2,10 @@ import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, P
 import { ProductService } from './product.service';
 import { ProductDto, UpdateProductDto } from './dto/product.dto';
 import { Product } from '../../../shared/schema/product.schema';
-import { FormatResponseInterceptor } from 'src/shared/interceptors/format_response.interceptor';
-import { ParseObjectIdPipe } from 'src/shared/pipes/parse_objectId_array.pipe';
+import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
+import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { ObjectId } from 'mongodb';
-import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
+import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 
 //1. Guards: Được sử dụng để bảo vệ các route.
 //2. Interceptors: Được sử dụng để thay đổi hoặc mở rộng hành vi của các method.

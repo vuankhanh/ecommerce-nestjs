@@ -4,7 +4,7 @@ import { AccountDocument } from './schemas/account.schema';
 import mongoose from 'mongoose';
 import { RefreshTokenService } from 'src/shared/service/refresh_token.service';
 import { AccountService } from 'src/shared/service/account.service';
-import { CustomUnauthorizedException } from 'src/shared/exception/custom-exception';
+import { CustomUnauthorizedException } from 'src/shared/core/exception/custom-exception';
 
 @Injectable()
 export class AuthService {
@@ -15,8 +15,8 @@ export class AuthService {
   ) { }
 
   createAccessToken(account: AccountDocument): string {
-    const { email, name, avatar } = account;
-    const payload = { email, name, avatar };
+    const { email, name, avatar, role } = account;
+    const payload = { email, name, avatar, role };
 
     const token = this.jwtService.sign(payload, {
       secret: process.env.ACCESS_TOKEN_SECRET,
@@ -27,8 +27,8 @@ export class AuthService {
   }
 
   async createRefreshToken(account: AccountDocument): Promise<string> {
-    const { email, name, avatar } = account;
-    const payload = { email, name, avatar };
+    const { email, name, avatar, role } = account;
+    const payload = { email, name, avatar, role };
 
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.REFRESH_TOKEN_SECRET,

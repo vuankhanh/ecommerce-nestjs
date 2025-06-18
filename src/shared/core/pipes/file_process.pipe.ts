@@ -1,8 +1,8 @@
 import { Inject, Injectable, PipeTransform, Scope } from '@nestjs/common';
 
 import { REQUEST } from '@nestjs/core';
-import { TProcessedMedia } from '../interface/files.interface';
-import { MediaProcessUtil } from '../util/media_process.util';
+import { TProcessedMedia } from '../../interface/files.interface';
+import { MediaProcessUtil } from '../../util/media_process.util';
 import { CustomInternalServerErrorException } from '../exception/custom-exception';
 
 @Injectable({

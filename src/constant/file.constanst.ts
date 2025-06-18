@@ -3,7 +3,7 @@ import * as multer from 'multer';
 
 import { IFileType } from "src/shared/interface/files.interface";
 import { Request } from "express";
-import { CustomBadRequestException } from "src/shared/exception/custom-exception";
+import { CustomBadRequestException } from "src/shared/core/exception/custom-exception";
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb) => {
   const urlCustomerUpload = '/customer/upload-csv';

@@ -3,12 +3,12 @@ import { SignUpDto } from './dto/signup.dto';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/signin.dto';
 import { Account, AccountDocument } from './schemas/account.schema';
-import { FormatResponseInterceptor } from 'src/shared/interceptors/format_response.interceptor';
+import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 
 import { AccountService } from 'src/shared/service/account.service';
-import { CustomConflictException, CustomInternalServerErrorException, CustomUnauthorizedException } from 'src/shared/exception/custom-exception';
-import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
-import { FirebaseAuthGuard } from 'src/shared/guards/firebase-auth.guard';
+import { CustomConflictException, CustomInternalServerErrorException, CustomUnauthorizedException } from 'src/shared/core/exception/custom-exception';
+import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
+import { FirebaseAuthGuard } from 'src/shared/core/guards/firebase-auth.guard';
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 import { log } from 'console';
 

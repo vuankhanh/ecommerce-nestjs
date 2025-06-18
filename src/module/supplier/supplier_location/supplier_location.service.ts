@@ -5,7 +5,7 @@ import { Document, Types, FilterQuery, FlattenMaps } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CustomConflictException } from 'src/shared/exception/custom-exception';
+import { CustomConflictException } from 'src/shared/core/exception/custom-exception';
 import { ISupplierDebt } from 'src/shared/interface/supplier_location.interface';
 
 @Injectable()

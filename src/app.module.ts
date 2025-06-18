@@ -13,13 +13,15 @@ import { AuthModule } from './module/auth/auth.module';
 import { LoggerMiddleware } from './shared/middleware/logger.middleware';
 import { CustomLoggerModule } from './module/custom_logger/custom_logger.module';
 import { APP_FILTER, RouterModule } from '@nestjs/core';
-import { HttpExceptionFilter } from './shared/exception/http_exception.filter';
+import { HttpExceptionFilter } from './shared/core/exception/http_exception.filter';
 import { SupplierProductModule } from './module/supplier/supplier_product/supplier_product.module';
 import { VnPublicApisModule } from './module/vn-public-apis/vn-public-apis.module';
 import { PurchaseOrderModule } from './module/purchase_order/purchase_order.module';
 import { SocketGateway } from './gateway/socket/socket.gateway';
 import { ServerConfigModule } from './module/server-config/server-config.module';
 import { AdminModule } from './module/admin/admin.module';
+import { Product } from './shared/schema/product.schema';
+import { ProductCategoryModule } from './module/admin/product-category/product-category.module';
 
 @Module({
   imports: [
@@ -31,11 +33,18 @@ import { AdminModule } from './module/admin/admin.module';
       useClass: MongodbProvider,
     }),
     JwtModule.register({ global: true }),
+    AdminModule,
     RouterModule.register([
       {
         path: 'admin',
         module: AdminModule,
-      }
+        children: [
+          {
+            path: 'product-category',
+            module: ProductCategoryModule,
+          }
+        ]
+      },
     ]),
     AlbumModule,
     CustomerModule,

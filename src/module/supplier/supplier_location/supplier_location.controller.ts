@@ -1,9 +1,9 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SupplierLocationService } from './supplier_location.service';
 import { SupplierLocationDto, UpdateSupplierLocationDto } from './dto/supplier_location.dto';
-import { FormatResponseInterceptor } from 'src/shared/interceptors/format_response.interceptor';
-import { ParseObjectIdPipe } from 'src/shared/pipes/parse_objectId_array.pipe';
-import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
+import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
+import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
+import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { Supplier_Location } from './schema/supplier_location.schema';
 import { SupplierDebtDto } from './dto/supplier_debt.dto';
 import { ISupplierDebt } from 'src/shared/interface/supplier_location.interface';

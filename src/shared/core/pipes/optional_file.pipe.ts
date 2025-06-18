@@ -1,8 +1,8 @@
 import { PipeTransform, Injectable } from '@nestjs/common';
-import { DiskStoragePipe } from 'src/shared/pipes/disk-storage.pipe';
-import { ChangeUploadfileNamePipe, ChangeUploadfilesNamePipe } from 'src/shared/pipes/change-uploadfile-name.pipe';
-import { FileProcessPipe, FilesProcessPipe } from 'src/shared/pipes/file_process.pipe';
-import { IMedia } from '../interface/media.interface';
+import { DiskStoragePipe } from 'src/shared/core/pipes/disk-storage.pipe';
+import { ChangeUploadfileNamePipe, ChangeUploadfilesNamePipe } from 'src/shared/core/pipes/change-uploadfile-name.pipe';
+import { FileProcessPipe, FilesProcessPipe } from 'src/shared/core/pipes/file_process.pipe';
+import { IMedia } from '../../interface/media.interface';
 
 @Injectable()
 export class OptionalFilePipe implements PipeTransform {

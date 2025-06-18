@@ -6,150 +6,59 @@ import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { ProductCategory, ProductCategoryDocument } from 'src/shared/schema/product-category.schema';
 
-export class ProductCategoryService implements IBasicService<ProductCategoryDocument> {
+export class ProductCategoryService implements IBasicService<ProductCategory> {
   constructor(
-    @InjectModel(ProductCategory.name)
-    private readonly productCategoryModel: Model<ProductCategoryDocument>,
+    @InjectModel(ProductCategory.name) private readonly productCategoryModel: Model<ProductCategory>,
   ) {}
 
-  async create(
-    data: Document<unknown, {}, ProductCategory, {}> &
-      ProductCategory & { _id: Types.ObjectId } & { __v: number }
-  ): Promise<
-    Document<
-      unknown,
-      {},
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number },
-      {}
-    > &
-      Document<unknown, {}, ProductCategory, {}> &
-      ProductCategory & { _id: Types.ObjectId } & { __v: number } & Required<{ _id: Types.ObjectId }>
-  > {
-    const created = new this.productCategoryModel(data);
-    return created.save();
+  async create(data: ProductCategory): Promise<ProductCategoryDocument> {
+    const productCategory = new this.productCategoryModel(data);
+    await productCategory.save();
+    return productCategory;
   }
 
   async getAll(
-    filterQuery: FilterQuery<
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number }
-    >,
+    filterQuery: FilterQuery<ProductCategory>,
     page: number,
     size: number
-  ): Promise<{
-    data: FlattenMaps<
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number }
-    >[];
-    paging: IPaging;
-  }> {
+  ): Promise<{ data: FlattenMaps<ProductCategory>[]; paging: IPaging }> {
     const countTotal = await this.productCategoryModel.countDocuments(filterQuery);
     const skip = (page - 1) * size;
-    const [data, total] = await Promise.all([
-      this.productCategoryModel
-        .find(filterQuery)
-        .skip(skip)
-        .limit(size)
-        .lean()
-        .exec(),
-      this.productCategoryModel.countDocuments(filterQuery),
-    ]);
-    return {
-      data: data as any,
-      paging: {
-        totalItems: countTotal,
-        page,
-        size,
-        totalPages: Math.ceil(total / size),
-      },
+    const data = await this.productCategoryModel.find(filterQuery).skip(skip).limit(size).lean();
+
+    const paging: IPaging = {
+      totalItems: countTotal,
+      page,
+      size,
+      totalPages: Math.ceil(countTotal / size)
     };
+    return { data, paging };
   }
 
   async getDetail(
-    filterQuery: FilterQuery<
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number }
-    >
-  ): Promise<
-    Document<
-      unknown,
-      {},
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number },
-      {}
-    > &
-      Document<unknown, {}, ProductCategory, {}> &
-      ProductCategory & { _id: Types.ObjectId } & { __v: number } & Required<{ _id: Types.ObjectId }>
-  > {
-    return this.productCategoryModel.findOne(filterQuery).exec();
+    filterQuery: FilterQuery<ProductCategory>
+  ): Promise<ProductCategoryDocument> {
+    return await this.productCategoryModel.findOne(filterQuery);;
   }
 
   async replace(
-    filterQuery: FilterQuery<
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number }
-    >,
-    data: Document<unknown, {}, ProductCategory, {}> &
-      ProductCategory & { _id: Types.ObjectId } & { __v: number }
-  ): Promise<
-    Document<
-      unknown,
-      {},
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number },
-      {}
-    > &
-      Document<unknown, {}, ProductCategory, {}> &
-      ProductCategory & { _id: Types.ObjectId } & { __v: number } & Required<{ _id: Types.ObjectId }>
-  > {
-    return this.productCategoryModel
-      .findOneAndReplace(filterQuery, data, { new: true })
-      .exec();
+    filterQuery: FilterQuery<ProductCategory>,
+    data: ProductCategory
+  ): Promise<ProductCategoryDocument> {
+    return await this.productCategoryModel.findOneAndReplace(filterQuery, data, { new: true });
   }
 
   async modify(
-    filterQuery: FilterQuery<
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number }
-    >,
-    data: Partial<
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number }
-    >
-  ): Promise<
-    Document<
-      unknown,
-      {},
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number },
-      {}
-    > &
-      Document<unknown, {}, ProductCategory, {}> &
-      ProductCategory & { _id: Types.ObjectId } & { __v: number } & Required<{ _id: Types.ObjectId }>
-  > {
-    return this.productCategoryModel
-      .findOneAndUpdate(filterQuery, data, { new: true })
-      .exec();
+    filterQuery: FilterQuery<ProductCategory>,
+    data: Partial<ProductCategory>
+  ): Promise<ProductCategoryDocument> {
+    return await this.productCategoryModel.findOneAndUpdate(filterQuery, data, { new: true });
   }
 
   async remove(
-    filterQuery: FilterQuery<
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number }
-    >
-  ): Promise<
-    Document<
-      unknown,
-      {},
-      Document<unknown, {}, ProductCategory, {}> &
-        ProductCategory & { _id: Types.ObjectId } & { __v: number },
-      {}
-    > &
-      Document<unknown, {}, ProductCategory, {}> &
-      ProductCategory & { _id: Types.ObjectId } & { __v: number } & Required<{ _id: Types.ObjectId }>
-  > {
-    return this.productCategoryModel.findOneAndDelete(filterQuery).exec();
+    filterQuery: FilterQuery<ProductCategory>
+  ): Promise<ProductCategoryDocument> {
+    return await this.productCategoryModel.findOneAndDelete(filterQuery);
   }
 }
 

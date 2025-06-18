@@ -1,8 +1,8 @@
 import { Inject, Injectable, PipeTransform, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { TProcessedMedia } from '../interface/files.interface';
-import { IMedia } from '../interface/media.interface';
-import { DiskStorageUtil } from '../util/disk_storage.util';
+import { TProcessedMedia } from '../../interface/files.interface';
+import { IMedia } from '../../interface/media.interface';
+import { DiskStorageUtil } from '../../util/disk_storage.util';
 import { Request } from 'express';
 
 @Injectable({

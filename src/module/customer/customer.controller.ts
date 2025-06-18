@@ -1,14 +1,14 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, HttpCode, Param, ParseIntPipe, Patch, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
-import { FormatResponseInterceptor } from 'src/shared/interceptors/format_response.interceptor';
+import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { CustomerService } from './customer.service';
 import { CustomerDto, UpdateCustomerDto } from './dto/customer.dto';
 import { Customer } from './schema/customer.schema';
-import { ParseObjectIdPipe } from 'src/shared/pipes/parse_objectId_array.pipe';
+import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorageMulterOptions } from 'src/constant/file.constanst';
 import { CsvUtil } from 'src/shared/util/csv.util';
-import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
-import { PhoneNumberInputPipe } from 'src/shared/pipes/string.pipe';
+import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
+import { PhoneNumberInputPipe } from 'src/shared/core/pipes/string.pipe';
 
 //1. Guards: Được sử dụng để bảo vệ các route.
 //2.Interceptors: Được sử dụng để thay đổi hoặc mở rộng hành vi của các method.

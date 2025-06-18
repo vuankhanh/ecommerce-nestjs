@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AlbumService } from '../album.service';
 import { ConfigService } from '@nestjs/config';
 import { ObjectId } from 'mongodb';
-import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/exception/custom-exception';
+import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
 @Injectable()
 export class ValidateModifyAlbumGuard implements CanActivate {
   constructor(

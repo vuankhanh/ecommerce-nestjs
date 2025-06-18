@@ -4,7 +4,7 @@ import { Supplier_Product, SupplierProductDocument } from './schema/supplier_pro
 import { FilterQuery, Model } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { CustomConflictException } from 'src/shared/exception/custom-exception';
+import { CustomConflictException } from 'src/shared/core/exception/custom-exception';
 import { Supplier_Location } from '../supplier_location/schema/supplier_location.schema';
 
 @Injectable()

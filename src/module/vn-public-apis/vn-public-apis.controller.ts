@@ -1,10 +1,10 @@
 import { Controller, Get, Query, UseGuards, UseInterceptors, } from '@nestjs/common';
-import { CustomBadRequestException } from 'src/shared/exception/custom-exception';
+import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
 
 import { VnPublicApisService } from './vn-public-apis.service';
-import { FormatResponseInterceptor } from 'src/shared/interceptors/format_response.interceptor';
+import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { CustomLoggerService } from 'src/module/custom_logger/custom_logger.service';
-import { LocalAuthGuard } from 'src/shared/guards/auth.guard';
+import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 
 @Controller('vn-public-apis')
 @UseGuards(LocalAuthGuard)
