@@ -4,7 +4,6 @@ import { AlbumController } from './album.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Album, albumSchema } from './schema/album.schema';
 import { ValidateCreateAlbumGuard } from './guards/validate_create_album.guard';
-import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { ChangeUploadfilesNamePipe } from 'src/shared/core/pipes/change-uploadfile-name.pipe';
 import { FilesProcessPipe } from 'src/shared/core/pipes/file_process.pipe';
@@ -24,7 +23,6 @@ import { DiskStoragePipe } from 'src/shared/core/pipes/disk-storage.pipe';
   providers: [
     AlbumService,
     ValidateCreateAlbumGuard,
-    ConfigService,
     LocalAuthGuard,
 
     ChangeUploadfilesNamePipe,

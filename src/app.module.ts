@@ -6,13 +6,12 @@ import { MongodbProvider } from './provider/database/mongodb.provider';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AlbumModule } from './module/album/album.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './module/auth/auth.module';
 
 import { LoggerMiddleware } from './shared/middleware/logger.middleware';
 import { CustomLoggerModule } from './module/custom_logger/custom_logger.module';
-import { APP_FILTER, RouterModule } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './shared/core/exception/http_exception.filter';
 import { SupplierProductModule } from './module/supplier/supplier_product/supplier_product.module';
 import { VnPublicApisModule } from './module/vn-public-apis/vn-public-apis.module';
@@ -20,13 +19,12 @@ import { PurchaseOrderModule } from './module/purchase_order/purchase_order.modu
 import { SocketGateway } from './gateway/socket/socket.gateway';
 import { ServerConfigModule } from './module/server-config/server-config.module';
 import { AdminModule } from './module/admin/admin.module';
-import { Product } from './shared/schema/product.schema';
-import { ProductCategoryModule } from './module/admin/product-category/product-category.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [configuration],
+      isGlobal: true,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -34,19 +32,6 @@ import { ProductCategoryModule } from './module/admin/product-category/product-c
     }),
     JwtModule.register({ global: true }),
     AdminModule,
-    RouterModule.register([
-      {
-        path: 'admin',
-        module: AdminModule,
-        children: [
-          {
-            path: 'product-category',
-            module: ProductCategoryModule,
-          }
-        ]
-      },
-    ]),
-    AlbumModule,
     CustomerModule,
     OrderModule,
     PaymentModule,
@@ -62,7 +47,7 @@ import { ProductCategoryModule } from './module/admin/product-category/product-c
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
-    SocketGateway,
+    SocketGateway
   ],
 })
 export class AppModule {

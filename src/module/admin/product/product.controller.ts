@@ -10,7 +10,7 @@ import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 //1. Guards: Được sử dụng để bảo vệ các route.
 //2. Interceptors: Được sử dụng để thay đổi hoặc mở rộng hành vi của các method.
 //3. Pipes: Được sử dụng để biến đổi hoặc xác thực dữ liệu.
-@Controller('product')
+@Controller()
 @UseGuards(LocalAuthGuard)
 @UseInterceptors(FormatResponseInterceptor)
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))

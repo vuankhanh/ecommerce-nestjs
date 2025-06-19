@@ -1,3 +1,4 @@
+import { PartialType } from "@nestjs/mapped-types";
 import { IsMongoId, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { IProductCategory } from "src/shared/interface/product.interface";
 
@@ -11,6 +12,7 @@ export class ProductCategoryDto implements IProductCategory {
   @IsString({ message: 'Mô tả Product Category không được để trống' })
   description?: string;
 
+  @IsOptional()
   @IsMongoId({ message: 'Id Product Category parent phải là chuỗi ObjectId' })
   parentId?: string; // ID của danh mục cha
 
@@ -26,3 +28,5 @@ export class ProductCategoryDto implements IProductCategory {
   @IsString({ each: true, message: 'Từ khóa SEO phải là chuỗi' })
   metaKeywords?: string[];  // SEO
 }
+
+export class UpdateProductCategoryDto extends PartialType(ProductCategoryDto) { }

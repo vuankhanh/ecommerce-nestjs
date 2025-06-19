@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { IProduct, IProductReview } from '../interface/product.interface';
-import { Album } from 'src/module/album/schema/album.schema';
+
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
-import { ProductCategory } from './product-category.schema';
+import { Product_Category } from './product-category.schema';
+import { Album } from 'src/module/admin/album/schema/album.schema';
 
 export type ProductDocument = HydratedDocument<Product>;
 
@@ -22,7 +23,7 @@ export class Product implements IProduct {
   })
   code: string;
 
-  @Prop({ type: Types.ObjectId, ref: ProductCategory.name })
+  @Prop({ type: Types.ObjectId, ref: Product_Category.name })
   productCategoryId?: Types.ObjectId | string;
 
   @Prop({ required: true })

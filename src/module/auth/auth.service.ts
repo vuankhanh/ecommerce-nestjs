@@ -5,13 +5,17 @@ import mongoose from 'mongoose';
 import { RefreshTokenService } from 'src/shared/service/refresh_token.service';
 import { AccountService } from 'src/shared/service/account.service';
 import { CustomUnauthorizedException } from 'src/shared/core/exception/custom-exception';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
+  private readonly jwtAccessToken = this.configService.get('jwt.accessToken');
+  private readonly jwtRefreshToken = this.configService.get('jwt.refreshToken');
   constructor(
+    private configService: ConfigService,
     private jwtService: JwtService,
     private refreshTokenService: RefreshTokenService,
-    private accountService: AccountService
+    private accountService: AccountService,
   ) { }
 
   createAccessToken(account: AccountDocument): string {
@@ -19,8 +23,8 @@ export class AuthService {
     const payload = { email, name, avatar, role };
 
     const token = this.jwtService.sign(payload, {
-      secret: process.env.ACCESS_TOKEN_SECRET,
-      expiresIn: process.env.ACCESS_TOKEN_LIFE
+      secret: this.jwtAccessToken.secret,
+      expiresIn: this.jwtAccessToken.expiresIn
     });
 
     return token;
@@ -31,11 +35,11 @@ export class AuthService {
     const payload = { email, name, avatar, role };
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: process.env.REFRESH_TOKEN_SECRET,
-      expiresIn: process.env.REFRESH_TOKEN_LIFE
+      secret: this.jwtRefreshToken.secret,
+      expiresIn: this.jwtRefreshToken.expiresIn
     });
 
-    const refreshTokenLife: number = parseInt(process.env.REFRESH_TOKEN_LIFE);
+    const refreshTokenLife: number = parseInt(this.jwtRefreshToken.expiresIn);
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + refreshTokenLife);
 
@@ -49,7 +53,7 @@ export class AuthService {
   verifyToken(token: string) {
     try {
       const decoded = this.jwtService.verify(token, {
-        secret: process.env.ACCESS_TOKEN_SECRET
+        secret: this.jwtAccessToken.secret
       });
       return decoded;
     } catch (error) {
@@ -69,7 +73,7 @@ export class AuthService {
         throw new CustomUnauthorizedException('Invalid refresh token');
       }
       await this.jwtService.verifyAsync(refreshToken, {
-        secret: process.env.REFRESH_TOKEN_SECRET
+        secret: this.jwtRefreshToken.secret,
       });
 
       return this.createAccessToken(account);

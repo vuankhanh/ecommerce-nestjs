@@ -16,10 +16,12 @@ import { AlbumModifyItemIndexChangeDto, AlbumModifyRemoveFilesDto } from './dto/
 import { FilesProcessPipe } from 'src/shared/core/pipes/file_process.pipe';
 import { IAlbum, IMedia } from 'src/shared/interface/media.interface';
 import { memoryStorageMulterOptions } from 'src/constant/file.constanst';
+import { Roles } from 'src/shared/core/decorator/roles.decorator';
 
-@Controller('album')
+@Controller()
 @UseInterceptors(FormatResponseInterceptor)
 @UseGuards(LocalAuthGuard)
+@Roles('admin')
 @UsePipes(ValidationPipe)
 export class AlbumController {
   constructor(

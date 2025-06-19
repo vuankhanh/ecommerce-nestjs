@@ -4,24 +4,24 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { IPaging } from 'src/shared/interface/paging.interface';
-import { ProductCategory, ProductCategoryDocument } from 'src/shared/schema/product-category.schema';
+import { Product_Category, ProductCategoryDocument } from 'src/shared/schema/product-category.schema';
 
-export class ProductCategoryService implements IBasicService<ProductCategory> {
+export class ProductCategoryService implements IBasicService<Product_Category> {
   constructor(
-    @InjectModel(ProductCategory.name) private readonly productCategoryModel: Model<ProductCategory>,
+    @InjectModel(Product_Category.name) private readonly productCategoryModel: Model<Product_Category>,
   ) {}
 
-  async create(data: ProductCategory): Promise<ProductCategoryDocument> {
+  async create(data: Product_Category): Promise<ProductCategoryDocument> {
     const productCategory = new this.productCategoryModel(data);
     await productCategory.save();
     return productCategory;
   }
 
   async getAll(
-    filterQuery: FilterQuery<ProductCategory>,
+    filterQuery: FilterQuery<Product_Category>,
     page: number,
     size: number
-  ): Promise<{ data: FlattenMaps<ProductCategory>[]; paging: IPaging }> {
+  ): Promise<{ data: FlattenMaps<Product_Category>[]; paging: IPaging }> {
     const countTotal = await this.productCategoryModel.countDocuments(filterQuery);
     const skip = (page - 1) * size;
     const data = await this.productCategoryModel.find(filterQuery).skip(skip).limit(size).lean();
@@ -36,27 +36,27 @@ export class ProductCategoryService implements IBasicService<ProductCategory> {
   }
 
   async getDetail(
-    filterQuery: FilterQuery<ProductCategory>
+    filterQuery: FilterQuery<Product_Category>
   ): Promise<ProductCategoryDocument> {
     return await this.productCategoryModel.findOne(filterQuery);;
   }
 
   async replace(
-    filterQuery: FilterQuery<ProductCategory>,
-    data: ProductCategory
+    filterQuery: FilterQuery<Product_Category>,
+    data: Product_Category
   ): Promise<ProductCategoryDocument> {
     return await this.productCategoryModel.findOneAndReplace(filterQuery, data, { new: true });
   }
 
   async modify(
-    filterQuery: FilterQuery<ProductCategory>,
-    data: Partial<ProductCategory>
+    filterQuery: FilterQuery<Product_Category>,
+    data: Partial<Product_Category>
   ): Promise<ProductCategoryDocument> {
     return await this.productCategoryModel.findOneAndUpdate(filterQuery, data, { new: true });
   }
 
   async remove(
-    filterQuery: FilterQuery<ProductCategory>
+    filterQuery: FilterQuery<Product_Category>
   ): Promise<ProductCategoryDocument> {
     return await this.productCategoryModel.findOneAndDelete(filterQuery);
   }

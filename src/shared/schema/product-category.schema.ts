@@ -5,10 +5,10 @@ import { ObjectId } from 'mongodb';
 
 import { VietnameseAccentUtil } from "../util/vietnamese-accent.util";
 
-export type ProductCategoryDocument = HydratedDocument<ProductCategory>;
+export type ProductCategoryDocument = HydratedDocument<Product_Category>;
 
 @Schema({ timestamps: true })
-export class ProductCategory implements IProductCategory {
+export class Product_Category implements IProductCategory {
   @Prop({
     type: String,
     required: true,
@@ -27,7 +27,7 @@ export class ProductCategory implements IProductCategory {
   @Prop({ type: String, required: false })
   description?: string;
 
-  @Prop({ type: Types.ObjectId, ref: ProductCategory.name, required: false })
+  @Prop({ type: Types.ObjectId, ref: Product_Category.name, required: false })
   parentId?: string | Types.ObjectId;
 
   @Prop({ type: String, required: false })
@@ -49,7 +49,9 @@ export class ProductCategory implements IProductCategory {
   }
 
   private generateSlug(): string {
-    return VietnameseAccentUtil.toNonAccentVietnamese(this.name);
+    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(this.name);
+    const slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
+    return slug;
   }
 
   set updateParentId(parentId: string) {
@@ -57,4 +59,4 @@ export class ProductCategory implements IProductCategory {
   }
 }
 
-export const productCategorySchema = SchemaFactory.createForClass(ProductCategory);
+export const productCategorySchema = SchemaFactory.createForClass(Product_Category);

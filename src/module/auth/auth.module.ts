@@ -8,7 +8,6 @@ import { LocalAuthGuard } from '../../shared/core/guards/auth.guard';
 import { RefreshToken, refreshTokenSchema } from './schemas/refresh_token.schema';
 import { AccountService } from 'src/shared/service/account.service';
 import { RefreshTokenService } from 'src/shared/service/refresh_token.service';
-import { ConfigModule } from '@nestjs/config';
 import { FirebaseAuthGuard } from 'src/shared/core/guards/firebase-auth.guard';
 @Module({
   imports: [
@@ -26,8 +25,7 @@ import { FirebaseAuthGuard } from 'src/shared/core/guards/firebase-auth.guard';
         schema: refreshTokenSchema,
         collection: RefreshToken.name.toLowerCase()
       }
-    ]),
-    ConfigModule
+    ])
   ],
   controllers: [AuthController],
   providers: [

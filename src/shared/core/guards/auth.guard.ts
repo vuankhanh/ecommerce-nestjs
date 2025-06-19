@@ -10,11 +10,14 @@ import { ITokenPayload } from '../../interface/token_payload.interface';
 import { CustomForbiddenException, CustomUnauthorizedException } from '../exception/custom-exception';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorator/roles.decorator';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class LocalAuthGuard implements CanActivate {
-  logger: Logger = new Logger(LocalAuthGuard.name);
+  private readonly jwtAccessToken = this.configService.get('jwt.accessToken');
+  private readonly logger: Logger = new Logger(LocalAuthGuard.name);
   constructor(
+    private readonly configService: ConfigService,
     private jwtService: JwtService,
     private reflector: Reflector
   ) { }
@@ -27,7 +30,7 @@ export class LocalAuthGuard implements CanActivate {
     }
     try {
       const payload: ITokenPayload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.ACCESS_TOKEN_SECRET,
+        secret: this.jwtAccessToken.secret,
       });
       // Lấy roles yêu cầu từ decorator
       const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [

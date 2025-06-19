@@ -67,7 +67,18 @@ export default () => {
     }
   }
 
+  const jwt = {
+    accessToken: {
+      secret: process.env.ACCESS_TOKEN_SECRET,
+      expiresIn: process.env.ACCESS_TOKEN_LIFE
+    },
+    refreshToken: {
+      secret: process.env.REFRESH_TOKEN_SECRET,
+      expiresIn: process.env.REFRESH_TOKEN_LIFE
+    }
+  }
+
   const config = process.env.NODE_ENV?.trim() === 'pro' ? pro : dev;
 
-  return { ...config, folder, vnPublicApi, authenticationProvider };
+  return { ...config, folder, vnPublicApi, authenticationProvider, jwt };
 }

@@ -1,5 +1,5 @@
 import { Transform, Type } from "class-transformer";
-import { IsArray, IsMongoId, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsMongoId, IsNumber, IsOptional, IsString } from "class-validator";
 import mongoose from "mongoose";
 
 export class AlbumModifyDto {
