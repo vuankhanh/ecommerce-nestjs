@@ -40,7 +40,7 @@ import { AdminModule } from './module/admin/admin.module';
     SupplierProductModule,
     VnPublicApisModule,
     PurchaseOrderModule,
-    ServerConfigModule,
+    ServerConfigModule
   ],
   providers: [
     {
