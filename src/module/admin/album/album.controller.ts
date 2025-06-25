@@ -2,7 +2,6 @@ import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, P
 import { AlbumService } from './album.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ValidateCreateAlbumGuard } from './guards/validate_create_album.guard';
-import { AlbumDto } from './dto/album.dto';
 import { FilesProccedInterceptor } from 'src/shared/core/interceptors/files_procced.interceptor';
 import { Album } from './schema/album.schema';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
@@ -17,6 +16,7 @@ import { FilesProcessPipe } from 'src/shared/core/pipes/file_process.pipe';
 import { IAlbum, IMedia } from 'src/shared/interface/media.interface';
 import { memoryStorageMulterOptions } from 'src/constant/file.constanst';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
+import { PurposeOfMedia } from 'src/constant/media.constant';
 
 @Controller()
 @UseInterceptors(FormatResponseInterceptor)
@@ -63,7 +63,7 @@ export class AlbumController {
     @Req() req: Request,
     @Query('name') name: string,
     @Query('route') route: string,
-    @Body() body: AlbumDto,
+    @Body('description') description: string,
     @UploadedFiles(ChangeUploadfilesNamePipe, FilesProcessPipe, DiskStoragePipe) medias: Array<IMedia>
   ) {
     const relativePath = req['customParams'].relativePath + '/' + route;
@@ -71,8 +71,11 @@ export class AlbumController {
     const album: IAlbum = {
       name,
       route,
+      purposeOfMedia: PurposeOfMedia.BANNER,
       media: medias,
-      relativePath
+      relativePath,
+      thumbnailUrl: medias[0]?.thumbnailUrl || '',
+      mainMedia: 0
     }
     const albumDoc: Album = new Album(album);
     const createdAlbum = await this.albumService.create(albumDoc);

@@ -15,17 +15,22 @@ export class DiskStoragePipe implements PipeTransform {
   transform(
     processedMedia: TProcessedMedia | TProcessedMedia[]
   ): IMedia | Array<IMedia> {
-    return Array.isArray(processedMedia) ? processedMedia.map(media => this.saveToDisk(media)) : this.saveToDisk(processedMedia);
+    const body = this.request.body;
+    if(Array.isArray(processedMedia)){
+      const arryObject = Object.keys(body)
+      return processedMedia.map((media, index) => this.saveToDisk(media, arryObject[index]));
+    }else{
+      return this.saveToDisk(processedMedia, body.file_0);
+    }
   }
 
-  private saveToDisk(processedMedia: TProcessedMedia): IMedia {
-    const customParams = this.request['customParams'];
-    const destination = customParams.albumFolder;
-
-    const query = this.request.query;
-    const route = query.route as string;
+  private saveToDisk(processedMedia: TProcessedMedia, fileInfo: any): IMedia {
+    console.log(this.request.body);
     
-    const relativePath = customParams.relativePath + '/' + route;
+    const customParams = this.request['customParams'];
+    const destination = customParams.uploadsFolder;
+    
+    const relativePath = customParams.relativePath;
 
     const absolutePath = destination + '/' + relativePath;
 
@@ -40,8 +45,8 @@ export class DiskStoragePipe implements PipeTransform {
       url: relativePath + '/' + file.originalname,
       thumbnailUrl: relativePath + '/' + thumbnail.originalname,
       name: file.originalname,
-      description: '',
-      alternateName: '',
+      description: fileInfo.description || '',
+      alternateName: fileInfo.alternateName || '',
       type: file.mimetype.includes('image') ? 'image' : 'video',
     }
 

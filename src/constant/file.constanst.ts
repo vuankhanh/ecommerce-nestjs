@@ -7,7 +7,7 @@ import { CustomBadRequestException } from "src/shared/core/exception/custom-exce
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb) => {
   const urlCustomerUpload = '/customer/upload-csv';
-  const matchMediaFile = ['image/png', 'image/jpeg', 'video/mp4', 'video/quicktime', 'video/webm'];
+  const matchMediaFile = ['image/png', 'image/jpeg', 'image/webp', 'video/mp4', 'video/quicktime', 'video/webm'];
   const matchContactFile = ['text/csv'];
 
   const match = req.url.includes(urlCustomerUpload) ? matchContactFile : matchMediaFile

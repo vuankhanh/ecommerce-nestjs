@@ -1,42 +1,36 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { AlbumService } from '../album.service';
 import { ConfigService } from '@nestjs/config';
-import { ObjectId } from 'mongodb';
 import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
+import { MediaLogoService } from '../media-logo.service';
+import { PurposeOfMedia } from 'src/constant/media.constant';
 @Injectable()
-export class ValidateModifyAlbumGuard implements CanActivate {
+export class ValidateModifyLogoAlbumGuard implements CanActivate {
   constructor(
+    private readonly mediaLogoService: MediaLogoService,
     private readonly configService: ConfigService,
-    private readonly albumService: AlbumService
   ) { }
   async canActivate(
     context: ExecutionContext,
   ): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    const query = request.query;
-    const id = query.id;
-    if(!id) {
-      return false;
-    }
+    const album = await this.mediaLogoService.getDetail();
 
-    const filterQuery = { _id: ObjectId.createFromHexString(id) };
-    const album = await this.albumService.getDetail(filterQuery);
-    
     if (!album) {
-      throw new CustomBadRequestException('Không tìm thấy Album này');
+      throw new CustomBadRequestException('Không tìm thấy Logo Album');
     };
 
-    if(!album.relativePath) {
-      throw new CustomInternalServerErrorException('Album relative path not found');
+    if (!album.relativePath) {
+      throw new CustomInternalServerErrorException('Không tìm thấy đường dẫn của Logo Album');
     }
 
     const uploadsFolder = this.configService.get('folder.uploads');
     request['customParams'] = {};
-    
+
     request.customParams.uploadsFolder = uploadsFolder;
-    request.customParams.relativePath = 'product';
-    
+    request.customParams.relativePath = `media/${PurposeOfMedia.LOGO}`;
+    request.customParams.purposeOfMedia = PurposeOfMedia.LOGO;
+
     return true;
   }
 }

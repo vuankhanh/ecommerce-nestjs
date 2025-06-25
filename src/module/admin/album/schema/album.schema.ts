@@ -6,7 +6,7 @@ import { IAlbum } from "src/shared/interface/media.interface";
 export type AlbumDocument = HydratedDocument<Album>;
 
 @Schema({ timestamps: true })
-export class Album implements IAlbum {
+export class Album {
   @Prop({
     type: String,
     required: true,

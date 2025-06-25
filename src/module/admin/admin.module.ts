@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ProductModule } from './product/product.module';
 import { ProductCategoryModule } from './product-category/product-category.module';
 import { RouterModule } from '@nestjs/core';
-import { AlbumModule } from './album/album.module';
 import { MediaModule } from './media/media.module';
 import { MediaLogoModule } from './media/media-logo/media-logo.module';
 import { MediaBannerModule } from './media/media-banner/media-banner.module';
@@ -14,7 +13,6 @@ import { MediaProductCategoryModule } from './media/media-product-category/media
   imports: [
     ProductModule,
     ProductCategoryModule,
-    AlbumModule,
     MediaModule,
     RouterModule.register([
       {
@@ -28,10 +26,6 @@ import { MediaProductCategoryModule } from './media/media-product-category/media
           {
             path: 'product',
             module: ProductModule,
-          },
-          {
-            path: 'album',
-            module: AlbumModule
           },
           {
             path: 'media',

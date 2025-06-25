@@ -1,4 +1,4 @@
-export enum MediaType {
+export enum PurposeOfMedia {
   //Basic Promotional media
   LOGO = 'logo',
   BANNER = 'banner',

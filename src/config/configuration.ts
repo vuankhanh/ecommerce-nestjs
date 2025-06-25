@@ -47,7 +47,7 @@ export default () => {
   };
 
   const folder = {
-    album: join(__dirname, '../..', process.env.ALBUM_FOLDER).replace(/\\/g, "/")
+    uploads: join(process.cwd(), process.env.UPLOAD_FOLDER).replace(/\\/g, "/")
   }
 
   const vnPublicApi: IUrl = {

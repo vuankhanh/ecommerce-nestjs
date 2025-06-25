@@ -15,7 +15,7 @@ export class FileProcessPipe implements PipeTransform {
   async transform(file: Express.Multer.File): Promise<TProcessedMedia> {
     try {
       const customParams = this.request['customParams'];
-      const mediaType = customParams.relativePath;
+      const mediaType = customParams.purposeOfMedia;
       return file.mimetype.includes('image') ? await MediaProcessUtil.processImage(file, mediaType) : await MediaProcessUtil.originalVideo(file);
     } catch (error) {
       throw new CustomInternalServerErrorException(error.message || error);

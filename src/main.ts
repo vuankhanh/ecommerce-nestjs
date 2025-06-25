@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
-  const staticPath = configService.get('folder.album');
+  const staticPath = configService.get('folder.uploads');
 
   app.enableCors();
   app.setGlobalPrefix('api');

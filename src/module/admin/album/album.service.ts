@@ -16,7 +16,7 @@ export class AlbumService implements IBasicService<Album> {
     @InjectModel(Album.name) private albumModel: Model<Album>,
     private configService: ConfigService
   ) {
-    this.albumFoler = this.configService.get('folder.album');
+    this.albumFoler = this.configService.get('folder.uploads');
   }
 
   async checkExistAlbum(filterQuery: FilterQuery<Album>) {

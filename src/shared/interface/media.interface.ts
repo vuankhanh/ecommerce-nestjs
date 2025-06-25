@@ -1,8 +1,13 @@
+import { MediaFormat, PurposeOfMedia } from "src/constant/media.constant";
+
 export interface IAlbum {
   name: string;
   route: string;
+  purposeOfMedia: `${PurposeOfMedia}`;
   media: IMedia[];
   relativePath: string;
+  thumbnailUrl: string;
+  mainMedia: number;
 }
 
 export interface IMedia {
@@ -11,5 +16,5 @@ export interface IMedia {
   name: string;
   description: string;
   alternateName: string;
-  type: 'image' | 'video';
+  type: `${MediaFormat}`;
 }
