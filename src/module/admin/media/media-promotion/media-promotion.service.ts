@@ -1,46 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { Album, AlbumDocument } from '../schema/album.schema';
-import { Document, Types, FilterQuery, FlattenMaps, Model } from 'mongoose';
-import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
+import { Document, FilterQuery, FlattenMaps, Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
-import { IMedia } from 'src/shared/interface/media.interface';
-import { Media } from '../schema/media.schema';
+import { IPaging } from 'src/shared/interface/paging.interface';
 import { PurposeOfMedia } from 'src/constant/media.constant';
 import { FileHelper } from 'src/shared/helper/file.helper';
-
+import { Media } from '../schema/media.schema';
 
 @Injectable()
-export class MediaLogoService implements IBasicService<Album> {
+export class MediaPromotionService implements IBasicService<Album> {
   private albumFoler: string;
-  private readonly filterQuery: FilterQuery<Album> = { purposeOfMedia: PurposeOfMedia.LOGO };
+  private readonly filterQuery: FilterQuery<Album> = { purposeOfMedia: PurposeOfMedia.PROMOTION };
   constructor(
-    @InjectModel(Album.name) private logoAlbumModel: Model<Album>,
+    @InjectModel(Album.name) private promotionAlbumModel: Model<Album>,
     private configService: ConfigService
   ) {
     this.albumFoler = this.configService.get('folder.uploads');
   }
 
-  async checkExistLogoAlbum() {
-    return await this.logoAlbumModel.countDocuments(this.filterQuery);
+  async checkExistPromotionAlbum() {
+    return await this.promotionAlbumModel.countDocuments(this.filterQuery);
   }
 
   async create(data: Album): Promise<AlbumDocument> {
-    const newAlbum = new this.logoAlbumModel(data);
-    return await newAlbum.save();
+    const createdAlbum = new this.promotionAlbumModel(data);
+    return createdAlbum.save();
   }
 
-  getAll(): Promise<{ data: FlattenMaps<AlbumDocument>[]; paging: IPaging; }> {
+  async getAll(): Promise<{ data: FlattenMaps<AlbumDocument>[]; paging: IPaging; }> {
     throw new Error('Method not implemented.');
   }
 
   async getDetail(): Promise<AlbumDocument> {
-    return await this.logoAlbumModel.findOne(this.filterQuery);
+    return this.promotionAlbumModel.findOne(this.filterQuery);
   }
 
   async getMainLogo(): Promise<FlattenMaps<Media>> {
-    return await this.logoAlbumModel.findOne(this.filterQuery)
+    return await this.promotionAlbumModel.findOne(this.filterQuery)
       .select('media thumbnailUrl')
       .populate('media', 'url thumbnailUrl')
       .then(album => {
@@ -52,16 +50,16 @@ export class MediaLogoService implements IBasicService<Album> {
       });
   }
 
-  replace(filterQuery: FilterQuery<Album>, data: Album): Promise<Document<unknown, {}, Album, {}> & Album & { _id: Types.ObjectId; } & { __v: number; }> {
-    throw new Error('Method not implemented.');
+  async replace(data: Album): Promise<AlbumDocument> {
+    return this.promotionAlbumModel.findOneAndReplace(this.filterQuery, data, { new: true }).exec();
   }
 
-  modify(filterQuery: FilterQuery<Album>, data: Partial<Album>): Promise<Document<unknown, {}, Album, {}> & Album & { _id: Types.ObjectId; } & { __v: number; }> {
-    throw new Error('Method not implemented.');
+  async modify(data: Partial<Album>): Promise<AlbumDocument> {
+    return this.promotionAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true }).exec();
   }
 
   async insert(data: Media): Promise<AlbumDocument> {
-    return await this.logoAlbumModel.findOneAndUpdate(
+    return await this.promotionAlbumModel.findOneAndUpdate(
       this.filterQuery,
       {
         $push: {
@@ -80,12 +78,11 @@ export class MediaLogoService implements IBasicService<Album> {
   }
 
   async remove(): Promise<AlbumDocument> {
-    const album = await this.logoAlbumModel.findOne(this.filterQuery)
+    const album = await this.promotionAlbumModel.findOne(this.filterQuery)
     if (album?.relativePath) {
       await FileHelper.removeFolder(this.albumFoler, album.relativePath);
     }
     return album;
   }
-
 
 }

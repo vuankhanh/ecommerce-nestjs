@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, Req, UploadedFiles, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MediaSlideShowService } from './media-slide-show.service';
 import { ValidateCreateSlideShowAlbumGuard } from './guards/validate_create_slide_show_album.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -15,8 +15,7 @@ import { PurposeOfMedia } from 'src/constant/media.constant';
 import { Album } from '../schema/album.schema';
 import { ValidateModifySlideShowAlbumGuard } from './guards/validate_modify_slide_show_album.guard';
 import { ParseObjectIdArrayPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
-import { SlideShowModifyRemoveFilesDto } from './dto/slide_show_modify.dto';
-import { AlbumModifyItemIndexChangeDto } from '../../album/dto/album_modify.dto';
+import { SlideShowModifyItemIndexChangeDto, SlideShowModifyRemoveFilesDto } from './dto/slide_show_modify.dto';
 import { Media } from '../schema/media.schema';
 
 @Controller()
@@ -85,7 +84,7 @@ export class MediaSlideShowController {
 
   @Patch('item-index-change')
   async itemIndexChange(
-    @Body(new ValidationPipe({ transform: true }), new ParseObjectIdArrayPipe('newItemIndexChange')) body: AlbumModifyItemIndexChangeDto,
+    @Body(new ValidationPipe({ transform: true }), new ParseObjectIdArrayPipe('newItemIndexChange')) body: SlideShowModifyItemIndexChangeDto,
   ) {
     const updatedAlbums = await this.mediaSlideShowService.itemIndexChange({}, body.newItemIndexChange);
     return updatedAlbums;
