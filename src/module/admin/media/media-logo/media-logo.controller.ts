@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorageMulterOptions } from 'src/constant/file.constanst';
 import { PurposeOfMedia } from 'src/constant/media.constant';
-import { ChangeUploadfileNamePipe, ChangeUploadfilesNamePipe } from 'src/shared/core/pipes/change-uploadfile-name.pipe';
+import { ChangeUploadfileNamePipe } from 'src/shared/core/pipes/change-uploadfile-name.pipe';
 import { DiskStoragePipe } from 'src/shared/core/pipes/disk-storage.pipe';
-import { FileProcessPipe, FilesProcessPipe } from 'src/shared/core/pipes/file_process.pipe';
+import { FileProcessPipe } from 'src/shared/core/pipes/file_process.pipe';
 import { IAlbum, IMedia } from 'src/shared/interface/media.interface';
 import { Album } from '../schema/album.schema';
 import { MediaLogoService } from './media-logo.service';
@@ -13,6 +13,8 @@ import { ValidateCreateLogoAlbumGuard } from './guards/validate_create_logo_albu
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
+import { Media } from '../schema/media.schema';
+import { ValidateModifyLogoAlbumGuard } from './guards/validate_modify_logo_album.guard';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
@@ -32,11 +34,7 @@ export class MediaLogoController {
 
   @Get('main')
   async getMainLogo() {
-    const logo = await this.mediaLogoService.getMainLogo();
-    if (!logo) {
-      return { message: 'No logo found' };
-    }
-    return logo;
+    return await this.mediaLogoService.getMainLogo();;
   }
 
   @Post()
@@ -50,13 +48,12 @@ export class MediaLogoController {
     @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia
   ) {
     const relativePath = req['customParams'].relativePath ;
-    console.log(`medias: ${media}`);
-    media.description = media.description || '';
+    const newMedia: Media = new Media(media);
     const album: IAlbum = {
       name: 'Logo',
       route: 'logo',
       purposeOfMedia: PurposeOfMedia.LOGO,
-      media: [media],
+      media: [newMedia],
       relativePath,
       thumbnailUrl: media.thumbnailUrl,
       mainMedia: 0
@@ -64,5 +61,19 @@ export class MediaLogoController {
     const albumDoc: Album = new Album(album);
     const createdAlbum = await this.mediaLogoService.create(albumDoc);
     return createdAlbum;
+  }
+
+  @Patch()
+  @UseGuards(ValidateModifyLogoAlbumGuard)
+  @UseInterceptors(
+    FileInterceptor('file', memoryStorageMulterOptions),
+    FileProccedInterceptor
+  )
+  async insert(
+    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia,
+  ) {
+    const newMedia: Media = new Media(media);
+
+    return await this.mediaLogoService.insert(newMedia);
   }
 }

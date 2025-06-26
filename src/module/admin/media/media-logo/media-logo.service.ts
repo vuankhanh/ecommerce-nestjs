@@ -58,8 +58,31 @@ export class MediaLogoService implements IBasicService<Album> {
   modify(filterQuery: FilterQuery<Album>, data: Partial<Album>): Promise<Document<unknown, {}, Album, {}> & Album & { _id: Types.ObjectId; } & { __v: number; }> {
     throw new Error('Method not implemented.');
   }
-  
-  remove(filterQuery: FilterQuery<Album>): Promise<Document<unknown, {}, Album, {}> & Album & { _id: Types.ObjectId; } & { __v: number; }> {
+
+  insert(data: Media): Promise<AlbumDocument> {
+    //insert vào một album đã tồn tại
+    const filterQuery: FilterQuery<Album> = { purposeOfMedia: 'logo' };
+    //Thêm vào đầu mảng media
+
+    return this.logoAlbumModel.findOneAndUpdate(
+      filterQuery,
+      {
+        $push: {
+          media: {
+            $each: [data],
+            $position: 0
+          }
+        },
+        $set: {
+          mainMedia: 0,
+          thumbnailUrl: data.thumbnailUrl
+        }
+      },
+      { new: true, upsert: true }
+    );
+  }
+
+  remove(filterQuery: FilterQuery<Album>): Promise<AlbumDocument> {
     throw new Error('Method not implemented.');
   }
 

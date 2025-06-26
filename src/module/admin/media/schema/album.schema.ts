@@ -74,7 +74,7 @@ albumSchema.index(
       purposeOfMedia: { 
         $in: [
           PurposeOfMedia.LOGO, 
-          PurposeOfMedia.BANNER, 
+          PurposeOfMedia.SLIDE_SHOW, 
           PurposeOfMedia.PROMOTION
         ] 
       } 

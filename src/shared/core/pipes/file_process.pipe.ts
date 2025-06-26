@@ -31,7 +31,7 @@ export class FilesProcessPipe implements PipeTransform {
   async transform(files: Express.Multer.File[]): Promise<Array<TProcessedMedia>> {
     try {
       const customParams = this.request['customParams'];
-      const mediaType = customParams.relativePath;
+      const mediaType = customParams.purposeOfMedia;
       return await Promise.all(
         files.map(async file=>{
           return file.mimetype.includes('image') ? await MediaProcessUtil.processImage(file, mediaType) : await MediaProcessUtil.originalVideo(file);

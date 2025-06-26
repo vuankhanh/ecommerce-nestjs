@@ -4,7 +4,7 @@ import { ProductCategoryModule } from './product-category/product-category.modul
 import { RouterModule } from '@nestjs/core';
 import { MediaModule } from './media/media.module';
 import { MediaLogoModule } from './media/media-logo/media-logo.module';
-import { MediaBannerModule } from './media/media-banner/media-banner.module';
+import { MediaSlideShowModule } from './media/media-slide-show/media-slide-show.module';
 import { MediaPromotionModule } from './media/media-promotion/media-promotion.module';
 import { MediaProductModule } from './media/media-product/media-product.module';
 import { MediaProductCategoryModule } from './media/media-product-category/media-product-category.module';
@@ -36,8 +36,8 @@ import { MediaProductCategoryModule } from './media/media-product-category/media
                 module: MediaLogoModule,
               },
               {
-                path: 'banner',
-                module: MediaBannerModule,
+                path: 'slide-show',
+                module: MediaSlideShowModule,
               },
               {
                 path: 'promotion',

@@ -4,10 +4,11 @@ import { VideoConverterUtil } from "./video_converter.util";
 import * as path from 'path';
 import { imageSize, imageTypes } from "src/constant/file.constanst";
 import { TProcessedMedia } from "../interface/files.interface";
+import { PurposeOfMedia } from "src/constant/media.constant";
 
 @Injectable()
 export class MediaProcessUtil {
-  static async processImage(file: Express.Multer.File, mediaType: 'logo' | 'product' = 'product'): Promise<TProcessedMedia> {
+  static async processImage(file: Express.Multer.File, mediaType: `${PurposeOfMedia}`): Promise<TProcessedMedia> {
     const size = imageSize[mediaType];
     const bufferFile = await ImageConverterUtil.resize(file, size);
     const newFile: Express.Multer.File = {

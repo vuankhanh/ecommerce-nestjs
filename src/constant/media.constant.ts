@@ -1,7 +1,7 @@
 export enum PurposeOfMedia {
   //Basic Promotional media
   LOGO = 'logo',
-  BANNER = 'banner',
+  SLIDE_SHOW = 'slide-show',
   PROMOTION = 'promotion',
   
   //Product

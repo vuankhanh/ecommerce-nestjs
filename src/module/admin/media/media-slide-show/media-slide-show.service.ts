@@ -1,0 +1,145 @@
+import { Injectable } from '@nestjs/common';
+import { IBasicService } from 'src/shared/interface/basic_service.interface';
+import { Album, AlbumDocument } from '../schema/album.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import mongoose, { FilterQuery, FlattenMaps, Model, Types } from 'mongoose';
+import { ConfigService } from '@nestjs/config';
+import { Media, MediaDocument } from '../schema/media.schema';
+import { IPaging } from 'src/shared/interface/paging.interface';
+import { PurposeOfMedia } from 'src/constant/media.constant';
+import { IMedia } from 'src/shared/interface/media.interface';
+import { FileHelper } from 'src/shared/helper/file.helper';
+import { SortUtil } from 'src/shared/util/sort_util';
+
+@Injectable()
+export class MediaSlideShowService implements IBasicService<Album> {
+  private albumFoler: string;
+  private readonly filterQuery: FilterQuery<Album> = { purposeOfMedia: PurposeOfMedia.SLIDE_SHOW };
+  constructor(
+    @InjectModel(Album.name) private slideShowAlbumModel: Model<Album>,
+    private configService: ConfigService
+  ) {
+    this.albumFoler = this.configService.get('folder.uploads');
+  }
+
+  async checkExistSlideShowAlbum() {
+    return await this.slideShowAlbumModel.countDocuments(this.filterQuery);
+  }
+
+  async create(data: Album): Promise<AlbumDocument> {
+    data.media = data.media.map(file => {
+      return { ...file, _id: new Types.ObjectId() }
+    });
+    const newAlbum = new this.slideShowAlbumModel(data);
+    return await newAlbum.save();
+  }
+
+  getAll(): Promise<{ data: FlattenMaps<AlbumDocument>[]; paging: IPaging; }> {
+    throw new Error('Method not implemented.');
+  }
+
+  async getDetail(): Promise<AlbumDocument> {
+    return await this.slideShowAlbumModel.findOne(this.filterQuery);
+  }
+
+  async replace(data: Album) {
+    const milestone = await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true });
+    return milestone;
+  }
+
+  async addNewFiles(
+    newFiles: Array<IMedia> = []
+  ) {
+    if (!newFiles.length) {
+      throw new Error('No new files to add');
+    }
+
+    newFiles = newFiles.map(file => {
+      return { ...file, _id: new Types.ObjectId() }
+    })
+    const updateQuery = {
+      $push: {
+        media: { $each: newFiles }
+      }
+    };
+
+    return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, updateQuery, { safe: true, new: true });;
+  }
+
+  async removeFiles(
+    filesWillRemove: Array<mongoose.Types.ObjectId> = [],
+  ) {
+    if (!filesWillRemove.length) {
+      throw new Error('No files to remove');
+    }
+
+    const updateQuery = {
+      $pull: {
+        media: { _id: { $in: filesWillRemove } }
+      }
+    }
+
+    //Lọc ra danh sách file cục bộ cần xóa
+    await this.filterMediaItems(filesWillRemove).then(async mediaUrls => {
+      //Xóa file
+      await FileHelper.removeMediaFiles(this.albumFoler, mediaUrls);
+    });
+
+    return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, updateQuery, { safe: true, new: true });;
+  }
+
+  async itemIndexChange(filterQuery: FilterQuery<Album>, itemIndexChanges: Array<string | mongoose.Types.ObjectId>) {
+    const album = await this.slideShowAlbumModel.findOne(filterQuery);
+    if (!album) {
+      throw new Error('Album not found');
+    }
+
+    album.media = SortUtil.sortDocumentArrayByIndex<Media>(album.media as Array<MediaDocument>, itemIndexChanges);
+
+    return await album.save();;
+  }
+
+  async modify(data: Partial<Album>) {
+    
+    return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true });;
+  }
+
+  async remove() {
+    const album = await this.slideShowAlbumModel.findOneAndDelete(this.filterQuery);
+    if (album?.relativePath) {
+      await FileHelper.removeFolder(this.albumFoler, album.relativePath);
+    }
+
+    return album;
+  }
+
+  async filterMediaItems(itemIds: Array<mongoose.Types.ObjectId | string>): Promise<Array<{ url: string, thumbnailUrl: string }>> {
+      return this.slideShowAlbumModel.aggregate([
+        { $match: this.filterQuery },
+        {
+          $project: {
+            media: {
+              $filter: {
+                input: '$media',
+                as: 'item',
+                cond: { $in: ['$$item._id', itemIds.map(id => new Types.ObjectId(id))] }
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            media: {
+              $map: {
+                input: '$media',
+                as: 'item',
+                in: { url: '$$item.url', thumbnailUrl: '$$item.thumbnailUrl' }
+              }
+            }
+          }
+        }
+      ]).then(res => {
+        return res[0] ? res[0].media : [];
+      });
+    }
+}

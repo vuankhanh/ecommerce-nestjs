@@ -71,7 +71,7 @@ export class AlbumController {
     const album: IAlbum = {
       name,
       route,
-      purposeOfMedia: PurposeOfMedia.BANNER,
+      purposeOfMedia: PurposeOfMedia.SLIDE_SHOW,
       media: medias,
       relativePath,
       thumbnailUrl: medias[0]?.thumbnailUrl || '',

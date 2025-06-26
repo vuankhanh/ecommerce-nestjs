@@ -4,6 +4,7 @@ import * as multer from 'multer';
 import { IFileType } from "src/shared/interface/files.interface";
 import { Request } from "express";
 import { CustomBadRequestException } from "src/shared/core/exception/custom-exception";
+import { PurposeOfMedia } from "./media.constant";
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb) => {
   const urlCustomerUpload = '/customer/upload-csv';
@@ -55,13 +56,43 @@ export const videoTypes: { [key in typeof videoEnums[number]]: IFileType } = {
   }
 };
 
-export const imageSize = {
+
+PurposeOfMedia
+
+// Định nghĩa cho tôi kiểu của imageSize có các key là value của enums PurposeOfMedia
+export type TImageSize = {
+  [key in PurposeOfMedia]: {
+    width: number;
+    height: number;
+  }
+}
+export const imageSize: TImageSize = {
   logo: {
     width: 500,
     height: 500
   },
+  'slide-show': {
+    width: 1920,
+    height: 1080
+  },
+  promotion: {
+    width: 1920,
+    height: 1080
+  },
   product: {
     width: 1920,
     height: 1080
+  },
+  'product-category': {
+    width: 500,
+    height: 500
+  },
+  post: {
+    width: 1920,
+    height: 1080
+  },
+  'post-category': {
+    width: 500,
+    height: 500
   }
 }
