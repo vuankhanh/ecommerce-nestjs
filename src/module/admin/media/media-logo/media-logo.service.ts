@@ -86,6 +86,4 @@ export class MediaLogoService implements IBasicService<Album> {
     }
     return album;
   }
-
-
 }
