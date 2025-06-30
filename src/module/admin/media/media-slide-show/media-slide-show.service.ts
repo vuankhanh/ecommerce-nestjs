@@ -27,9 +27,6 @@ export class MediaSlideShowService implements IBasicService<Album> {
   }
 
   async create(data: Album): Promise<AlbumDocument> {
-    data.media = data.media.map(file => {
-      return { ...file, _id: new Types.ObjectId() }
-    });
     const newAlbum = new this.slideShowAlbumModel(data);
     return await newAlbum.save();
   }
@@ -54,9 +51,6 @@ export class MediaSlideShowService implements IBasicService<Album> {
       throw new Error('No new files to add');
     }
 
-    newFiles = newFiles.map(file => {
-      return { ...file, _id: new Types.ObjectId() }
-    })
     const updateQuery = {
       $push: {
         media: { $each: newFiles }
@@ -100,7 +94,7 @@ export class MediaSlideShowService implements IBasicService<Album> {
   }
 
   async modify(data: Partial<Album>) {
-    
+
     return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true });;
   }
 
@@ -114,32 +108,32 @@ export class MediaSlideShowService implements IBasicService<Album> {
   }
 
   async filterMediaItems(itemIds: Array<mongoose.Types.ObjectId | string>): Promise<Array<{ url: string, thumbnailUrl: string }>> {
-      return this.slideShowAlbumModel.aggregate([
-        { $match: this.filterQuery },
-        {
-          $project: {
-            media: {
-              $filter: {
-                input: '$media',
-                as: 'item',
-                cond: { $in: ['$$item._id', itemIds.map(id => new Types.ObjectId(id))] }
-              }
-            }
-          }
-        },
-        {
-          $project: {
-            media: {
-              $map: {
-                input: '$media',
-                as: 'item',
-                in: { url: '$$item.url', thumbnailUrl: '$$item.thumbnailUrl' }
-              }
+    return this.slideShowAlbumModel.aggregate([
+      { $match: this.filterQuery },
+      {
+        $project: {
+          media: {
+            $filter: {
+              input: '$media',
+              as: 'item',
+              cond: { $in: ['$$item._id', itemIds.map(id => new Types.ObjectId(id))] }
             }
           }
         }
-      ]).then(res => {
-        return res[0] ? res[0].media : [];
-      });
-    }
+      },
+      {
+        $project: {
+          media: {
+            $map: {
+              input: '$media',
+              as: 'item',
+              in: { url: '$$item.url', thumbnailUrl: '$$item.thumbnailUrl' }
+            }
+          }
+        }
+      }
+    ]).then(res => {
+      return res[0] ? res[0].media : [];
+    });
+  }
 }

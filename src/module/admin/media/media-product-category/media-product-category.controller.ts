@@ -1,4 +1,5 @@
-import { Controller, DefaultValuePipe, Get, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Request } from 'express';
 import { MediaProductCategoryService } from './media-product-category.service';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
@@ -17,6 +18,8 @@ import { PurposeOfMedia } from 'src/constant/media.constant';
 import { VietnameseAccentUtil } from 'src/shared/util/vietnamese-accent.util';
 import { Album } from '../schema/album.schema';
 import { ValidateModifyProductCategoryAlbumGuard } from './guards/validate_modify_product_category_album.guard';
+import { ParseObjectIdArrayPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
+import { ProductCategoryModifyItemIndexChangeDto, ProductCategoryModifyRemoveFilesDto } from './dto/product_category_modify.dto';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
@@ -76,10 +79,14 @@ export class MediaProductCategoryController {
     @Query('name') name: string,
     @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia
   ) {
-    const relativePath = req['customParams'].relativePath;
-    const noneAccentName = VietnameseAccentUtil.toNonAccentVietnamese(name);
-    const route = VietnameseAccentUtil.replaceSpaceToDash(noneAccentName);
+    console.log(req.query);
+    const customParams = req['customParams'];
+    const relativePath = customParams.relativePath;
+    const route = customParams.route;
     const newMedia: Media = new Media(media);
+
+    console.log(`name: ${name}`);
+    console.log(`route: ${route}`);
 
     const album: IAlbum = {
       name,
@@ -95,13 +102,13 @@ export class MediaProductCategoryController {
     return createdAlbum;
   }
 
-  @Patch()
+  @Patch('add-new-files')
   @UseGuards(ValidateModifyProductCategoryAlbumGuard)
   @UseInterceptors(
     FileInterceptor('file', memoryStorageMulterOptions),
     FileProccedInterceptor
   )
-  async insert(
+  async addNewFiles(
     @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia,
     @Query('id', new ParseObjectIdPipe()) id?: string,
     @Query('route') route?: string,
@@ -111,7 +118,51 @@ export class MediaProductCategoryController {
     else if (route) filterQuery['route'] = route;
 
     const newMedia: Media = new Media(media);
+    const updatedAlbums = await this.mediaProductCategoryService.addNewFiles(filterQuery, newMedia);
+    return updatedAlbums;
+  }
 
-    return await this.mediaProductCategoryService.insert(filterQuery, newMedia);
+  @Patch('remove-files')
+  async removeFiles(
+    @Body(new ValidationPipe({ transform: true }), new ParseObjectIdArrayPipe('filesWillRemove')) body: ProductCategoryModifyRemoveFilesDto,
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('route') route?: string,
+  ) {
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (route) filterQuery['route'] = route;
+
+    console.log(filterQuery);
+    
+    console.log(body.filesWillRemove);
+    
+    const updatedAlbums = await this.mediaProductCategoryService.removeFiles(filterQuery, body.filesWillRemove);
+    return updatedAlbums;
+  }
+
+  @Patch('item-index-change')
+  async itemIndexChange(
+    @Body(new ValidationPipe({ transform: true }), new ParseObjectIdArrayPipe('newItemIndexChange')) body: ProductCategoryModifyItemIndexChangeDto,
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('route') route?: string,
+  ) {
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (route) filterQuery['route'] = route;
+
+    const updatedAlbums = await this.mediaProductCategoryService.itemIndexChange(filterQuery, body.newItemIndexChange);
+    return updatedAlbums;
+  }
+
+  @Delete()
+  async remove(
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('route') route?: string,
+  ) {
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (route) filterQuery['route'] = route;
+
+    return await this.mediaProductCategoryService.remove(filterQuery);
   }
 }

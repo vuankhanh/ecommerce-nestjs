@@ -24,9 +24,6 @@ export class AlbumService implements IBasicService<Album> {
   }
 
   async create(data: Album) {
-    data.media = data.media.map(file => {
-      return { ...file, _id: new Types.ObjectId() }
-    });
     const newAlbum = new this.albumModel(data);
     await newAlbum.save();
     const filterQuery = { _id: newAlbum._id };
@@ -84,9 +81,6 @@ export class AlbumService implements IBasicService<Album> {
       throw new Error('No new files to add');
     }
 
-    newFiles = newFiles.map(file => {
-      return { ...file, _id: new Types.ObjectId() }
-    })
     const updateQuery = {
       $push: {
         media: { $each: newFiles }

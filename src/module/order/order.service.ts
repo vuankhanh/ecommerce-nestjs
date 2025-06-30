@@ -18,9 +18,6 @@ export class OrderService implements IBasicService<Order> {
   ) { }
 
   async create(data: Order): Promise<OrderDocument> {
-    data.orderItems = data.orderItems.map(item => {
-      return { ...item, _id: new Types.ObjectId() }
-    });
     const order = new this.orderModel(data);
     await order.save();
     return order;
