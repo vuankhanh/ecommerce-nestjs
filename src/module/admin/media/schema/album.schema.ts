@@ -20,7 +20,7 @@ export class Album implements IAlbum {
     required: true,
     unique: true
   })
-  route: string;
+  slug: string;
 
   @Prop({
     type: String,
@@ -54,7 +54,7 @@ export class Album implements IAlbum {
 
   constructor(album: IAlbum) {
     this.name = album.name;
-    this.route = album.route;
+    this.slug = album.slug;
     this.purposeOfMedia = album.purposeOfMedia;
     this.media = album.media;
     this.relativePath = album.relativePath;

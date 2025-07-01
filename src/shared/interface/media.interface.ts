@@ -2,7 +2,7 @@ import { MediaFormat, PurposeOfMedia } from "src/constant/media.constant";
 
 export interface IAlbum {
   name: string;
-  route: string;
+  slug: string;
   purposeOfMedia: `${PurposeOfMedia}`;
   media: IMedia[];
   relativePath: string;

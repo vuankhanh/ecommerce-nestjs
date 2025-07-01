@@ -10,7 +10,7 @@ import { CsvUtil } from 'src/shared/util/csv.util';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { PhoneNumberInputPipe } from 'src/shared/core/pipes/string.pipe';
 
-//1. Guards: Được sử dụng để bảo vệ các route.
+//1. Guards: Được sử dụng để bảo vệ các slug.
 //2.Interceptors: Được sử dụng để thay đổi hoặc mở rộng hành vi của các method.
 //3. Pipes: Được sử dụng để biến đổi hoặc xác thực dữ liệu.
 @Controller('customer')

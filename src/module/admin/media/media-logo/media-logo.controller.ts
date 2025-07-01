@@ -51,7 +51,7 @@ export class MediaLogoController {
     const newMedia: Media = new Media(media);
     const album: IAlbum = {
       name: 'Logo',
-      route: 'logo',
+      slug: 'logo',
       purposeOfMedia: PurposeOfMedia.LOGO,
       media: [newMedia],
       relativePath,

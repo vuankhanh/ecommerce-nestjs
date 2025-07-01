@@ -1,39 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { IBasicService } from 'src/shared/interface/basic_service.interface';
-import { Album, AlbumDocument } from '../schema/album.schema';
-import mongoose, { Document, FilterQuery, FlattenMaps, Model, Types } from 'mongoose';
-import { PurposeOfMedia } from 'src/constant/media.constant';
 import { InjectModel } from '@nestjs/mongoose';
+import { Album, AlbumDocument } from '../schema/album.schema';
+import mongoose, { FilterQuery, FlattenMaps, Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
-import { IPaging } from 'src/shared/interface/paging.interface';
-import { FileHelper } from 'src/shared/helper/file.helper';
+import { PurposeOfMedia } from 'src/constant/media.constant';
 import { Media, MediaDocument } from '../schema/media.schema';
+import { FileHelper } from 'src/shared/helper/file.helper';
 import { SortUtil } from 'src/shared/util/sort_util';
 
 @Injectable()
-export class MediaProductCategoryService implements IBasicService<Album> {
+export class MediaProductService {
   private albumFoler: string;
   constructor(
-    @InjectModel(Album.name) private productCategoryAlbumModel: Model<Album>,
+    @InjectModel(Album.name) private productAlbumModel: Model<Album>,
     private configService: ConfigService
   ) {
     this.albumFoler = this.configService.get('folder.uploads');
   }
 
-  async checkExistProductCategoryAlbum(filterQuery: FilterQuery<Album>): Promise<number> {
-    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
-    return await this.productCategoryAlbumModel.countDocuments(filterQuery);
+  async checkExistProductAlbum(filterQuery: FilterQuery<Album>): Promise<number> {
+    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
+    return await this.productAlbumModel.countDocuments(filterQuery);
   }
 
   async create(data: Album): Promise<AlbumDocument> {
-    const newAlbum = new this.productCategoryAlbumModel(data);
+    const newAlbum = new this.productAlbumModel(data);
     return await newAlbum.save();
   }
 
   async getAll(filterQuery: FilterQuery<Album>, page: number, size: number) {
-    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
-    const countTotal = await this.productCategoryAlbumModel.countDocuments(filterQuery);
-    const albumsAggregate = await this.productCategoryAlbumModel.aggregate(
+    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
+    const countTotal = await this.productAlbumModel.countDocuments(filterQuery);
+    const albumsAggregate = await this.productAlbumModel.aggregate(
       [
         { $match: filterQuery },
         {
@@ -59,13 +57,13 @@ export class MediaProductCategoryService implements IBasicService<Album> {
   }
 
   async getDetail(filterQuery: FilterQuery<Album>): Promise<AlbumDocument> {
-    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
-    return await this.productCategoryAlbumModel.findOne(filterQuery);
+    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
+    return await this.productAlbumModel.findOne(filterQuery);
   }
 
-  async getMainProductCategory(filterQuery: FilterQuery<Album>): Promise<FlattenMaps<Media>> {
-    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
-    return await this.productCategoryAlbumModel.findOne(filterQuery)
+  async getMainProduct(filterQuery: FilterQuery<Album>): Promise<FlattenMaps<Media>> {
+    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
+    return await this.productAlbumModel.findOne(filterQuery)
       .select('media thumbnailUrl')
       .populate('media', 'url thumbnailUrl')
       .then(album => {
@@ -78,13 +76,13 @@ export class MediaProductCategoryService implements IBasicService<Album> {
   }
 
   replace(filterQuery: FilterQuery<Album>, data: Album): Promise<AlbumDocument> {
-    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
+    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
     throw new Error('Method not implemented.');
   }
 
-  async addNewFiles(filterQuery: FilterQuery<Album>, data: Media): Promise<AlbumDocument> {
-    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
-    return await this.productCategoryAlbumModel.findOneAndUpdate(
+  async addNewFiles(filterQuery: FilterQuery<Album>, data: Media[]): Promise<AlbumDocument> {
+    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
+    return await this.productAlbumModel.findOneAndUpdate(
       filterQuery,
       {
         $push: {
@@ -95,7 +93,7 @@ export class MediaProductCategoryService implements IBasicService<Album> {
         },
         $set: {
           mainMedia: 0,
-          thumbnailUrl: data.thumbnailUrl
+          thumbnailUrl: data[0].thumbnailUrl
         }
       },
       { new: true, upsert: true }
@@ -110,7 +108,7 @@ export class MediaProductCategoryService implements IBasicService<Album> {
       throw new Error('No files to remove');
     }
 
-    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
+    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
 
     const updateQuery = {
       $pull: {
@@ -124,11 +122,11 @@ export class MediaProductCategoryService implements IBasicService<Album> {
       await FileHelper.removeMediaFiles(this.albumFoler, mediaUrls);
     });
 
-    return await this.productCategoryAlbumModel.findOneAndUpdate(filterQuery, updateQuery, { safe: true, new: true });;
+    return await this.productAlbumModel.findOneAndUpdate(filterQuery, updateQuery, { safe: true, new: true });;
   }
 
   async itemIndexChange(filterQuery: FilterQuery<Album>, itemIndexChanges: Array<string | mongoose.Types.ObjectId>) {
-    const album = await this.productCategoryAlbumModel.findOne(filterQuery);
+    const album = await this.productAlbumModel.findOne(filterQuery);
     if (!album) {
       throw new Error('Album not found');
     }
@@ -139,13 +137,13 @@ export class MediaProductCategoryService implements IBasicService<Album> {
   }
 
   modify(filterQuery: FilterQuery<Album>, data: Partial<Album>): Promise<AlbumDocument> {
-    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
+    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
     throw new Error('Method not implemented.');
   }
 
   async remove(filterQuery: FilterQuery<Album>): Promise<AlbumDocument> {
-    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
-    const album = await this.productCategoryAlbumModel.findOne(filterQuery)
+    filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
+    const album = await this.productAlbumModel.findOne(filterQuery)
     if (album?.relativePath) {
       await FileHelper.removeFolder(this.albumFoler, album.relativePath);
     }
@@ -153,7 +151,7 @@ export class MediaProductCategoryService implements IBasicService<Album> {
   }
 
   async filterMediaItems(filterQuery: FilterQuery<Album>, itemIds: Array<mongoose.Types.ObjectId | string>): Promise<Array<{ url: string, thumbnailUrl: string }>> {
-    return this.productCategoryAlbumModel.aggregate([
+    return this.productAlbumModel.aggregate([
       { $match: filterQuery },
       {
         $project: {

@@ -51,7 +51,7 @@ export class MediaPromotionController {
     const newMedia: Media = new Media(media);
     const album: IAlbum = {
       name: 'Promotion',
-      route: 'prmotion',
+      slug: 'prmotion',
       purposeOfMedia: PurposeOfMedia.PROMOTION,
       media: [newMedia],
       relativePath,

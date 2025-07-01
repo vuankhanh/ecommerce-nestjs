@@ -49,7 +49,7 @@ export class MediaSlideShowController {
     const mainMedia = 0;
     const album: IAlbum = {
       name: 'Slide Show',
-      route: 'slide-show',
+      slug: 'slide-show',
       purposeOfMedia: PurposeOfMedia.SLIDE_SHOW,
       media: newMedias,
       relativePath,

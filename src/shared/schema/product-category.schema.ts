@@ -30,22 +30,10 @@ export class Product_Category implements IProductCategory {
   @Prop({ type: Types.ObjectId, ref: Product_Category.name, required: false })
   parentId?: string | Types.ObjectId;
 
-  @Prop({ type: String, required: false })
-  metaTitle?: string;
-
-  @Prop({ type: String, required: false })
-  metaDescription?: string;
-
-  @Prop({ type: [String], default: [] })
-  metaKeywords?: string[];
-
   constructor(data: IProductCategory) {
     this.name = data.name;
     this.slug = this.generateSlug();
     this.description = data.description;
-    this.metaTitle = data.metaTitle;
-    this.metaDescription = data.metaDescription;
-    this.metaKeywords = data.metaKeywords;
   }
 
   private generateSlug(): string {

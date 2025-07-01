@@ -15,18 +15,6 @@ export class ProductCategoryDto implements IProductCategory {
   @IsOptional()
   @IsMongoId({ message: 'Id Product Category parent phải là chuỗi ObjectId' })
   parentId?: string; // ID của danh mục cha
-
-  @IsOptional()
-  @IsString({ message: 'Tiêu đề SEO phải là chuỗi' })
-  metaTitle?: string;       // SEO
-
-  @IsOptional()
-  @IsString({ message: 'Mô tả SEO phải là chuỗi' })
-  metaDescription?: string; // SEO
-
-  @IsOptional()
-  @IsString({ each: true, message: 'Từ khóa SEO phải là chuỗi' })
-  metaKeywords?: string[];  // SEO
 }
 
 export class UpdateProductCategoryDto extends PartialType(ProductCategoryDto) { }

@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Product_Category, ProductCategoryDocument } from 'src/shared/schema/product-category.schema';
+import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
 
 export class ProductCategoryService implements IBasicService<Product_Category> {
   constructor(
@@ -12,6 +13,14 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
   ) {}
 
   async create(data: Product_Category): Promise<ProductCategoryDocument> {
+    // Validate circular reference nếu có parentId
+    if (data.parentId) {
+      const isValid = await this.validateParentId(null, data.parentId.toString());
+      if (!isValid) {
+        throw new CustomBadRequestException('Đã phát hiện danh mục cha mẹ hoặc tham chiếu vòng tròn không hợp lệ');
+      }
+    }
+    
     const productCategory = new this.productCategoryModel(data);
     await productCategory.save();
     return productCategory;
@@ -52,6 +61,18 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
     filterQuery: FilterQuery<Product_Category>,
     data: Partial<Product_Category>
   ): Promise<ProductCategoryDocument> {
+    // Validate circular reference nếu có parentId trong data update
+    if (data.parentId) {
+      const currentCategory = await this.productCategoryModel.findOne(filterQuery);
+      if (!currentCategory) {
+        throw new CustomBadRequestException('Danh mục không tồn tại');
+      }
+
+      const isValid = await this.validateParentId(currentCategory._id.toString(), data.parentId.toString());
+      if (!isValid) {
+        throw new CustomBadRequestException('Không thể cập nhật danh mục với parentId không hợp lệ hoặc tham chiếu vòng tròn');
+      }
+    }
     return await this.productCategoryModel.findOneAndUpdate(filterQuery, data, { new: true });
   }
 
@@ -59,6 +80,81 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
     filterQuery: FilterQuery<Product_Category>
   ): Promise<ProductCategoryDocument> {
     return await this.productCategoryModel.findOneAndDelete(filterQuery);
+  }
+
+  // --------------------------------
+
+  // Validation methods
+  private async validateParentId(categoryId: string | null, parentId: string): Promise<boolean> {
+    // Kiểm tra parent category có tồn tại không
+    const parentExists = await this.productCategoryModel.exists({ _id: parentId });
+    if (!parentExists) {
+      return false;
+    }
+
+    // Nếu đang update category (có categoryId)
+    if (categoryId) {
+      // Không thể set parent là chính nó
+      if (categoryId === parentId) {
+        return false;
+      }
+
+      // Kiểm tra circular reference
+      const hasCircular = await this.checkCircularReference(categoryId, parentId);
+      if (hasCircular) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private async checkCircularReference(categoryId: string, parentId: string): Promise<boolean> {
+    const visited = new Set<string>();
+    let currentId = parentId;
+
+    while (currentId) {
+      // Nếu gặp lại category ban đầu -> có vòng lặp
+      if (currentId === categoryId) {
+        return true;
+      }
+
+      // Nếu đã visit -> có vòng lặp
+      if (visited.has(currentId)) {
+        return true;
+      }
+
+      visited.add(currentId);
+
+      // Tìm parent tiếp theo
+      const parent = await this.productCategoryModel.findById(currentId);
+      currentId = parent?.parentId?.toString();
+    }
+
+    return false; // Không có circular reference
+  }
+
+  // Helper method để lấy category tree
+  async getCategoryTree(): Promise<any[]> {
+    const allCategories = await this.productCategoryModel.find({}).lean();
+    return this.buildTree(allCategories, null);
+  }
+
+  private buildTree(categories: any[], parentId: any): any[] {
+    const tree = [];
+    
+    for (const category of categories) {
+      if ((parentId === null && !category.parentId) || 
+          (category.parentId && category.parentId.toString() === parentId?.toString())) {
+        const children = this.buildTree(categories, category._id);
+        tree.push({
+          ...category,
+          children: children.length > 0 ? children : undefined
+        });
+      }
+    }
+    
+    return tree;
   }
 }
 

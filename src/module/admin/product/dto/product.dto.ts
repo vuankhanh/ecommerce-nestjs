@@ -1,5 +1,5 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { IsBoolean, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsMongoId, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { IProduct } from "src/shared/interface/product.interface";
 
 export class ProductDto implements IProduct {
@@ -29,22 +29,6 @@ export class ProductDto implements IProduct {
   @IsNotEmpty({ message: 'Còn hàng được để trống' })
   @IsBoolean({ message: 'Còn hàng phải là số' })
   stock: number;
-
-  @IsOptional()
-  @IsString({ message: 'Từ khóa hoặc nhãn phải là chuỗi' })
-  tags?: string[];
-
-  @IsOptional()
-  @IsString({ message: 'Tiêu đề SEO phải là chuỗi' }) 
-  metaTitle?: string;
-
-  @IsOptional()
-  @IsString({ message: 'Mô tả SEO phải là chuỗi' })
-  metaDescription?: string;
-
-  @IsOptional()
-  @IsString({ each: true, message: 'Từ khóa SEO phải là chuỗi' })
-  metaKeywords?: string[];
 }
 
 export class UpdateProductDto extends PartialType(ProductDto) { }

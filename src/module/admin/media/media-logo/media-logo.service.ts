@@ -52,11 +52,11 @@ export class MediaLogoService implements IBasicService<Album> {
       });
   }
 
-  replace(filterQuery: FilterQuery<Album>, data: Album): Promise<Document<unknown, {}, Album, {}> & Album & { _id: Types.ObjectId; } & { __v: number; }> {
+  replace(filterQuery: FilterQuery<Album>, data: Album): Promise<AlbumDocument> {
     throw new Error('Method not implemented.');
   }
 
-  modify(filterQuery: FilterQuery<Album>, data: Partial<Album>): Promise<Document<unknown, {}, Album, {}> & Album & { _id: Types.ObjectId; } & { __v: number; }> {
+  modify(filterQuery: FilterQuery<Album>, data: Partial<Album>): Promise<AlbumDocument> {
     throw new Error('Method not implemented.');
   }
 

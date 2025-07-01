@@ -2,7 +2,7 @@ import { Transform, Type } from "class-transformer";
 import { IsArray, IsMongoId, IsNumber, IsOptional, IsString } from "class-validator";
 import mongoose from "mongoose";
 
-export class AlbumModifyDto {
+export class ProductModifyDto {
   @IsOptional()
   @IsString()
   name: string;
@@ -17,14 +17,14 @@ export class AlbumModifyDto {
   isMain: number;
 }
 
-export class AlbumModifyRemoveFilesDto {
+export class ProductModifyRemoveFilesDto {
   @IsArray({ message: 'filesWillRemove must be an array' })
   @IsMongoId({ each: true, message: 'filesWillRemove must be an array of string or ObjectId' })
   @Type(() => String)
   filesWillRemove: Array<mongoose.Types.ObjectId>;
 }
 
-export class AlbumModifyItemIndexChangeDto {
+export class ProductModifyItemIndexChangeDto {
   @IsArray({ message: 'newItemIndexChange must be an array' })
   @IsMongoId({ each: true, message: 'newItemIndexChange must be an array of string or ObjectId' })
   @Type(() => String)

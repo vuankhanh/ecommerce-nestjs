@@ -2,13 +2,13 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CustomBadRequestException, CustomConflictException } from 'src/shared/core/exception/custom-exception';
 import { PurposeOfMedia } from 'src/constant/media.constant';
-import { MediaProductCategoryService } from '../media-product-category.service';
+import { MediaProductService } from '../media-product.service';
 import { VietnameseAccentUtil } from 'src/shared/util/vietnamese-accent.util';
 
 @Injectable()
-export class ValidateCreateProductCategoryAlbumGuard implements CanActivate {
+export class ValidateCreateProductAlbumGuard implements CanActivate {
   constructor(
-    private readonly mediaProductCategoryService: MediaProductCategoryService,
+    private readonly mediaProductService: MediaProductService,
     private readonly configService: ConfigService
   ) { }
   async canActivate(
@@ -34,9 +34,9 @@ export class ValidateCreateProductCategoryAlbumGuard implements CanActivate {
 
     const filterQuery = { slug };
 
-    const isExists = await this.mediaProductCategoryService.checkExistProductCategoryAlbum(filterQuery);
+    const isExists = await this.mediaProductService.checkExistProductAlbum(filterQuery);
     if (isExists) {
-      throw new CustomConflictException('Product Category Album đã tồn tại');
+      throw new CustomConflictException('Product Album đã tồn tại');
     };
 
     
@@ -45,8 +45,8 @@ export class ValidateCreateProductCategoryAlbumGuard implements CanActivate {
 
     request.customParams.slug = slug;
     request.customParams.uploadsFolder = uploadsFolder;
-    request.customParams.relativePath = `media/${PurposeOfMedia.PRODUCT_CATEGORY}`;
-    request.customParams.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
+    request.customParams.relativePath = `media/${PurposeOfMedia.PRODUCT}`;
+    request.customParams.purposeOfMedia = PurposeOfMedia.PRODUCT;
 
     return true;
   }
