@@ -6,11 +6,13 @@ import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Product_Category, ProductCategoryDocument } from 'src/shared/schema/product-category.schema';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
+import { Album } from '../media/schema/album.schema';
+import { Product } from 'src/shared/schema/product.schema';
 
 export class ProductCategoryService implements IBasicService<Product_Category> {
   constructor(
     @InjectModel(Product_Category.name) private readonly productCategoryModel: Model<Product_Category>,
-  ) {}
+  ) { }
 
   async create(data: Product_Category): Promise<ProductCategoryDocument> {
     // Validate circular reference nếu có parentId
@@ -20,7 +22,7 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
         throw new CustomBadRequestException('Đã phát hiện danh mục cha mẹ hoặc tham chiếu vòng tròn không hợp lệ');
       }
     }
-    
+
     const productCategory = new this.productCategoryModel(data);
     await productCategory.save();
     return productCategory;
@@ -33,7 +35,37 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
   ): Promise<{ data: FlattenMaps<Product_Category>[]; paging: IPaging }> {
     const countTotal = await this.productCategoryModel.countDocuments(filterQuery);
     const skip = (page - 1) * size;
-    const data = await this.productCategoryModel.find(filterQuery).skip(skip).limit(size).lean();
+    const data = await this.productCategoryModel.aggregate([
+      {
+        $match: filterQuery
+      },
+      {
+        $lookup: {
+          from: Album.name.toLocaleLowerCase(), // Tên collection của album trong MongoDB
+          localField: 'albumId',
+          foreignField: '_id',
+          as: 'album'
+        }
+      },
+      {
+        $unwind: {
+          path: '$album',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          description: 0, // Loại bỏ trường description,
+          'album.media': 0 // Loại bỏ trường media trong album
+        }
+      },
+      {
+        $skip: skip
+      },
+      {
+        $limit: size
+      }
+    ]);
 
     const paging: IPaging = {
       totalItems: countTotal,
@@ -47,7 +79,63 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
   async getDetail(
     filterQuery: FilterQuery<Product_Category>
   ): Promise<ProductCategoryDocument> {
-    return await this.productCategoryModel.findOne(filterQuery);;
+    const [data] = await this.productCategoryModel.aggregate([
+      {
+        $match: filterQuery
+      },
+      {
+        $lookup: {
+          from: Album.name.toLocaleLowerCase(), // Tên collection của album trong MongoDB
+          localField: 'albumId',
+          foreignField: '_id',
+          as: 'album'
+        }
+      },
+      {
+        $lookup: {
+          from: Product_Category.name.toLowerCase(), // Tự lookup vào chính collection này
+          localField: 'parentId',
+          foreignField: '_id',
+          as: 'parent'
+        }
+      },
+      // Lookup để lấy danh sách sản phẩm liên quan
+      {
+        $lookup: {
+          from: Product.name.toLocaleLowerCase(), // Tên collection của Product trong MongoDB
+          localField: '_id',
+          foreignField: 'categoryId', // Hoặc tên field tương ứng trong Product schema
+          as: 'products'
+        }
+      },
+      {
+        $unwind: {
+          path: '$album',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $unwind: {
+          path: '$parent',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $addFields: {
+          productCount: { $size: '$products' }
+        }
+      },
+      {
+        $project: {
+          description: 0, // Loại bỏ trường description,
+          'album.media': 0, // Loại bỏ trường media trong album,
+          products: 0
+        }
+      }
+    ]);
+    console.log(data[0]);
+    
+    return data;
   }
 
   async replace(
@@ -142,10 +230,10 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
 
   private buildTree(categories: any[], parentId: any): any[] {
     const tree = [];
-    
+
     for (const category of categories) {
-      if ((parentId === null && !category.parentId) || 
-          (category.parentId && category.parentId.toString() === parentId?.toString())) {
+      if ((parentId === null && !category.parentId) ||
+        (category.parentId && category.parentId.toString() === parentId?.toString())) {
         const children = this.buildTree(categories, category._id);
         tree.push({
           ...category,
@@ -153,7 +241,7 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
         });
       }
     }
-    
+
     return tree;
   }
 }

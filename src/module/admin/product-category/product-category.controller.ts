@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { ProductCategoryDto, UpdateProductCategoryDto } from './dto/product-category.dto';
@@ -7,6 +7,7 @@ import { ProductCategoryService } from './product-category.service';
 import { Product_Category } from 'src/shared/schema/product-category.schema';
 import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
 import { ObjectId } from 'mongodb';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 @Controller()
 @UseGuards(LocalAuthGuard)
 @Roles('admin')
@@ -15,7 +16,8 @@ import { ObjectId } from 'mongodb';
 export class ProductCategoryController {
   constructor(
     private readonly productCategoryService: ProductCategoryService
-  ) {}
+  ) { }
+
   @Get()
   async getAll(
     @Query('name') name: string,
@@ -28,12 +30,17 @@ export class ProductCategoryController {
     return await this.productCategoryService.getAll(filterQuery, page, size);
   }
 
-  @Get(':slug')
+  @Get('detail')
   async getDetail(
-    @Param('slug') slug: string,
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('slug') slug?: string
   ) {
-    const filterQuery = { slug };
-
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (slug) filterQuery['slug'] = slug;
+    
+    console.log('filterQuery', filterQuery);
+    
     return await this.productCategoryService.getDetail(filterQuery);
   }
 
@@ -43,7 +50,10 @@ export class ProductCategoryController {
     @Body() body: ProductCategoryDto
   ) {
     const productCategory: Product_Category = new Product_Category(body);
-    if(body.parentId) {
+    if (body.albumId) {
+      productCategory.updatealbumId = body.albumId;
+    }
+    if (body.parentId) {
       productCategory.updateParentId = body.parentId;
     }
 
@@ -58,15 +68,22 @@ export class ProductCategoryController {
     }
   }
 
-  @Put(':slug')
+  @Put()
   @HttpCode(HttpStatus.OK)
   async replace(
-    @Param('slug') slug: string,
-    @Body() body: ProductCategoryDto
+    @Body() body: ProductCategoryDto,
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('slug') slug?: string
   ) {
-    const filterQuery = { slug };
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (slug) filterQuery['slug'] = slug;
+
     const productCategory: Product_Category = new Product_Category(body);
-    if(body.parentId) {
+    if (body.albumId) {
+      productCategory.updatealbumId = body.albumId;
+    }
+    if (body.parentId) {
       productCategory.updateParentId = body.parentId;
     }
 
@@ -81,13 +98,18 @@ export class ProductCategoryController {
     }
   }
 
-  @Patch(':slug')
+  @Patch()
   @HttpCode(HttpStatus.OK)
   async modify(
-    @Param('slug') slug: string,
-    @Body() body: UpdateProductCategoryDto
+    @Body() body: UpdateProductCategoryDto,
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('slug') slug?: string
   ) {
-    const filterQuery = { slug };
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (slug) filterQuery['slug'] = slug;
+
+
     const data: Partial<Product_Category> = body;
     if (body.parentId) data.parentId = ObjectId.createFromHexString(body.parentId.toString());
 
@@ -101,4 +123,16 @@ export class ProductCategoryController {
       throw new CustomInternalServerErrorException('Lỗi khi cập nhật danh mục sản phẩm');
     }
   }
+
+  @Delete()
+    async remove(
+      @Query('id', new ParseObjectIdPipe()) id?: string,
+      @Query('slug') slug?: string,
+    ) {
+      const filterQuery = {};
+      if (id) filterQuery['_id'] = id;
+      else if (slug) filterQuery['slug'] = slug;
+  
+      return await this.productCategoryService.remove(filterQuery);
+    }
 }

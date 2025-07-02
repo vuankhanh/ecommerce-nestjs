@@ -4,6 +4,7 @@ import { HydratedDocument, Types } from "mongoose";
 import { ObjectId } from 'mongodb';
 
 import { VietnameseAccentUtil } from "../util/vietnamese-accent.util";
+import { Album } from "src/module/admin/media/schema/album.schema";
 
 export type ProductCategoryDocument = HydratedDocument<Product_Category>;
 
@@ -18,6 +19,13 @@ export class Product_Category implements IProductCategory {
   name: string;
 
   @Prop({
+    type: Types.ObjectId,
+    ref: Album.name,
+    required: false,
+  })
+  albumId?: Types.ObjectId | string; // ID của album chứa ảnh danh mục
+
+  @Prop({
     type: String,
     required: true,
     trim: true,
@@ -30,16 +38,24 @@ export class Product_Category implements IProductCategory {
   @Prop({ type: Types.ObjectId, ref: Product_Category.name, required: false })
   parentId?: string | Types.ObjectId;
 
+  @Prop({ type: Boolean, default: true })
+  isActive: boolean;
+
   constructor(data: IProductCategory) {
     this.name = data.name;
     this.slug = this.generateSlug();
     this.description = data.description;
+    this.isActive = data.isActive
   }
 
   private generateSlug(): string {
     const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(this.name);
     const slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
     return slug;
+  }
+
+  set updatealbumId(albumId: string) {
+    this.albumId = albumId ? ObjectId.createFromHexString(albumId.toString()) : null;
   }
 
   set updateParentId(parentId: string) {
