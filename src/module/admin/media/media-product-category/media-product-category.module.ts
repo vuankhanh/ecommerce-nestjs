@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MediaProductCategoryController } from './media-product-category.controller';
 import { MediaProductCategoryService } from './media-product-category.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Album, albumSchema } from '../schema/album.schema';
+import { Album, albumSchema } from '../../../../shared/schema/album.schema';
 
 @Module({
   imports: [

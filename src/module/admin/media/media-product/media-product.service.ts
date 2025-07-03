@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Album, AlbumDocument } from '../schema/album.schema';
+import { Album, AlbumDocument } from '../../../../shared/schema/album.schema';
 import mongoose, { FilterQuery, FlattenMaps, Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { PurposeOfMedia } from 'src/constant/media.constant';
-import { Media, MediaDocument } from '../schema/media.schema';
+import { Media, MediaDocument } from '../../../../shared/schema/media.schema';
 import { FileHelper } from 'src/shared/helper/file.helper';
 import { SortUtil } from 'src/shared/util/sort_util';
 

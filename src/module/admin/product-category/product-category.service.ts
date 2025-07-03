@@ -6,7 +6,7 @@ import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Product_Category, ProductCategoryDocument } from 'src/shared/schema/product-category.schema';
 import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
-import { Album } from '../media/schema/album.schema';
+import { Album } from '../../../shared/schema/album.schema';
 import { Product } from 'src/shared/schema/product.schema';
 
 export class ProductCategoryService implements IBasicService<Product_Category> {

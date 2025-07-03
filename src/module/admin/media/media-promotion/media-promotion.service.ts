@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
-import { Album, AlbumDocument } from '../schema/album.schema';
+import { Album, AlbumDocument } from '../../../../shared/schema/album.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, FilterQuery, FlattenMaps, Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { PurposeOfMedia } from 'src/constant/media.constant';
 import { FileHelper } from 'src/shared/helper/file.helper';
-import { Media } from '../schema/media.schema';
+import { Media } from '../../../../shared/schema/media.schema';
 
 @Injectable()
 export class MediaPromotionService implements IBasicService<Album> {

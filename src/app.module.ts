@@ -19,6 +19,9 @@ import { PurchaseOrderModule } from './module/purchase_order/purchase_order.modu
 import { SocketGateway } from './gateway/socket/socket.gateway';
 import { ServerConfigModule } from './module/server-config/server-config.module';
 import { AdminModule } from './module/admin/admin.module';
+import { ProductModule } from './module/client/product/product.module';
+import { ProductCategoryModule } from './module/client/product-category/product-category.module';
+import { SlideShowModule } from './module/client/slide-show/slide-show.module';
 
 @Module({
   imports: [
@@ -40,7 +43,10 @@ import { AdminModule } from './module/admin/admin.module';
     SupplierProductModule,
     VnPublicApisModule,
     PurchaseOrderModule,
-    ServerConfigModule
+    ServerConfigModule,
+    ProductModule,
+    ProductCategoryModule,
+    SlideShowModule
   ],
   providers: [
     {

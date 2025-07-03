@@ -4,7 +4,7 @@ import { HydratedDocument, Types } from "mongoose";
 import { ObjectId } from 'mongodb';
 
 import { VietnameseAccentUtil } from "../util/vietnamese-accent.util";
-import { Album } from "src/module/admin/media/schema/album.schema";
+import { Album } from "src/shared/schema/album.schema";
 
 export type ProductCategoryDocument = HydratedDocument<Product_Category>;
 

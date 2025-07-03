@@ -5,7 +5,7 @@ import { IProduct, IProductReview } from '../interface/product.interface';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { Product_Category } from './product-category.schema';
-import { Album } from 'src/module/admin/media/schema/album.schema';
+import { Album } from 'src/shared/schema/album.schema';
 
 export type ProductDocument = HydratedDocument<Product>;
 

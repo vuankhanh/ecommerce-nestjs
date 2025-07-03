@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MediaLogoController } from './media-logo.controller';
 import { MediaLogoService } from './media-logo.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Album, albumSchema } from '../schema/album.schema';
+import { Album, albumSchema } from '../../../../shared/schema/album.schema';
 
 @Module({
   imports: [

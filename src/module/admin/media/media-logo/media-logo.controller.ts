@@ -6,14 +6,14 @@ import { ChangeUploadfileNamePipe } from 'src/shared/core/pipes/change-uploadfil
 import { DiskStoragePipe } from 'src/shared/core/pipes/disk-storage.pipe';
 import { FileProcessPipe } from 'src/shared/core/pipes/file_process.pipe';
 import { IAlbum, IMedia } from 'src/shared/interface/media.interface';
-import { Album } from '../schema/album.schema';
+import { Album } from '../../../../shared/schema/album.schema';
 import { MediaLogoService } from './media-logo.service';
 import { FileProccedInterceptor } from 'src/shared/core/interceptors/file_procced.interceptor';
 import { ValidateCreateLogoAlbumGuard } from './guards/validate_create_logo_album.guard';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
-import { Media } from '../schema/media.schema';
+import { Media } from '../../../../shared/schema/media.schema';
 import { ValidateModifyLogoAlbumGuard } from './guards/validate_modify_logo_album.guard';
 
 @Controller()

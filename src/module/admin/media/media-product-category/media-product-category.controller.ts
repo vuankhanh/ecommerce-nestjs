@@ -13,9 +13,9 @@ import { ChangeUploadfileNamePipe } from 'src/shared/core/pipes/change-uploadfil
 import { FileProcessPipe } from 'src/shared/core/pipes/file_process.pipe';
 import { DiskStoragePipe } from 'src/shared/core/pipes/disk-storage.pipe';
 import { IAlbum, IMedia } from 'src/shared/interface/media.interface';
-import { Media } from '../schema/media.schema';
+import { Media } from '../../../../shared/schema/media.schema';
 import { PurposeOfMedia } from 'src/constant/media.constant';
-import { Album } from '../schema/album.schema';
+import { Album } from '../../../../shared/schema/album.schema';
 import { ValidateModifyProductCategoryAlbumGuard } from './guards/validate_modify_product_category_album.guard';
 import { ParseObjectIdArrayPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { ProductCategoryModifyItemIndexChangeDto, ProductCategoryModifyRemoveFilesDto } from './dto/product_category_modify.dto';

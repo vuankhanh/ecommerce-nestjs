@@ -12,11 +12,11 @@ import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { PurposeOfMedia } from 'src/constant/media.constant';
-import { Album } from '../schema/album.schema';
+import { Album } from '../../../../shared/schema/album.schema';
 import { ValidateModifySlideShowAlbumGuard } from './guards/validate_modify_slide_show_album.guard';
 import { ParseObjectIdArrayPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { SlideShowModifyItemIndexChangeDto, SlideShowModifyRemoveFilesDto } from './dto/slide_show_modify.dto';
-import { Media } from '../schema/media.schema';
+import { Media } from '../../../../shared/schema/media.schema';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
