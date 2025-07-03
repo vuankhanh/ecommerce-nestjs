@@ -1,11 +1,17 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { IsBoolean, IsMongoId, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsBoolean, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { IProduct } from "src/shared/interface/product.interface";
 
 export class ProductDto implements IProduct {
   @IsNotEmpty({ message: 'Tên sản phẩm không được để trống' })
   @IsString({ message: 'Tên sản phẩm phải là chuỗi' })
   name: string;
+
+  @IsOptional()
+  @IsMongoId({ message: 'Id danh mục sản phẩm phải là chuỗi ObjectId' })
+  @Transform(({ value }) => value === '' ? undefined : value)
+  productCategoryId?: string;
 
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
   @IsString({ message: 'Mô tả phải là chuỗi' })
@@ -16,19 +22,16 @@ export class ProductDto implements IProduct {
   shortDescription: string;
 
   @IsMongoId({ message: 'Id album phải là chuỗi ObjectId' })
+  @Transform(({ value }) => value === '' ? undefined : value)
   albumId: string;
 
   @IsNotEmpty({ message: 'Giá không được để trống' })
   @IsNumber({}, { message: 'Giá phải là số' })
   price: number;
 
-  @IsNotEmpty({ message: 'Danh mục không được để trống' })
-  @IsString({ message: 'Danh mục phải là chuỗi' })
-  category: string;
-
   @IsNotEmpty({ message: 'Còn hàng được để trống' })
-  @IsBoolean({ message: 'Còn hàng phải là số' })
-  stock: number;
+  @IsBoolean({ message: 'Còn hàng phải là Boolean' })
+  inStock: boolean;
 }
 
 export class UpdateProductDto extends PartialType(ProductDto) { }

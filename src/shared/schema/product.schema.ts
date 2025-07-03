@@ -26,29 +26,20 @@ export class Product implements IProduct {
   @Prop({ type: Types.ObjectId, ref: Product_Category.name })
   productCategoryId?: Types.ObjectId | string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   description: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   shortDescription: string;
 
-  @Prop({ type: Types.ObjectId, required: true, ref: Album.name })
-  albumId: Types.ObjectId | string;
+  @Prop({ type: Types.ObjectId, ref: Album.name })
+  albumId?: Types.ObjectId | string;
 
-  @Prop({ required: true })
+  @Prop({ type: Number, required: true })
   price: number;
 
-  @Prop()
-  salePrice?: number;
-
-  @Prop({ required: true })
-  category: string;
-
-  @Prop()
-  brand?: string;
-
-  @Prop({ required: true })
-  stock: number;
+  @Prop({ type: Boolean, required: true })
+  inStock: boolean;
 
   @Prop({ type: [String], default: [] })
   tags?: string[];
@@ -84,10 +75,9 @@ export class Product implements IProduct {
     this.name = product.name;
     this.code = this.generateProductCode();
     this.price = product.price;
+    this.inStock = product.inStock;
     this.description = product.description;
     this.shortDescription = product.shortDescription;
-    this.category = product.category;
-    this.stock = product.stock;
     this.reviews = product.reviews || [];
     this.averageRating = product.averageRating || 0;
     this.totalReviews = product.totalReviews || 0;

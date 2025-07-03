@@ -31,12 +31,15 @@ export class ProductController {
     return await this.productService.getAll(filterQuery, page, size);
   }
 
-  @Get(':id')
+  @Get('detail')
   async getDetail(
-    @Param('id', new ParseObjectIdPipe()) id: string,
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('slug') slug?: string
   ) {
-    const filterQuery = { _id: id };
-    
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (slug) filterQuery['slug'] = slug;
+
     return await this.productService.getDetail(filterQuery);
   }
 
@@ -45,40 +48,53 @@ export class ProductController {
     @Body() productDto: ProductDto
   ) {
     const product = new Product(productDto);
-    product.updateAlbumId = productDto.albumId;
+    if (productDto.albumId) product.updateAlbumId = productDto.albumId;
+    if (productDto.productCategoryId) product.updateProductCategoryId = productDto.productCategoryId;
 
     return await this.productService.create(product);
   }
 
-  @Put(':id')
+  @Put()
   async replace(
-    @Param('id', new ParseObjectIdPipe()) id: string,
-    @Body() productDto: ProductDto
+    @Body() productDto: ProductDto,
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('slug') slug?: string
   ) {
-    const filterQuery = { _id: id };
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (slug) filterQuery['slug'] = slug;
+
     const product = new Product(productDto);
     product.updateAlbumId = productDto.albumId;
 
     return await this.productService.replace(filterQuery, product);
   }
 
-  @Patch(':id')
+  @Patch()
   async modify(
-    @Param('id', new ParseObjectIdPipe()) id: string,
-    @Body() productDto: UpdateProductDto
+    @Body() productDto: UpdateProductDto,
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('slug') slug?: string
   ) {
-    const filterQuery = { _id: id };
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (slug) filterQuery['slug'] = slug;
+
     const data: Partial<Product> = productDto;
     if (productDto.albumId) data.albumId = ObjectId.createFromHexString(productDto.albumId);
-    
+
     return await this.productService.modify(filterQuery, data);
   }
 
-  @Delete(':id')
+  @Delete()
   async delete(
-    @Param('id', new ParseObjectIdPipe()) id: string
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('slug') slug?: string
   ) {
-    const filterQuery = { _id: id };
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (slug) filterQuery['slug'] = slug;
+    
     return await this.productService.remove(filterQuery);
   }
 }

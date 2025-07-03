@@ -39,8 +39,6 @@ export class ProductCategoryController {
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
     
-    console.log('filterQuery', filterQuery);
-    
     return await this.productCategoryService.getDetail(filterQuery);
   }
 
@@ -112,16 +110,10 @@ export class ProductCategoryController {
 
     const data: Partial<Product_Category> = body;
     if (body.parentId) data.parentId = ObjectId.createFromHexString(body.parentId.toString());
+    if (body.albumId) data.albumId = ObjectId.createFromHexString(body.albumId.toString());
 
-    try {
-      const modifiedProductCategory = await this.productCategoryService.modify(filterQuery, data);
-      return modifiedProductCategory;
-    } catch (error) {
-      if (error.code === 11000) {
-        throw new CustomBadRequestException('Tên danh mục đã tồn tại, vui lòng chọn tên khác');
-      }
-      throw new CustomInternalServerErrorException('Lỗi khi cập nhật danh mục sản phẩm');
-    }
+    const modifiedProductCategory = await this.productCategoryService.modify(filterQuery, data);
+    return modifiedProductCategory;
   }
 
   @Delete()

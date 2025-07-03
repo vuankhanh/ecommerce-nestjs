@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Product_Category, ProductCategoryDocument } from 'src/shared/schema/product-category.schema';
-import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
+import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
 import { Album } from '../media/schema/album.schema';
 import { Product } from 'src/shared/schema/product.schema';
 
@@ -127,14 +127,14 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
       },
       {
         $project: {
-          description: 0, // Loại bỏ trường description,
-          'album.media': 0, // Loại bỏ trường media trong album,
           products: 0
         }
       }
     ]);
-    console.log(data[0]);
-    
+
+    console.log(data);
+
+
     return data;
   }
 
@@ -161,7 +161,14 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
         throw new CustomBadRequestException('Không thể cập nhật danh mục với parentId không hợp lệ hoặc tham chiếu vòng tròn');
       }
     }
-    return await this.productCategoryModel.findOneAndUpdate(filterQuery, data, { new: true });
+    try {
+      return await this.productCategoryModel.findOneAndUpdate(filterQuery, data, { new: true });
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new CustomBadRequestException('Tên danh mục đã tồn tại, vui lòng chọn tên khác');
+      }
+      throw new CustomInternalServerErrorException('Lỗi khi cập nhật danh mục sản phẩm');
+    }
   }
 
   async remove(

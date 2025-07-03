@@ -28,29 +28,28 @@ export class ProductService implements IBasicService<Product> {
             from: Album.name.toLocaleLowerCase(), // Tên của bộ sưu tập Album
             localField: 'albumId',
             foreignField: '_id',
-            as: 'albumDetail'
+            as: 'album'
           }
         },
         {
           $unwind: {
-            path: '$albumDetail',
+            path: '$album',
             preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
           }
         },
         {
           $addFields: {
-            'albumDetail.mediaItems': { $size: { $ifNull: ['$albumDetail.media', []] } },
-            'albumDetail.thumbnail': { $arrayElemAt: ["$albumDetail.media.thumbnailUrl", 0] }
+            'album.mediaItems': { $size: { $ifNull: ['$album.media', []] } }
           }
         },
         {
           $project: {
-            'albumDetail.media': 0,
+            'album.media': 0,
             'description': 0,
-            'usageInstructions': 0,
-            'brand': 0,
-            'rating': 0,
-            'reviews': 0
+            'reviews': 0,
+            'tags': 0,
+            'totalReviews': 0,
+            'metaKeywords': 0
           }
         },
         { $skip: size * (page - 1) },
@@ -100,19 +99,18 @@ export class ProductService implements IBasicService<Product> {
             from: Album.name.toLocaleLowerCase(), // Tên của bộ sưu tập Album
             localField: 'albumId',
             foreignField: '_id',
-            as: 'albumDetail'
+            as: 'album'
           }
         },
         {
           $unwind: {
-            path: '$albumDetail',
+            path: '$album',
             preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
           }
         },
         {
           $addFields: {
-            'albumDetail.mediaItems': { $size: { $ifNull: ['$albumDetail.media', []] } },
-            'albumDetail.thumbnail': { $arrayElemAt: ["$albumDetail.media.thumbnailUrl", 0] }
+            'album.mediaItems': { $size: { $ifNull: ['$albumDetail.media', []] } }
           }
         },
       ]

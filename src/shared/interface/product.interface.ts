@@ -17,10 +17,10 @@ export interface IProduct {
   name: string;
   description: string;
   shortDescription: string;
-  albumId: Types.ObjectId | string; // ID của album chứa ảnh sản phẩm
+  albumId?: Types.ObjectId | string; // ID của album chứa ảnh sản phẩm
   price: number;
-  category: string;
-  stock: number;
+  productCategoryId?: Types.ObjectId | string;
+  inStock: boolean;
   reviews?: IProductReview[];
   averageRating?: number;   // Tính trung bình từ reviews
   totalReviews?: number;
