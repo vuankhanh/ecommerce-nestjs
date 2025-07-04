@@ -6,11 +6,14 @@ import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Album } from '../../../shared/schema/album.schema';
 import { Product_Category } from 'src/shared/schema/product-category.schema';
+import { ProductCategoryService } from '../product-category/product-category.service';
+import { CustomNotFoundException } from 'src/shared/core/exception/custom-exception';
 
 @Injectable()
 export class ProductService implements IBasicService<Product> {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
+    private readonly productCategoryService: ProductCategoryService
   ) { }
 
   async create(data: Product): Promise<ProductDocument> {
@@ -18,7 +21,7 @@ export class ProductService implements IBasicService<Product> {
     await product.save();
     return product;
   }
-  
+
   async getAll(filterQuery: FilterQuery<Product>, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
     const countTotal = await this.productModel.countDocuments(filterQuery);
     const productAggregate = await this.productModel.aggregate(
@@ -35,6 +38,20 @@ export class ProductService implements IBasicService<Product> {
         {
           $unwind: {
             path: '$album',
+            preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
+          }
+        },
+        {
+          $lookup: {
+            from: Product_Category.name.toLocaleLowerCase(), // Tên của bộ sưu tập Album
+            localField: 'productCategoryId',
+            foreignField: '_id',
+            as: 'productCategory'
+          }
+        },
+        {
+          $unwind: {
+            path: '$productCategory',
             preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
           }
         },
@@ -67,8 +84,21 @@ export class ProductService implements IBasicService<Product> {
         totalPages: Math.ceil(countTotal / size),
       }
     };
-    
+
     return metaData;
+  }
+
+  async getProductsByCategorySlug(categorySlug: string, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
+
+    const productCategory = await this.productCategoryService.getDetail({ slug: categorySlug });
+    if (!productCategory) {
+      throw new CustomNotFoundException('Không tìm thấy danh mục sản phẩm');
+    }
+
+    const productCategoryId = productCategory._id;
+
+    const filterQuery: FilterQuery<Product> = { productCategoryId };
+    return this.getAll(filterQuery, page, size);
   }
 
   async getDetail(filterQuery: FilterQuery<Product>): Promise<ProductDocument> {

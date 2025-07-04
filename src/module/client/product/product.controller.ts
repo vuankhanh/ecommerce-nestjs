@@ -40,4 +40,13 @@ export class ProductController {
 
     return await this.productService.getDetail(filterQuery);
   }
+
+  @Get('/by-category-slug')
+  async getProductsByCategorySlug(
+    @Query('slug') slug: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
+  ){
+    return await this.productService.getProductsByCategorySlug(slug, page, size);
+  }
 }
