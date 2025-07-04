@@ -15,6 +15,7 @@ export interface IProductReview {
 
 export interface IProduct {
   name: string;
+  slug?: string; // Tự động sinh ra từ tên sản phẩm
   description: string;
   shortDescription: string;
   albumId?: Types.ObjectId | string; // ID của album chứa ảnh sản phẩm

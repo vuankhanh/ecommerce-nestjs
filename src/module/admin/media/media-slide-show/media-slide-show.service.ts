@@ -82,8 +82,8 @@ export class MediaSlideShowService implements IBasicService<Album> {
     return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, updateQuery, { safe: true, new: true });;
   }
 
-  async itemIndexChange(filterQuery: FilterQuery<Album>, itemIndexChanges: Array<string | mongoose.Types.ObjectId>) {
-    const album = await this.slideShowAlbumModel.findOne(filterQuery);
+  async itemIndexChange(itemIndexChanges: Array<string | mongoose.Types.ObjectId>) {
+    const album = await this.slideShowAlbumModel.findOne(this.filterQuery);
     if (!album) {
       throw new Error('Album not found');
     }

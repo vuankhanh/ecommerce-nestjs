@@ -64,8 +64,9 @@ export class ProductController {
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
 
-    const product = new Product(productDto);
-    product.updateAlbumId = productDto.albumId;
+    const product: Product = new Product(productDto);
+    if (productDto.albumId) product.updateAlbumId = productDto.albumId;
+    if (productDto.productCategoryId) product.updateProductCategoryId = productDto.productCategoryId;
 
     return await this.productService.replace(filterQuery, product);
   }
@@ -82,6 +83,7 @@ export class ProductController {
 
     const data: Partial<Product> = productDto;
     if (productDto.albumId) data.albumId = ObjectId.createFromHexString(productDto.albumId);
+    if (productDto.productCategoryId) data.productCategoryId = ObjectId.createFromHexString(productDto.productCategoryId);
 
     return await this.productService.modify(filterQuery, data);
   }

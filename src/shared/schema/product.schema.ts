@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { Product_Category } from './product-category.schema';
 import { Album } from 'src/shared/schema/album.schema';
+import { VietnameseAccentUtil } from '../util/vietnamese-accent.util';
 
 export type ProductDocument = HydratedDocument<Product>;
 
@@ -13,9 +14,18 @@ export type ProductDocument = HydratedDocument<Product>;
 export class Product implements IProduct {
   @Prop({
     type: String,
+    unique: true,
     required: true
   })
   name: string;
+
+  @Prop({
+    type: String,
+    unique: true,
+    required: true,
+    trim: true,
+  })
+  slug: string;
 
   @Prop({
     type: String,
@@ -73,6 +83,7 @@ export class Product implements IProduct {
 
   constructor(product: IProduct) {
     this.name = product.name;
+    this.slug = this.generateSlug();
     this.code = this.generateProductCode();
     this.price = product.price;
     this.inStock = product.inStock;
@@ -81,6 +92,12 @@ export class Product implements IProduct {
     this.reviews = product.reviews || [];
     this.averageRating = product.averageRating || 0;
     this.totalReviews = product.totalReviews || 0;
+  }
+
+  private generateSlug(): string {
+    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(this.name);
+    const slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
+    return slug;
   }
 
   private generateProductCode(): string {

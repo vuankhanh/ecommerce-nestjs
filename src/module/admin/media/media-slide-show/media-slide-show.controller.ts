@@ -86,7 +86,7 @@ export class MediaSlideShowController {
   async itemIndexChange(
     @Body(new ValidationPipe({ transform: true }), new ParseObjectIdArrayPipe('newItemIndexChange')) body: SlideShowModifyItemIndexChangeDto,
   ) {
-    const updatedAlbums = await this.mediaSlideShowService.itemIndexChange({}, body.newItemIndexChange);
+    const updatedAlbums = await this.mediaSlideShowService.itemIndexChange(body.newItemIndexChange);
     return updatedAlbums;
   }
 
