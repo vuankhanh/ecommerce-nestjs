@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { Document, Types, FilterQuery, FlattenMaps } from 'mongoose';
+import { FilterQuery, FlattenMaps } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
@@ -33,6 +32,7 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
     page: number,
     size: number
   ): Promise<{ data: FlattenMaps<Product_Category>[]; paging: IPaging }> {
+    filterQuery.isActive = true;
     const countTotal = await this.productCategoryModel.countDocuments(filterQuery);
     const skip = (page - 1) * size;
     const data = await this.productCategoryModel.aggregate([

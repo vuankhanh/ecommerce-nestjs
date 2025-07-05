@@ -76,7 +76,11 @@ export class MediaSlideShowService implements IBasicService<Album> {
     //Lọc ra danh sách file cục bộ cần xóa
     await this.filterMediaItems(filesWillRemove).then(async mediaUrls => {
       //Xóa file
-      await FileHelper.removeMediaFiles(this.albumFoler, mediaUrls);
+      try {
+        await FileHelper.removeMediaFiles(this.albumFoler, mediaUrls);
+      } catch (error) {
+        console.log('Error removing media files:', error);
+      }
     });
 
     return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, updateQuery, { safe: true, new: true });;

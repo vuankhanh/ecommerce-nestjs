@@ -39,7 +39,7 @@ export class ValidateModifyProductCategoryAlbumGuard implements CanActivate {
     request['customParams'] = {};
 
     request.customParams.uploadsFolder = uploadsFolder;
-    request.customParams.relativePath = `media/${PurposeOfMedia.PRODUCT_CATEGORY}`;
+    request.customParams.relativePath = productCategory.relativePath;
     request.customParams.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
 
     return true;

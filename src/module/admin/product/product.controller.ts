@@ -6,6 +6,7 @@ import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_r
 import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { ObjectId } from 'mongodb';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
+import { VietnameseAccentUtil } from 'src/shared/util/vietnamese-accent.util';
 
 //1. Guards: Được sử dụng để bảo vệ các slug.
 //2. Interceptors: Được sử dụng để thay đổi hoặc mở rộng hành vi của các method.
@@ -84,6 +85,10 @@ export class ProductController {
     const data: Partial<Product> = productDto;
     if (productDto.albumId) data.albumId = ObjectId.createFromHexString(productDto.albumId);
     if (productDto.productCategoryId) data.productCategoryId = ObjectId.createFromHexString(productDto.productCategoryId);
+    if (productDto.name) {
+      const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(productDto.name);
+      data.slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
+    }
 
     return await this.productService.modify(filterQuery, data);
   }
@@ -96,7 +101,7 @@ export class ProductController {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
-    
+
     return await this.productService.remove(filterQuery);
   }
 }

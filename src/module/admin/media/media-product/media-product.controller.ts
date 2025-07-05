@@ -79,14 +79,10 @@ export class MediaProductController {
     @Query('name') name: string,
     @UploadedFiles(ChangeUploadfilesNamePipe, FilesProcessPipe, DiskStoragePipe) medias: IMedia[]
   ) {
-    console.log(req.query);
     const customParams = req['customParams'];
     const relativePath = customParams.relativePath;
     const slug = customParams.slug;
     const newMedias: Media[] = medias.map(media=>new Media(media));
-
-    console.log(`name: ${name}`);
-    console.log(`slug: ${slug}`);
 
     const album: IAlbum = {
       name,
@@ -109,7 +105,7 @@ export class MediaProductController {
     FilesProccedInterceptor
   )
   async addNewFiles(
-    @UploadedFile(ChangeUploadfilesNamePipe, FilesProcessPipe, DiskStoragePipe) medias: IMedia[],
+    @UploadedFiles(ChangeUploadfilesNamePipe, FilesProcessPipe, DiskStoragePipe) medias: IMedia[],
     @Query('id', new ParseObjectIdPipe()) id?: string,
     @Query('slug') slug?: string,
   ) {

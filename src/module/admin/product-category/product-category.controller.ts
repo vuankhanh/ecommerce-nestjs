@@ -8,6 +8,7 @@ import { Product_Category } from 'src/shared/schema/product-category.schema';
 import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
 import { ObjectId } from 'mongodb';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { VietnameseAccentUtil } from 'src/shared/util/vietnamese-accent.util';
 @Controller()
 @UseGuards(LocalAuthGuard)
 @Roles('admin')
@@ -38,7 +39,7 @@ export class ProductCategoryController {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
-    
+
     return await this.productCategoryService.getDetail(filterQuery);
   }
 
@@ -111,20 +112,24 @@ export class ProductCategoryController {
     const data: Partial<Product_Category> = body;
     if (body.parentId) data.parentId = ObjectId.createFromHexString(body.parentId.toString());
     if (body.albumId) data.albumId = ObjectId.createFromHexString(body.albumId.toString());
+    if (body.name) {
+      const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(body.name);
+      data.slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
+    }
 
     const modifiedProductCategory = await this.productCategoryService.modify(filterQuery, data);
     return modifiedProductCategory;
   }
 
   @Delete()
-    async remove(
-      @Query('id', new ParseObjectIdPipe()) id?: string,
-      @Query('slug') slug?: string,
-    ) {
-      const filterQuery = {};
-      if (id) filterQuery['_id'] = id;
-      else if (slug) filterQuery['slug'] = slug;
-  
-      return await this.productCategoryService.remove(filterQuery);
-    }
+  async remove(
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('slug') slug?: string,
+  ) {
+    const filterQuery = {};
+    if (id) filterQuery['_id'] = id;
+    else if (slug) filterQuery['slug'] = slug;
+
+    return await this.productCategoryService.remove(filterQuery);
+  }
 }

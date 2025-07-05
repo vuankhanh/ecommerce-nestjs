@@ -45,7 +45,7 @@ export class ValidateCreateProductAlbumGuard implements CanActivate {
 
     request.customParams.slug = slug;
     request.customParams.uploadsFolder = uploadsFolder;
-    request.customParams.relativePath = `media/${PurposeOfMedia.PRODUCT}`;
+    request.customParams.relativePath = `media/${PurposeOfMedia.PRODUCT}/${slug}`;
     request.customParams.purposeOfMedia = PurposeOfMedia.PRODUCT;
 
     return true;

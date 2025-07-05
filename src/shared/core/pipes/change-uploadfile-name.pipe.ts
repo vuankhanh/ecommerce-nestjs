@@ -13,6 +13,8 @@ export class ChangeUploadfileNamePipe implements PipeTransform {
 @Injectable()
 export class ChangeUploadfilesNamePipe implements PipeTransform {
   transform(files: Array<Express.Multer.File>) {
+    console.log(files);
+    
     return files.map(file => {
       return {
         ...file,

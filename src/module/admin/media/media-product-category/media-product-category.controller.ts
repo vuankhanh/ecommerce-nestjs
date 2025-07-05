@@ -130,10 +130,6 @@ export class MediaProductCategoryController {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
-
-    console.log(filterQuery);
-    
-    console.log(body.filesWillRemove);
     
     const updatedAlbums = await this.mediaProductCategoryService.removeFiles(filterQuery, body.filesWillRemove);
     return updatedAlbums;

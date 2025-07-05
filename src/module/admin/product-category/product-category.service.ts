@@ -132,9 +132,6 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
       }
     ]);
 
-    console.log(data);
-
-
     return data;
   }
 

@@ -87,7 +87,7 @@ export class MediaProductService {
       {
         $push: {
           media: {
-            $each: [data],
+            $each: data,
             $position: 0
           }
         },
@@ -119,7 +119,11 @@ export class MediaProductService {
     //Lọc ra danh sách file cục bộ cần xóa
     await this.filterMediaItems(filterQuery, filesWillRemove).then(async mediaUrls => {
       //Xóa file
-      await FileHelper.removeMediaFiles(this.albumFoler, mediaUrls);
+      try {
+        await FileHelper.removeMediaFiles(this.albumFoler, mediaUrls);
+      } catch (error) {
+        console.log('Error removing media files:', error);
+      }
     });
 
     return await this.productAlbumModel.findOneAndUpdate(filterQuery, updateQuery, { safe: true, new: true });;
