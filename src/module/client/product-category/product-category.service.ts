@@ -107,7 +107,7 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
         $lookup: {
           from: Product.name.toLocaleLowerCase(), // Tên collection của Product trong MongoDB
           localField: '_id',
-          foreignField: 'categoryId', // Hoặc tên field tương ứng trong Product schema
+          foreignField: 'productCategoryId', // Hoặc tên field tương ứng trong Product schema
           as: 'products'
         }
       },
@@ -134,9 +134,6 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
         }
       }
     ]);
-
-    console.log(data);
-
 
     return data;
   }

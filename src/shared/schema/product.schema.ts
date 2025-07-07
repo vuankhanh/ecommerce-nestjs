@@ -33,7 +33,10 @@ export class Product implements IProduct {
   })
   code: string;
 
-  @Prop({ type: Types.ObjectId, ref: Product_Category.name })
+  @Prop({
+    type: Types.ObjectId,
+    ref: Product_Category.name,
+  })
   productCategoryId?: Types.ObjectId | string;
 
   @Prop({ type: String, required: true })

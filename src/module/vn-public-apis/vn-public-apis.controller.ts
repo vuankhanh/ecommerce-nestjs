@@ -7,7 +7,6 @@ import { CustomLoggerService } from 'src/module/custom_logger/custom_logger.serv
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 
 @Controller('vn-public-apis')
-@UseGuards(LocalAuthGuard)
 @UseInterceptors(FormatResponseInterceptor)
 export class VnPublicApisController {
   constructor(
