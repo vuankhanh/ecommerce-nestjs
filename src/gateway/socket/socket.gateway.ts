@@ -6,14 +6,11 @@ import { CustomLoggerService } from 'src/module/custom_logger/custom_logger.serv
   cors: {
     origin: (origin, callback) => {
       const allowedOrigins = [
-        'http://localhost:4200',
-        'https://localhost:4200',
         'http://localhost:4000',
         'https://localhost:4000',
         'http://localhost:4211',
         'https://localhost:4211',
-        'http://localhost:4212',
-        'https://localhost:4212',
+        'http://bep4than.online'
       ];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
