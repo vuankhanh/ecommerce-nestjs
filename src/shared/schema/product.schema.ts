@@ -39,6 +39,8 @@ export class Product implements IProduct {
   })
   productCategoryId?: Types.ObjectId | string;
 
+  productCategory?: Product_Category;
+
   @Prop({ type: String, required: true })
   description: string;
 
@@ -47,6 +49,8 @@ export class Product implements IProduct {
 
   @Prop({ type: Types.ObjectId, ref: Album.name })
   albumId?: Types.ObjectId | string;
+
+  album?: Album;
 
   @Prop({ type: Number, required: true })
   price: number;

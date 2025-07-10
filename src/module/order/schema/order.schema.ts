@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { OrderItem } from "./order_product_item.schema";
 import { PaymentMethod } from "src/constant/payment.constant";
 import { OrderUtil } from "src/shared/util/order.util";
+import { IDelivery } from "src/shared/interface/delivery.interface";
 
 export type OrderDocument = HydratedDocument<Order>;
 
@@ -38,20 +39,11 @@ export class Order implements IOrder {
   @Prop({ type: String, enum: PaymentMethod, required: true })
   paymentMethod: TPaymentMethod;
 
-  @Prop({ type: String })
-  customerName?: string;
-
-  @Prop({ type: String })
-  customerPhoneNumber?: string;
-
-  @Prop({ type: String })
-  customerAddress?: string;
-
-  @Prop({ type: String })
-  customerDeliveryAddress?: string;
-
   @Prop({ type: Types.ObjectId, ref: Customer.name })
   customerId?: Types.ObjectId | string;
+
+  @Prop({ type: Object})
+  delivery: IDelivery;
 
   @Prop({ type: String })
   note: string;
@@ -65,6 +57,7 @@ export class Order implements IOrder {
     this.discount = order.discount;
     this.deliveryFee = order.deliveryFee;
     this.paymentMethod = order.paymentMethod;
+    this.delivery = order.delivery;
     this.note = order.note;
   }
 
@@ -77,16 +70,6 @@ export class Order implements IOrder {
 
   set updateCustomerId(customerId: string) {
     this.customerId = ObjectId.createFromHexString(customerId);
-  }
-
-  set updateCustomerInfo(customer: Partial<Customer>) {
-    this.customerName = customer.name;
-    this.customerPhoneNumber = customer.phoneNumber;
-    this.customerAddress = customer.address;
-  }
-
-  set updateCustomerDeliveryAddress(deliveryAddress: string) {
-    this.customerDeliveryAddress = deliveryAddress;
   }
 
 }

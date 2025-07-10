@@ -1,4 +1,7 @@
 import { Types } from "mongoose";
+import { Album } from "../schema/album.schema";
+import { Product } from "../schema/product.schema";
+import { Product_Category } from "../schema/product-category.schema";
 
 export interface IProductCategory {
   name: string;
@@ -19,8 +22,10 @@ export interface IProduct {
   description: string;
   shortDescription: string;
   albumId?: Types.ObjectId | string; // ID của album chứa ảnh sản phẩm
+  album?: Album;
   price: number;
   productCategoryId?: Types.ObjectId | string;
+  productCategory?: Product_Category;
   inStock: boolean;
   reviews?: IProductReview[];
   averageRating?: number;   // Tính trung bình từ reviews

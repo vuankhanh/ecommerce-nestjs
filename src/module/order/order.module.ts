@@ -4,6 +4,7 @@ import { OrderService } from './order.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Order, orderSchema } from './schema/order.schema';
 import { ConfigService } from '@nestjs/config';
+import { ProductModule } from '../client/product/product.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { ConfigService } from '@nestjs/config';
         schema: orderSchema,
         collection: Order.name.toLowerCase()
       }
-    ])
+    ]),
+    ProductModule
   ],
   controllers: [OrderController],
   providers: [OrderService, ConfigService]

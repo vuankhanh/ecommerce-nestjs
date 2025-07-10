@@ -10,7 +10,8 @@ import { CustomLoggerService } from 'src/module/custom_logger/custom_logger.serv
         'https://localhost:4000',
         'http://localhost:4211',
         'https://localhost:4211',
-        'http://bep4than.online'
+        'http://bep4than.online',
+        'https://bep4than.online'
       ];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);

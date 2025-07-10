@@ -2,7 +2,7 @@ import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, P
 import { OrderService } from './order.service';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
-import { OrderDto, UpdateOrderDto } from './dto/order.dto';
+import { OrderCreateDto, UpdateOrderDto } from './dto/order-create.dto';
 import { Order } from './schema/order.schema';
 import { ObjectId } from 'mongodb';
 import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
@@ -11,15 +11,20 @@ import { OrderStatus } from 'src/constant/status.constant';
 import { OrderUtil } from 'src/shared/util/order.util';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
+import { IOrder, IOrderItem } from 'src/shared/interface/order.interface';
+import { ProductService } from '../client/product/product.service';
+import { ProductDocument } from 'src/shared/schema/product.schema';
+import { OrderItem } from './schema/order_product_item.schema';
 
 @Controller('order')
-@UseGuards(LocalAuthGuard)
+// @UseGuards(LocalAuthGuard)
 @UseInterceptors(FormatResponseInterceptor)
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 export class OrderController {
   constructor(
     private configService: ConfigService,
     private readonly orderService: OrderService,
+    private readonly productService: ProductService
   ) { }
 
   @Get()
@@ -45,71 +50,93 @@ export class OrderController {
 
   @Post()
   async create(
-    @Body() orderDto: OrderDto
+    @Body() orderCreateDto: OrderCreateDto
   ) {
-    const order = new Order(orderDto);
-    if (orderDto.customerDeliveryAddress) order.updateCustomerDeliveryAddress = orderDto.customerDeliveryAddress;
-    if (orderDto.customerName) order.updateCustomerInfo = {
-      name: orderDto.customerName,
-      phoneNumber: orderDto.customerPhoneNumber,
-      address: orderDto.customerAddress
-    };
+    console.log(orderCreateDto);
+    const orderItems: IOrderItem[] = [];
+    for (const item of orderCreateDto.orderItems) {
+      const productId = ObjectId.createFromHexString(item.productId);
+      const product: ProductDocument = await this.productService.getDetail({ _id: productId })
+      if (!product) {
+        throw new CustomBadRequestException(`Sản phẩm với ID ${item.productId} không tồn tại`);
+      }
 
-    if (orderDto.customerId) order.updateCustomerId = orderDto.customerId;
+      const orderItem: IOrderItem = {
+        productThumbnail: product?.album?.thumbnailUrl,
+        productCode: product.code,
+        productName: product.name,
+        quantity: item.quantity,
+        price: product.price
+      };
 
+      orderItems.push(orderItem);
+    }
+
+    const iOrder : IOrder = {
+      orderItems: orderItems,
+      status: OrderStatus.PENDING,
+      paymentMethod: orderCreateDto.paymentMethod,
+      deliveryFee: orderCreateDto.deliveryFee,
+      discount: orderCreateDto.discount,
+      note: orderCreateDto.note,
+      delivery: orderCreateDto.delivery,
+    }
+    const order: Order = new Order(iOrder);
+    console.log(order.orderItems);
+    
     return await this.orderService.create(order);
   }
 
-  @Put(':id')
-  async replace(
-    @Param('id', new ParseObjectIdPipe()) id: string,
-    @Body() orderDto: OrderDto
-  ) {
-    const filterQuery = { _id: id };
-    const order = new Order(orderDto);
-    order.updateCustomerId = orderDto.customerId;
+  // @Put(':id')
+  // async replace(
+  //   @Param('id', new ParseObjectIdPipe()) id: string,
+  //   @Body() orderDto: OrderDto
+  // ) {
+  //   const filterQuery = { _id: id };
+  //   const order = new Order(orderDto);
+  //   order.updateCustomerId = orderDto.customerId;
 
-    return await this.orderService.replace(filterQuery, order);
-  }
+  //   return await this.orderService.replace(filterQuery, order);
+  // }
 
-  @Patch(':id')
-  async modify(
-    @Param('id', new ParseObjectIdPipe()) id: string,
-    @Body() orderDto: UpdateOrderDto
-  ) {
-    const filterQuery = { _id: id };
+  // @Patch(':id')
+  // async modify(
+  //   @Param('id', new ParseObjectIdPipe()) id: string,
+  //   @Body() orderDto: UpdateOrderDto
+  // ) {
+  //   const filterQuery = { _id: id };
 
-    const data: Partial<Order> = orderDto;
-    // Lấy đơn hàng hiện tại từ cơ sở dữ liệu
-    const currentOrder = await this.orderService.findById(id);
+  //   const data: UpdateOrderDto = orderDto;
+  //   // Lấy đơn hàng hiện tại từ cơ sở dữ liệu
+  //   const currentOrder = await this.orderService.findById(id);
 
-    // Cập nhật các thuộc tính thay đổi
-    if (orderDto.orderItems) currentOrder.orderItems = OrderUtil.transformOrderItems(orderDto.orderItems);
-    if (orderDto.deliveryFee !== undefined) currentOrder.deliveryFee = orderDto.deliveryFee;
-    if (orderDto.discount !== undefined) currentOrder.discount = orderDto.discount;
+  //   // Cập nhật các thuộc tính thay đổi
+  //   if (orderDto.orderItems) currentOrder.orderItems = OrderUtil.transformOrderItems(orderDto.orderItems);
+  //   if (orderDto.deliveryFee !== undefined) currentOrder.deliveryFee = orderDto.deliveryFee;
+  //   if (orderDto.discount !== undefined) currentOrder.discount = orderDto.discount;
 
-    // Tính lại tổng số nếu các thuộc tính liên quan thay đổi
-    if (orderDto.orderItems || orderDto.deliveryFee !== undefined || orderDto.discount !== undefined) {
-      const subTotal = OrderUtil.calculateSubTotal(currentOrder.orderItems);
-      data.total = OrderUtil.calculateTotal(subTotal, currentOrder.deliveryFee, currentOrder.discount);
-    }
+  //   // Tính lại tổng số nếu các thuộc tính liên quan thay đổi
+  //   if (orderDto.orderItems || orderDto.deliveryFee !== undefined || orderDto.discount !== undefined) {
+  //     const subTotal = OrderUtil.calculateSubTotal(currentOrder.orderItems);
+  //     data.total = OrderUtil.calculateTotal(subTotal, currentOrder.deliveryFee, currentOrder.discount);
+  //   }
 
-    if (orderDto.customerId) data.customerId = ObjectId.createFromHexString(orderDto.customerId);
+  //   if (orderDto.customerId) data.customerId = ObjectId.createFromHexString(orderDto.customerId);
 
-    if (orderDto.customerName) {
-      data.customerName = orderDto.customerName;
-    }
+  //   if (orderDto.customerName) {
+  //     data.customerName = orderDto.customerName;
+  //   }
 
-    if (orderDto.customerAddress) {
-      data.customerAddress = orderDto.customerAddress;
-    }
+  //   if (orderDto.customerAddress) {
+  //     data.customerAddress = orderDto.customerAddress;
+  //   }
 
-    if (orderDto.customerPhoneNumber) {
-      data.customerPhoneNumber = orderDto.customerPhoneNumber;
-    }
+  //   if (orderDto.customerPhoneNumber) {
+  //     data.customerPhoneNumber = orderDto.customerPhoneNumber;
+  //   }
 
-    return await this.orderService.modify(filterQuery, data);
-  }
+  //   return await this.orderService.modify(filterQuery, data);
+  // }
 
   @Delete(':id')
   async remove(
@@ -129,14 +156,6 @@ export class OrderController {
       throw new CustomBadRequestException('Trạng thái của Order phải là CONFIRMED, SHIPPING, hoặc COMPLETED để in');
     }
     const order: Order = new Order(orderDetail);
-
-    const customerInfo = {
-      name: orderDetail.customerName,
-      phoneNumber: orderDetail.customerPhoneNumber,
-      address: orderDetail.customerAddress,
-    }
-    order.updateCustomerInfo = customerInfo;
-    order.updateCustomerDeliveryAddress = orderDetail.customerDeliveryAddress;
 
     const footer: IFooterTemplate = this.configService.get<IFooterTemplate>('brand');
     const template: Template = new Template(order, footer);
