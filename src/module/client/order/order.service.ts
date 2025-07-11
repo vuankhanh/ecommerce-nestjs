@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
-import { Order, OrderDocument } from './schema/order.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
-import { Customer } from '../customer/schema/customer.schema';
 import { Template } from 'src/shared/interface/template.interface';
 import { OrderStatus } from 'src/constant/status.constant';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
+import { Order, OrderDocument } from 'src/shared/schema/order.schema';
+import { Account } from 'src/module/auth/schemas/account.schema';
 
 @Injectable()
 export class OrderService implements IBasicService<Order> {
@@ -25,94 +25,94 @@ export class OrderService implements IBasicService<Order> {
 
   async getAll(filterQuery: FilterQuery<Order>, page: number, size: number): Promise<{ data: OrderDocument[]; paging: IPaging; }> {
     filterQuery.status = { $ne: OrderStatus.CANCELED };
-    const countTotal = await this.orderModel.countDocuments(filterQuery);
-    const orderAggregate = await this.orderModel.aggregate(
-      [
-        { $match: filterQuery },
-        {
-          $lookup: {
-            from: Customer.name.toLowerCase(), // Tên của collection Customer
-            localField: 'customerId',
-            foreignField: '_id',
-            as: 'customerDetail'
-          }
-        },
-        {
-          $unwind: {
-            path: '$customerDetail',
-            preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
-          }
-        },
-        {
-          $addFields: {
-            'productName': {
-              $ifNull: [
-                { $arrayElemAt: ["$orderItems.productName", 0] }, null
-              ]
-            },
-            'productThumbnail': {
-              $ifNull: [
-                { $arrayElemAt: ["$orderItems.productThumbnail", 0] }, null
-              ]
-            },
-            'productQuantity': {
-              $ifNull: [
-                { $sum: "$orderItems.quantity" }, 0
-              ]
-            },
-            'subTotal': {
-              $ifNull: [
-                {
-                  $sum: {
-                    $map: {
-                      input: "$orderItems",
-                      as: "item",
-                      in: { $multiply: ["$$item.price", "$$item.quantity"] }
-                    }
-                  }
-                },
-                0
-              ]
-            }
-          }
-        },
-        { $skip: size * (page - 1) },
-        { $limit: size },
-        {
-          $project: {
-            orderItems: {
-              productCode: 0,
-              _id: 0
-            },
-            customerId: 0,
-            note: 0,
-            __v: 0,
-            customerDetail: {
-              _id: 0,
-              __v: 0,
-              address: 0,
-              email: 0,
-              dob: 0,
-              company: 0,
-              note: 0,
-              createdAt: 0,
-              updatedAt: 0,
-            }
-          }
-        }
-      ]
-    );
+    // const countTotal = await this.orderModel.countDocuments(filterQuery);
+    // const orderAggregate = await this.orderModel.aggregate(
+    //   [
+    //     { $match: filterQuery },
+    //     {
+    //       $lookup: {
+    //         from: Customer.name.toLowerCase(), // Tên của collection Customer
+    //         localField: 'customerId',
+    //         foreignField: '_id',
+    //         as: 'customerDetail'
+    //       }
+    //     },
+    //     {
+    //       $unwind: {
+    //         path: '$customerDetail',
+    //         preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
+    //       }
+    //     },
+    //     {
+    //       $addFields: {
+    //         'productName': {
+    //           $ifNull: [
+    //             { $arrayElemAt: ["$orderItems.productName", 0] }, null
+    //           ]
+    //         },
+    //         'productThumbnail': {
+    //           $ifNull: [
+    //             { $arrayElemAt: ["$orderItems.productThumbnail", 0] }, null
+    //           ]
+    //         },
+    //         'productQuantity': {
+    //           $ifNull: [
+    //             { $sum: "$orderItems.quantity" }, 0
+    //           ]
+    //         },
+    //         'subTotal': {
+    //           $ifNull: [
+    //             {
+    //               $sum: {
+    //                 $map: {
+    //                   input: "$orderItems",
+    //                   as: "item",
+    //                   in: { $multiply: ["$$item.price", "$$item.quantity"] }
+    //                 }
+    //               }
+    //             },
+    //             0
+    //           ]
+    //         }
+    //       }
+    //     },
+    //     { $skip: size * (page - 1) },
+    //     { $limit: size },
+    //     {
+    //       $project: {
+    //         orderItems: {
+    //           productCode: 0,
+    //           _id: 0
+    //         },
+    //         customerId: 0,
+    //         note: 0,
+    //         __v: 0,
+    //         customerDetail: {
+    //           _id: 0,
+    //           __v: 0,
+    //           address: 0,
+    //           email: 0,
+    //           dob: 0,
+    //           company: 0,
+    //           note: 0,
+    //           createdAt: 0,
+    //           updatedAt: 0,
+    //         }
+    //       }
+    //     }
+    //   ]
+    // );
 
-    const metaData = {
-      data: orderAggregate,
-      paging: {
-        totalItems: countTotal,
-        size: size,
-        page: page,
-        totalPages: Math.ceil(countTotal / size),
-      }
-    };
-    return metaData;
+    // const metaData = {
+    //   data: orderAggregate,
+    //   paging: {
+    //     totalItems: countTotal,
+    //     size: size,
+    //     page: page,
+    //     totalPages: Math.ceil(countTotal / size),
+    //   }
+    // };
+    return null;
   }
 
   async getDetail(filterQuery: FilterQuery<Order>): Promise<OrderDocument> {
@@ -156,7 +156,7 @@ export class OrderService implements IBasicService<Order> {
         { $match: filterQuery },
         {
           $lookup: {
-            from: Customer.name.toLowerCase(), // Tên của collection Customer
+            from: Account.name.toLowerCase(), // Tên của collection Customer
             localField: 'customerId',
             foreignField: '_id',
             as: 'customerDetail'

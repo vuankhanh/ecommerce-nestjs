@@ -1,12 +1,11 @@
 
 import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
-import { IOrder, IOrderItem, TOrderStatus } from "../../../shared/interface/order.interface";
-import { TPaymentMethod } from "../../../shared/interface/payment.interface";
+import { IOrder, IOrderItem, TOrderStatus } from "../../../../shared/interface/order.interface";
+import { TPaymentMethod } from "../../../../shared/interface/payment.interface";
 import { PaymentMethod } from "src/constant/payment.constant";
 import { OrderStatus } from "src/constant/status.constant";
-import { IsValid } from "../../../shared/custom-validator/custom-validator";
+import { IsValid } from "../../../../shared/custom-validator/custom-validator";
 import { PartialType } from "@nestjs/mapped-types";
-import { OrderItem } from "../schema/order_product_item.schema";
 import { DeliveryInfoDto } from "src/shared/dto/delivery.dto";
 import { Type } from "class-transformer";
 import { IOrderCreateRequest, IOrderItemsRequest } from "src/shared/interface/order-request.interface";

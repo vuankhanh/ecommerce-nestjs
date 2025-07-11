@@ -3,7 +3,6 @@ import { OrderService } from './order.service';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { OrderCreateDto, UpdateOrderDto } from './dto/order-create.dto';
-import { Order } from './schema/order.schema';
 import { ObjectId } from 'mongodb';
 import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
 import { ConfigService } from '@nestjs/config';
@@ -12,9 +11,9 @@ import { OrderUtil } from 'src/shared/util/order.util';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
 import { IOrder, IOrderItem } from 'src/shared/interface/order.interface';
-import { ProductService } from '../client/product/product.service';
+import { ProductService } from '../product/product.service';
 import { ProductDocument } from 'src/shared/schema/product.schema';
-import { OrderItem } from './schema/order_product_item.schema';
+import { Order } from 'src/shared/schema/order.schema';
 
 @Controller('order')
 // @UseGuards(LocalAuthGuard)

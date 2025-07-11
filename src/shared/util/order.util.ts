@@ -1,5 +1,5 @@
-import { OrderItem } from "src/module/order/schema/order_product_item.schema";
 import { IOrderItem } from "../interface/order.interface";
+import { OrderItem } from "../schema/order_product_item.schema";
 
 export class OrderUtil {
   static calculateSubTotal(orderItems: OrderItem[]): number {

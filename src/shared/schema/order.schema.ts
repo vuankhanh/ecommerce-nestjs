@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
 import { OrderStatus } from "src/constant/status.constant";
-import { Customer } from "src/module/customer/schema/customer.schema";
 import { IOrder, IOrderItem, TOrderStatus } from "src/shared/interface/order.interface";
 import { TPaymentMethod } from "src/shared/interface/payment.interface";
 import { ObjectId } from "mongodb";
@@ -10,6 +9,7 @@ import { OrderItem } from "./order_product_item.schema";
 import { PaymentMethod } from "src/constant/payment.constant";
 import { OrderUtil } from "src/shared/util/order.util";
 import { IDelivery } from "src/shared/interface/delivery.interface";
+import { Account } from "src/module/auth/schemas/account.schema";
 
 export type OrderDocument = HydratedDocument<Order>;
 
@@ -39,7 +39,7 @@ export class Order implements IOrder {
   @Prop({ type: String, enum: PaymentMethod, required: true })
   paymentMethod: TPaymentMethod;
 
-  @Prop({ type: Types.ObjectId, ref: Customer.name })
+  @Prop({ type: Types.ObjectId, ref: Account.name })
   customerId?: Types.ObjectId | string;
 
   @Prop({ type: Object})

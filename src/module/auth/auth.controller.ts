@@ -96,6 +96,8 @@ export class AuthController {
     const name = user.name;
     const avatar = user.picture;
     const provider = user.firebase.sign_in_provider;
+    console.log(`provider: ${provider}`);
+    
     if (provider !== 'google.com' && provider !== 'facebook.com') {
       throw new CustomUnauthorizedException('Chỉ hỗ trợ đăng nhập bằng Google hoặc Facebook');
     }
@@ -121,14 +123,14 @@ export class AuthController {
         if (provider === 'google.com') {
           if(!account.googleId || account.googleId !== user.uid) {
             this.logger.log('Updating Google ID for existing user.');
-            account.updateGoogleId = user.uid;
+            account.googleId = user.uid;
           }
         }
 
         if (provider === 'facebook.com') {
           if(!account.facebookId || account.facebookId !== user.uid) {
             this.logger.log('Updating Facebook ID for existing user.');
-            account.updateFacebookId = user.uid;
+            account.facebookId = user.uid;
           }
         }
         await account.save();
