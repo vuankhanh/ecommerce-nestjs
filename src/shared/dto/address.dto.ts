@@ -1,19 +1,24 @@
 import { IsNotEmpty, IsString } from "class-validator";
 import { IDistrict, IProvince, IWard } from "../interface/vn-public-apis.interface";
 import { IAddress } from "../interface/address.interface";
+import { IsValid } from "../custom-validator/custom-validator";
+import { validateAddressDistrict, validateAddressProvince, validateAddressWard } from "../custom-validator/address.validator";
 
 
 export class AddressDto implements IAddress {
-  @IsNotEmpty({ message: 'The province is required' })
+  @IsNotEmpty({ message: 'Tỉnh không được để trống' })
+  @IsValid(validateAddressProvince, { message: 'Tỉnh không đúng định dạng' })
   province: IProvince; // Province object
 
-  @IsNotEmpty({ message: 'The district is required' })
+  @IsNotEmpty({ message: 'Huyện không được để trống' })
+  @IsValid(validateAddressDistrict, { message: 'Huyện không đúng định dạng' })
   district: IDistrict; // District object
 
-  @IsNotEmpty({ message: 'The ward is required' })
+  @IsNotEmpty({ message: 'Xã không được để trống' })
+  @IsValid(validateAddressWard, { message: 'Xã không đúng định dạng' })
   ward: IWard; // Ward name
 
-  @IsNotEmpty({ message: 'The street is required' })
-  @IsString({ message: 'The street must be a string' })
+  @IsNotEmpty({ message: 'Đường phố không được để trống' })
+  @IsString({ message: 'Đường phố phải là chuỗi' })
   street: string; // Street address
 }

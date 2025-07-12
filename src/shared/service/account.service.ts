@@ -11,8 +11,16 @@ export class AccountService {
     @InjectModel(Account.name) private accountModel: Model<Account>,
   ) { }
 
-  findOne(query: FilterQuery<Account>): Promise<AccountDocument> {
-    return this.accountModel.findOne(query).select('+password');
+  async findOne(query: FilterQuery<Account>): Promise<AccountDocument> {
+    return await this.accountModel.findOne(query).select('+password');
+  }
+
+  async getIdAccountByEmail(email: string): Promise<string> {
+    const account = await this.accountModel.findOne({ email }).select('_id');
+    if (!account) {
+      return null;
+    }
+    return account._id.toString();
   }
 
   async create(signup: Account): Promise<AccountDocument> {
@@ -22,7 +30,7 @@ export class AccountService {
 
     const newUser = new this.accountModel(signup);
     newUser.password = hashedPassword;
-    return newUser.save();
+    return await newUser.save();
   }
 
   async createNonePasswordAccount(account: Account): Promise<AccountDocument> {
