@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Account, AccountDocument } from 'src/module/auth/schemas/account.schema';
 import * as bcrypt from 'bcrypt';
 
@@ -11,7 +11,7 @@ export class AccountService {
     @InjectModel(Account.name) private accountModel: Model<Account>,
   ) { }
 
-  findOne(query: any): Promise<AccountDocument> {
+  findOne(query: FilterQuery<Account>): Promise<AccountDocument> {
     return this.accountModel.findOne(query).select('+password');
   }
 
@@ -47,8 +47,33 @@ export class AccountService {
     return account;
   }
 
-  findOneAndRemove(query: any): Promise<any> {
+  async createPassword(email: string, newPassword: string): Promise<AccountDocument> {
+    const account = await this.accountModel.findOne({ email });
+    if (!account) {
+      return Promise.resolve(null);
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+    account.password = hashedNewPassword;
+    account.hasPassword = true; // Ensure hasPassword is set to true
+    return await account.save();
+  }
+
+  async updatePassword(email: string, currentPassword: string, newPassword: string): Promise<AccountDocument> {
+    const account = await this.validateAccount(email, currentPassword);
+    if (!account) {
+      return Promise.resolve(null);
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+
+    account.password = hashedNewPassword;
+    account.hasPassword = true; // Ensure hasPassword is set to true
+    return await account.save();
+  }
+
+  async findOneAndRemove(query: any): Promise<any> {
     this.logger.log('Deleting User.');
-    return this.accountModel.findOneAndDelete(query);
+    return await this.accountModel.findOneAndDelete(query);
   }
 }

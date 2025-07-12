@@ -17,8 +17,13 @@ export class Account implements IUser {
   })
   email: string;
 
-  @Prop()
+  @Prop({
+    type: String,
+  })
   password?: string;
+
+  @Prop({ type: String, default: false })
+  hasPassword?: boolean;
 
   @Prop({ unique: true, sparse: true })
   googleId?: string;
@@ -63,6 +68,7 @@ export class Account implements IUser {
 
   set updatePassword(password: string) {
     this.password = password;
+    this.hasPassword = true;
   }
 
   set updateGoogleId(googleId: string) {

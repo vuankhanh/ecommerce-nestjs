@@ -34,9 +34,9 @@ export class AuthController {
         throw new CustomConflictException('Tên đăng nhập đã tồn tại');
       }
 
-      const signUp = new Account(
+      const signUp: Account = new Account(
         signUpDto.email,
-        signUpDto.password
+        signUpDto.name
       );
 
       signUp.updatePassword = signUpDto.password;
@@ -96,7 +96,6 @@ export class AuthController {
     const name = user.name;
     const avatar = user.picture;
     const provider = user.firebase.sign_in_provider;
-    console.log(`provider: ${provider}`);
     
     if (provider !== 'google.com' && provider !== 'facebook.com') {
       throw new CustomUnauthorizedException('Chỉ hỗ trợ đăng nhập bằng Google hoặc Facebook');
@@ -107,7 +106,7 @@ export class AuthController {
 
       if (!account) {
         this.logger.log('Creating new user from Firebase authentication.');
-        const signUp = new Account(email, name, avatar);
+        const signUp: Account = new Account(email, name, avatar);
 
         if (provider === 'google.com') {
           signUp.updateFacebookId = user.uid;

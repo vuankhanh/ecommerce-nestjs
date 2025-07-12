@@ -5,6 +5,7 @@ export interface IUser {
   password?: string;
   googleId?: string;
   facebookId?: string;
+  hasPassword?: boolean;
   name: string;
   avatar?: string;
   role: `${UserRole}`
