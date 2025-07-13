@@ -4,7 +4,7 @@ import { AccountDocument } from './schemas/account.schema';
 import mongoose from 'mongoose';
 import { RefreshTokenService } from 'src/shared/service/refresh_token.service';
 import { AccountService } from 'src/shared/service/account.service';
-import { CustomUnauthorizedException } from 'src/shared/core/exception/custom-exception';
+import { CustomForbiddenException, CustomUnauthorizedException } from 'src/shared/core/exception/custom-exception';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -70,7 +70,7 @@ export class AuthService {
 
       const refreshTokenDoc = await this.refreshTokenService.findOne(accountId, refreshToken);
       if (!refreshTokenDoc) {
-        throw new CustomUnauthorizedException('Invalid refresh token');
+        throw new CustomForbiddenException('Không tìm thấy refresh token');
       }
       await this.jwtService.verifyAsync(refreshToken, {
         secret: this.jwtRefreshToken.secret,
@@ -78,7 +78,7 @@ export class AuthService {
 
       return this.createAccessToken(account);
     } catch (error) {
-      throw new CustomUnauthorizedException('Invalid refresh token');
+      throw new CustomForbiddenException('Invalid refresh token');
     }
   }
 }

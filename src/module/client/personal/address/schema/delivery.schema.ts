@@ -1,8 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import { HydratedDocument, Types } from "mongoose";
+import { ObjectId } from "mongodb";
 import { validatePhoneNumber } from "src/shared/custom-validator/vietnamese-phone-number.validator";
 import { IAddress } from "src/shared/interface/address.interface";
 import { IDelivery } from "src/shared/interface/delivery.interface";
+import { Account } from "src/module/auth/schemas/account.schema";
 
 export type DeliveryDocument = HydratedDocument<Delivery>;
 
@@ -10,13 +12,23 @@ export type DeliveryDocument = HydratedDocument<Delivery>;
   timestamps: true
 })
 export class Delivery implements IDelivery {
-  @Prop({ type: String, required: true })
-  accountId: string;
+  @Prop({ type: Types.ObjectId, required: true, ref: Account.name })
+  accountId: Types.ObjectId;
 
   @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({ type: String, required: true, unique: true, pattern: validatePhoneNumber })
+  @Prop({
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: function(phone: string) {
+        return validatePhoneNumber(phone);
+      },
+      message: 'Invalid phone number format'
+    }
+  })
   phoneNumber: string;
 
   @Prop({ type: Object, required: true })
@@ -25,16 +37,14 @@ export class Delivery implements IDelivery {
   @Prop({ type: String, required: true })
   addressDetail: string;
 
-  constructor(name: string, phoneNumber: string, address: IAddress) {
-    this.name = name;
-    this.phoneNumber = phoneNumber;
-    this.address = address;
-    this.addressDetail = this.getAddressDetail;
-  }
-
-  private get getAddressDetail(): string {
-    return `${this.address.street}, ${this.address.ward.name}, ${this.address.district.name}, ${this.address.province.name}`;
-  }
+  @Prop({ type: Boolean, default: false })
+  isDefault?: boolean;
 }
 
 export const delivertySchema = SchemaFactory.createForClass(Delivery);
+
+// Index để đảm bảo chỉ có 1 địa chỉ mặc định per account
+delivertySchema.index({ accountId: 1, isDefault: 1 }, { 
+  unique: true, 
+  partialFilterExpression: { isDefault: true } 
+});
