@@ -36,6 +36,10 @@ export class OrderCreateDto implements IOrderCreateRequest {
   @Type(() => DeliveryInfoDto)
   delivery: DeliveryInfoDto;
 
+  constructor() {
+    console.log(`OrderCreateDto constructor called`);
+    
+  }
 }
 
 export class UpdateOrderDto extends PartialType(OrderCreateDto) { }

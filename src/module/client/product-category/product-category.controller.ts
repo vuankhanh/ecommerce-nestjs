@@ -25,12 +25,9 @@ export class ProductCategoryController {
 
   @Get('detail')
   async getDetail(
-    @Query('id', new ParseObjectIdPipe()) id?: string,
     @Query('slug') slug?: string
   ) {
-    const filterQuery = {};
-    if (id) filterQuery['_id'] = id;
-    else if (slug) filterQuery['slug'] = slug;
+    const filterQuery = { slug };
     
     return await this.productCategoryService.getDetail(filterQuery);
   }

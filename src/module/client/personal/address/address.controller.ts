@@ -69,6 +69,7 @@ export class AddressController {
       accountId: new Types.ObjectId(accountId), 
       isDefault: true 
     };
+    
     return this.addressService.getDetail(filterQuery);
   }
 

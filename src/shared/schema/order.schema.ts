@@ -40,7 +40,7 @@ export class Order implements IOrder {
   paymentMethod: TPaymentMethod;
 
   @Prop({ type: Types.ObjectId, ref: Account.name })
-  customerId?: Types.ObjectId | string;
+  accountId?: Types.ObjectId;
 
   @Prop({ type: Object})
   delivery: IDelivery;
@@ -68,8 +68,8 @@ export class Order implements IOrder {
     return `${prefix}${date}${randomNumber}`;
   }
 
-  set updateCustomerId(customerId: string) {
-    this.customerId = ObjectId.createFromHexString(customerId);
+  set updateAccountId(accountId: Types.ObjectId) {
+    this.accountId = accountId;
   }
 
 }

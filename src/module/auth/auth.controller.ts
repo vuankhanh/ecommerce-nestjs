@@ -10,7 +10,6 @@ import { CustomConflictException, CustomInternalServerErrorException, CustomUnau
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { FirebaseAuthGuard } from 'src/shared/core/guards/firebase-auth.guard';
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
-import { log } from 'console';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { UserRole } from 'src/constant/user.constant';
 

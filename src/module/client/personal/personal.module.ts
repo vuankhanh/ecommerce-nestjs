@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 
 import { InfoModule } from './info/info.module';
 import { RouterModule } from '@nestjs/core';
-import { OrderModule } from './order/order.module';
 import { AddressModule } from './address/address.module';
 
 @Module({
@@ -17,10 +16,6 @@ import { AddressModule } from './address/address.module';
             module: InfoModule,
           },
           {
-            path: 'order',
-            module: OrderModule,
-          },
-          {
             path: 'address',
             module: AddressModule,
           }
@@ -28,7 +23,6 @@ import { AddressModule } from './address/address.module';
       }
     ]),
     InfoModule,
-    OrderModule,
     AddressModule,
   ]
 })
