@@ -9,9 +9,10 @@ import { CustomBadRequestException, CustomInternalServerErrorException } from 's
 import { ObjectId } from 'mongodb';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { VietnameseAccentUtil } from 'src/shared/util/vietnamese-accent.util';
+import { UserRole } from 'src/constant/user.constant';
 @Controller()
 @UseGuards(LocalAuthGuard)
-@Roles('admin')
+@Roles(UserRole.ADMIN)
 @UsePipes(ValidationPipe)
 @UseInterceptors(FormatResponseInterceptor)
 export class ProductCategoryController {

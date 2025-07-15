@@ -1,7 +1,6 @@
 import { Prop, Schema } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { IOrderItem } from "src/shared/interface/order.interface";
-import { OrderUtil } from "src/shared/util/order.util";
 
 @Schema({ timestamps: true })
 export class OrderItem implements IOrderItem {

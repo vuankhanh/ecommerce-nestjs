@@ -19,10 +19,11 @@ import { Album } from '../../../../shared/schema/album.schema';
 import { ValidateModifyProductCategoryAlbumGuard } from './guards/validate_modify_product_category_album.guard';
 import { ParseObjectIdArrayPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { ProductCategoryModifyItemIndexChangeDto, ProductCategoryModifyRemoveFilesDto } from './dto/product_category_modify.dto';
+import { UserRole } from 'src/constant/user.constant';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
-@Roles('admin')
+@Roles(UserRole.ADMIN)
 @UsePipes(ValidationPipe)
 @UseInterceptors(FormatResponseInterceptor)
 export class MediaProductCategoryController {

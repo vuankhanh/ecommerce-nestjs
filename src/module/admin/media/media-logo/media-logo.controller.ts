@@ -15,10 +15,11 @@ import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { Media } from '../../../../shared/schema/media.schema';
 import { ValidateModifyLogoAlbumGuard } from './guards/validate_modify_logo_album.guard';
+import { UserRole } from 'src/constant/user.constant';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
-@Roles('admin')
+@Roles(UserRole.ADMIN)
 @UsePipes(ValidationPipe)
 @UseInterceptors(FormatResponseInterceptor)
 export class MediaLogoController {

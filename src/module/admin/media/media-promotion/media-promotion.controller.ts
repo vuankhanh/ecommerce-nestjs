@@ -15,10 +15,11 @@ import { ValidateModifyPromotionAlbumGuard } from './guards/validate_modify_prom
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
+import { UserRole } from 'src/constant/user.constant';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
-@Roles('admin')
+@Roles(UserRole.ADMIN)
 @UsePipes(ValidationPipe)
 @UseInterceptors(FormatResponseInterceptor)
 export class MediaPromotionController {

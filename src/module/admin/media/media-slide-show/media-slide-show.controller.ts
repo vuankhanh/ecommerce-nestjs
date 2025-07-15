@@ -17,10 +17,11 @@ import { ValidateModifySlideShowAlbumGuard } from './guards/validate_modify_slid
 import { ParseObjectIdArrayPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { SlideShowModifyItemIndexChangeDto, SlideShowModifyRemoveFilesDto } from './dto/slide_show_modify.dto';
 import { Media } from '../../../../shared/schema/media.schema';
+import { UserRole } from 'src/constant/user.constant';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
-@Roles('admin')
+@Roles(UserRole.ADMIN)
 @UsePipes(ValidationPipe)
 @UseInterceptors(FormatResponseInterceptor)
 export class MediaSlideShowController {

@@ -1,59 +1,83 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
-import { OrderService } from './order.service';
-import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
-import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
-import { OrderCreateDto, UpdateOrderDto } from './dto/order-create.dto';
-import { ObjectId } from 'mongodb';
-import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
+import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { OrderStatus } from 'src/constant/status.constant';
-import { OrderUtil } from 'src/shared/util/order.util';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
-import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
-import { IOrder, IOrderItem } from 'src/shared/interface/order.interface';
+import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ProductService } from '../product/product.service';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { IOrder, IOrderItem } from 'src/shared/interface/order.interface';
 import { ProductDocument } from 'src/shared/schema/product.schema';
-import { Order } from 'src/shared/schema/order.schema';
+import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
+import { OrderStatus } from 'src/constant/status.constant';
+import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
 
-@Controller('order')
+import { Types } from 'mongoose';
+import { Request } from 'express';
+import { AccountIdGuard } from '../personal/guard/account_id.guard';
+import { Roles } from 'src/shared/core/decorator/roles.decorator';
+import { UserRole } from 'src/constant/user.constant';
+import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
+import { OrderCreateDto } from 'src/module/order-basic/dto/order-create.dto';
+import { Order } from 'src/module/order-basic/schema/order.schema';
+
+@Controller('/client/order')
+@Roles(UserRole.CLIENT)
+@UseGuards(LocalAuthGuard, AccountIdGuard)
 @UseInterceptors(FormatResponseInterceptor)
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-export class OrderController {
+export class OrderLoyaltyController {
   constructor(
     private configService: ConfigService,
-    private readonly orderService: OrderService,
+    private readonly orderBasicService: OrderBasicService,
     private readonly productService: ProductService
   ) { }
 
   @Get()
   async getAll(
+    @Req() request: Request,
     @Query('name') name: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
   ) {
+    const accountId: string = request['customParams'].accountId;
+    if (!accountId) {
+      throw new CustomBadRequestException('Không tìm thấy thông tin tài khoản');
+    }
+    
     const filterQuery = {};
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
+    filterQuery['accountId'] = new Types.ObjectId(accountId);
 
-    return await this.orderService.getAll(filterQuery, page, size);
+    return await this.orderBasicService.getAll(filterQuery, page, size);
   }
 
-  @Get(':id')
+  @Get('detail')
   async getDetail(
-    @Param('id', new ParseObjectIdPipe()) id: string,
+    @Req() request: Request,
+    @Query('id', new ParseObjectIdPipe()) id: string,
   ) {
-    const filterQuery = { _id: id };
+    const accountId: string = request['customParams'].accountId;
+    if (!accountId) {
+      throw new CustomBadRequestException('Không tìm thấy thông tin tài khoản');
+    }
 
-    return await this.orderService.getDetail(filterQuery);
+    const filterQuery = { _id: id, accountId: new Types.ObjectId(accountId) };
+
+    return await this.orderBasicService.getDetail(filterQuery);
   }
 
   @Post()
   async create(
+    @Req() request: Request,
     @Body() orderCreateDto: OrderCreateDto
   ) {
-    console.log(orderCreateDto);
+    const accountId: string = request['customParams'].accountId;
+    if (!accountId) {
+      throw new CustomBadRequestException('Không tìm thấy thông tin tài khoản');
+    }
+
     const orderItems: IOrderItem[] = [];
     for (const item of orderCreateDto.orderItems) {
-      const productId = ObjectId.createFromHexString(item.productId);
+      const productId = new Types.ObjectId(item.productId);
       const product: ProductDocument = await this.productService.getDetail({ _id: productId })
       if (!product) {
         throw new CustomBadRequestException(`Sản phẩm với ID ${item.productId} không tồn tại`);
@@ -80,9 +104,9 @@ export class OrderController {
       delivery: orderCreateDto.delivery,
     }
     const order: Order = new Order(iOrder);
-    console.log(order.orderItems);
-    
-    return await this.orderService.create(order);
+    order.updateAccountId = new Types.ObjectId(accountId);
+
+    return await this.orderBasicService.create(order);
   }
 
   // @Put(':id')
@@ -142,14 +166,14 @@ export class OrderController {
   ) {
     const filterQuery = { _id: id };
 
-    return await this.orderService.remove(filterQuery);
+    return await this.orderBasicService.remove(filterQuery);
   }
 
   @Post(':id/print')
   async print(
     @Param('id', new ParseObjectIdPipe()) id: string
   ) {
-    const orderDetail = await this.orderService.getDetail({ _id: id });
+    const orderDetail = await this.orderBasicService.getDetail({ _id: id });
     if (![OrderStatus.CONFIRMED, OrderStatus.SHIPPING, OrderStatus.COMPLETED].includes(orderDetail.status as OrderStatus)) {
       throw new CustomBadRequestException('Trạng thái của Order phải là CONFIRMED, SHIPPING, hoặc COMPLETED để in');
     }
@@ -157,6 +181,6 @@ export class OrderController {
 
     const footer: IFooterTemplate = this.configService.get<IFooterTemplate>('brand');
     const template: Template = new Template(order, footer);
-    return await this.orderService.print(template);
+    return await this.orderBasicService.print(template);
   }
 }

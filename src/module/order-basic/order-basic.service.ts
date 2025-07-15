@@ -7,11 +7,11 @@ import { Template } from 'src/shared/interface/template.interface';
 import { OrderStatus } from 'src/constant/status.constant';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { Order, OrderDocument } from 'src/shared/schema/order.schema';
 import { Account } from 'src/module/auth/schemas/account.schema';
+import { Order, OrderDocument } from './schema/order.schema';
 
 @Injectable()
-export class OrderService implements IBasicService<Order> {
+export class OrderBasicService implements IBasicService<Order> {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
     private configService: ConfigService
@@ -24,7 +24,6 @@ export class OrderService implements IBasicService<Order> {
   }
 
   async getAll(filterQuery: FilterQuery<Order>, page: number, size: number): Promise<{ data: OrderDocument[]; paging: IPaging; }> {
-    filterQuery.status = { $ne: OrderStatus.CANCELED };
     const countTotal = await this.orderModel.countDocuments(filterQuery);
     const orderAggregate = await this.orderModel.aggregate(
       [

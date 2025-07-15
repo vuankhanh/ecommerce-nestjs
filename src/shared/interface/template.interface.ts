@@ -1,4 +1,4 @@
-import { Order } from "../schema/order.schema";
+import { Order } from "src/module/order-basic/schema/order.schema";
 import { ICustomer } from "./customer.interface";
 import { IOrder } from "./order.interface";
 

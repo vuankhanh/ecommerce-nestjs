@@ -8,17 +8,23 @@ import { MediaSlideShowModule } from './media/media-slide-show/media-slide-show.
 import { MediaPromotionModule } from './media/media-promotion/media-promotion.module';
 import { MediaProductModule } from './media/media-product/media-product.module';
 import { MediaProductCategoryModule } from './media/media-product-category/media-product-category.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
     ProductModule,
     ProductCategoryModule,
     MediaModule,
+    OrderModule,
     RouterModule.register([
       {
         path: 'admin',
         module: AdminModule,
         children: [
+          {
+            path: 'order',
+            module: OrderModule,
+          },
           {
             path: 'product-category',
             module: ProductCategoryModule,

@@ -20,10 +20,11 @@ import { ValidateModifyProductAlbumGuard } from './guards/validate_modify_produc
 import { ParseObjectIdArrayPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { ProductModifyItemIndexChangeDto, ProductModifyRemoveFilesDto } from './dto/product_modify.dto';
 import { FilesProccedInterceptor } from 'src/shared/core/interceptors/files_procced.interceptor';
+import { UserRole } from 'src/constant/user.constant';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
-@Roles('admin')
+@Roles(UserRole.ADMIN)
 @UsePipes(ValidationPipe)
 @UseInterceptors(FormatResponseInterceptor)
 export class MediaProductController {

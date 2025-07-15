@@ -12,7 +12,6 @@ import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './shared/core/exception/http_exception.filter';
 import { VnPublicApisModule } from './module/vn-public-apis/vn-public-apis.module';
 import { SocketGateway } from './gateway/socket/socket.gateway';
-import { ServerConfigModule } from './module/server-config/server-config.module';
 import { AdminModule } from './module/admin/admin.module';
 import { ClientModule } from './module/client/client.module';
 
@@ -31,7 +30,6 @@ import { ClientModule } from './module/client/client.module';
     AuthModule,
     CustomLoggerModule,
     VnPublicApisModule,
-    ServerConfigModule,
     ClientModule
   ],
   providers: [
