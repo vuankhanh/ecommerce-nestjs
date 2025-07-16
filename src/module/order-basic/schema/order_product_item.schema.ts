@@ -19,6 +19,12 @@ export class OrderItem implements IOrderItem {
   @Prop({ type: String, required: true })
   productName: string;
 
+  @Prop({ type: String, required: true })
+  productCategorySlug: string;
+
+  @Prop({ type: String, required: true })
+  productSlug: string;
+
   @Prop({ type: Number, required: true })
   quantity: number;
 
@@ -33,6 +39,8 @@ export class OrderItem implements IOrderItem {
     this.productThumbnail = orderItem.productThumbnail;
     this.productCode = orderItem.productCode;
     this.productName = orderItem.productName;
+    this.productCategorySlug = orderItem.productCategorySlug;
+    this.productSlug = orderItem.productSlug;
     this.quantity = orderItem.quantity;
     this.price = orderItem.price;
     this.total = this.price * this.quantity;

@@ -18,6 +18,8 @@ export interface IOrderItem {
   productThumbnail: string;
   productCode: string;
   productName: string;
+  productCategorySlug: string;
+  productSlug: string;
   quantity: number;
   price: number;
 }

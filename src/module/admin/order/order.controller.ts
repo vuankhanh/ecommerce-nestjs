@@ -8,6 +8,7 @@ import { FilterDto } from './dto/filter.dto';
 import { FilterQuery } from 'mongoose';
 import { Order } from 'src/module/order-basic/schema/order.schema';
 import { OrderStatus } from 'src/constant/status.constant';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
@@ -18,7 +19,7 @@ export class OrderController {
   constructor(
     private readonly orderBasicService: OrderBasicService
   ) { }
-
+  
   @Post()
   @HttpCode(200)
   async getAll(
@@ -40,5 +41,15 @@ export class OrderController {
     }
     
     return await this.orderBasicService.getAll(filterQuery, page, size);
+  }
+
+  @Get('detail')
+  getDetail(
+    @Query('id', new ParseObjectIdPipe()) id?: string,
+  ) {
+    const filterQuery: FilterQuery<Order> = {};
+    if (id) filterQuery['_id'] = id;
+
+    return this.orderBasicService.getDetail(filterQuery);
   }
 }

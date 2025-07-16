@@ -63,6 +63,8 @@ export class OrderVisitorController {
         productThumbnail: product?.album?.thumbnailUrl,
         productCode: product.code,
         productName: product.name,
+        productCategorySlug: product.productCategory?.slug,
+        productSlug: product.slug,
         quantity: item.quantity,
         price: product.price
       };
