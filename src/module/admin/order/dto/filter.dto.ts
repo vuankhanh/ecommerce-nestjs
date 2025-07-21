@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
 import { IsArray, IsDate, IsOptional, IsString, ValidateIf } from "class-validator";
-import { OrderStatus } from "src/constant/status.constant";
+import { OrderStatus } from "src/constant/order.constant";
 
 export class FilterDto {
   @IsOptional()

@@ -4,11 +4,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Template } from 'src/shared/interface/template.interface';
-import { OrderStatus } from 'src/constant/status.constant';
+import { OrderFrom, OrderStatus } from 'src/constant/order.constant';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { Account } from 'src/module/auth/schemas/account.schema';
 import { Order, OrderDocument } from './schema/order.schema';
+import { UserRole } from 'src/constant/user.constant';
 
 @Injectable()
 export class OrderBasicService implements IBasicService<Order> {
@@ -29,21 +30,39 @@ export class OrderBasicService implements IBasicService<Order> {
       [
         { $match: filterQuery },
         {
+          $sort: { createdAt: -1 } // Sắp xếp theo ngày tạo mới nhất
+        },
+        {
           $lookup: {
             from: Account.name.toLocaleLowerCase(), // Tên của collection Customer
             localField: 'accountId',
             foreignField: '_id',
-            as: 'account'
+            as: 'orderAccount'
           }
         },
         {
           $unwind: {
-            path: '$account',
+            path: '$orderAccount',
             preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
           }
         },
         {
           $addFields: {
+            orderFrom: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $eq: ["$orderAccount.role", UserRole.CLIENT] },
+                    then: OrderFrom.LOYALTY
+                  },
+                  {
+                    case: { $eq: ["$orderAccount.role", UserRole.ADMIN] },
+                    then: OrderFrom.ADMIN
+                  }
+                ],
+                default: OrderFrom.VISITOR
+              }
+            },
             'productName': {
               $ifNull: [
                 { $arrayElemAt: ["$orderItems.productName", 0] }, null
@@ -82,20 +101,22 @@ export class OrderBasicService implements IBasicService<Order> {
             orderItems: {
               _id: 0
             },
-            accountId: 0,
             note: 0,
             __v: 0,
-            account: {
-              _id: 0,
-              __v: 0,
-              address: 0,
-              email: 0,
-              dob: 0,
-              company: 0,
-              note: 0,
-              createdAt: 0,
-              updatedAt: 0,
-            }
+            accountId: 0,
+            orderAccount: 0
+            // orderAccount: {
+            //   _id: 0,
+            //   createdAt: 0,
+            //   updatedAt: 0,
+            //   facebookId: 0,
+            //   googleId: 0,
+            //   role: 0,
+            //   createdByProvider: 0,
+            //   hasPassword: 0,
+            //   password: 0,
+            //   __v: 0
+            // }
           }
         }
       ]
@@ -140,7 +161,7 @@ export class OrderBasicService implements IBasicService<Order> {
     const port = this.configService.get('printer.port');
 
     const url = `${protocol}://${host}:${port}/api/print`;
-    
+
     return await axios.post(url, temp).then(res => res.data);
   }
 

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
-import { OrderStatus } from "src/constant/status.constant";
+import { OrderStatus } from "src/constant/order.constant";
 import { IOrder, IOrderItem, TOrderStatus } from "src/shared/interface/order.interface";
 import { TPaymentMethod } from "src/shared/interface/payment.interface";
 import { ObjectId } from "mongodb";

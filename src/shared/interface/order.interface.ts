@@ -1,4 +1,4 @@
-import { OrderStatus } from "src/constant/status.constant";
+import { OrderStatus } from "src/constant/order.constant";
 import { TPaymentMethod } from "./payment.interface";
 import { IDelivery } from "./delivery.interface";
 

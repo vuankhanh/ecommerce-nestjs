@@ -7,7 +7,7 @@ import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_r
 import { FilterDto } from './dto/filter.dto';
 import { FilterQuery } from 'mongoose';
 import { Order } from 'src/module/order-basic/schema/order.schema';
-import { OrderStatus } from 'src/constant/status.constant';
+import { OrderStatus } from 'src/constant/order.constant';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 
 @Controller()

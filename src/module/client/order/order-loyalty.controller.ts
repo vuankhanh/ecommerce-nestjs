@@ -7,7 +7,7 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { IOrder, IOrderItem } from 'src/shared/interface/order.interface';
 import { ProductDocument } from 'src/shared/schema/product.schema';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
-import { OrderStatus } from 'src/constant/status.constant';
+import { OrderStatus } from 'src/constant/order.constant';
 import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
 
 import { Types } from 'mongoose';

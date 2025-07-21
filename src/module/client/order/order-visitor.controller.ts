@@ -4,7 +4,7 @@ import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pi
 import { ObjectId } from 'mongodb';
 import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
 import { ConfigService } from '@nestjs/config';
-import { OrderStatus } from 'src/constant/status.constant';
+import { OrderStatus } from 'src/constant/order.constant';
 import { OrderUtil } from 'src/shared/util/order.util';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
@@ -50,7 +50,6 @@ export class OrderVisitorController {
   async create(
     @Body() orderCreateDto: OrderCreateDto
   ) {
-    console.log(orderCreateDto);
     const orderItems: IOrderItem[] = [];
     for (const item of orderCreateDto.orderItems) {
       const productId = ObjectId.createFromHexString(item.productId);
