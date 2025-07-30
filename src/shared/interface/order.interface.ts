@@ -1,6 +1,7 @@
 import { OrderStatus } from "src/constant/order.constant";
 import { TPaymentMethod } from "./payment.interface";
 import { IDelivery } from "./delivery.interface";
+import { Types } from "mongoose";
 
 export type TOrderStatus = `${OrderStatus}`;
 
@@ -15,6 +16,7 @@ export interface IOrder {
 }
 
 export interface IOrderItem {
+  productId: string | Types.ObjectId;
   productThumbnail: string;
   productCode: string;
   productName: string;

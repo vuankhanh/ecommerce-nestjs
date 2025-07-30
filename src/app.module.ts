@@ -14,6 +14,7 @@ import { VnPublicApisModule } from './module/vn-public-apis/vn-public-apis.modul
 import { SocketGateway } from './gateway/socket/socket.gateway';
 import { AdminModule } from './module/admin/admin.module';
 import { ClientModule } from './module/client/client.module';
+import { MailModule } from './module/mail/mail.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { ClientModule } from './module/client/client.module';
     AuthModule,
     CustomLoggerModule,
     VnPublicApisModule,
-    ClientModule
+    ClientModule,
+    MailModule
   ],
   providers: [
     {

@@ -78,7 +78,14 @@ export default () => {
     }
   }
 
+  const mail = {
+    host: process.env.MAIL_APPLICATION_HOST || 'smtp.gmail.com',
+    port: Number(process.env.MAIL_APPLICATION_PORT) || 465,
+    user: process.env.MAIL_APPLICATION_USER || '',
+    password: process.env.MAIL_APPLICATIOM_PASSWORD || ''
+  }
+
   const config = process.env.NODE_ENV?.trim() === 'pro' ? pro : dev;
 
-  return { ...config, folder, vnPublicApi, authenticationProvider, jwt };
+  return { ...config, folder, vnPublicApi, authenticationProvider, jwt, mail };
 }

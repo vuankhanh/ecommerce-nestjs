@@ -34,5 +34,3 @@ export class OrderCreateDto implements IOrderCreateRequest {
   @Type(() => DeliveryInfoDto)
   delivery: DeliveryInfoDto;
 }
-
-export class UpdateOrderDto extends PartialType(OrderCreateDto) { }

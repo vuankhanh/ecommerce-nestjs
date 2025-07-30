@@ -1,6 +1,7 @@
 import { Prop, Schema } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { IOrderItem } from "src/shared/interface/order.interface";
+import { Product } from "src/shared/schema/product.schema";
 
 @Schema({ timestamps: true })
 export class OrderItem implements IOrderItem {
@@ -9,6 +10,9 @@ export class OrderItem implements IOrderItem {
     default: () => new Types.ObjectId()
   })
   _id?: Types.ObjectId;
+
+  @Prop({ type: String, ref: Product.name, required: true })
+  productId: string | Types.ObjectId;
 
   @Prop({ type: String, required: true })
   productThumbnail: string;
@@ -33,16 +37,4 @@ export class OrderItem implements IOrderItem {
 
   @Prop({ type: Number, required: true })
   total: number;
-
-  constructor(orderItem: IOrderItem) {
-    this._id = new Types.ObjectId();
-    this.productThumbnail = orderItem.productThumbnail;
-    this.productCode = orderItem.productCode;
-    this.productName = orderItem.productName;
-    this.productCategorySlug = orderItem.productCategorySlug;
-    this.productSlug = orderItem.productSlug;
-    this.quantity = orderItem.quantity;
-    this.price = orderItem.price;
-    this.total = this.price * this.quantity;
-  }
 }

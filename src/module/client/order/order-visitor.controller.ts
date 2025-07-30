@@ -1,19 +1,18 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
-import { ObjectId } from 'mongodb';
 import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
 import { ConfigService } from '@nestjs/config';
 import { OrderStatus } from 'src/constant/order.constant';
-import { OrderUtil } from 'src/shared/util/order.util';
-import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
-import { IOrder, IOrderItem } from 'src/shared/interface/order.interface';
+import { IOrder } from 'src/shared/interface/order.interface';
 import { ProductService } from '../product/product.service';
-import { ProductDocument } from 'src/shared/schema/product.schema';
 import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
 import { OrderCreateDto } from 'src/module/order-basic/dto/order-create.dto';
 import { Order } from 'src/module/order-basic/schema/order.schema';
+import { OrderItemsMapClientPipe } from 'src/shared/core/pipes/order-items-map-client.pipe';
+import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
+import { OrderEntity } from 'src/module/order-basic/entity/order.entity';
 
 @Controller('order')
 @UseInterceptors(FormatResponseInterceptor)
@@ -48,29 +47,9 @@ export class OrderVisitorController {
 
   @Post()
   async create(
-    @Body() orderCreateDto: OrderCreateDto
+    @Body() orderCreateDto: OrderCreateDto,
+    @Body('orderItems', OrderItemsMapClientPipe) orderItems: Array<OrderProductItemEntity>
   ) {
-    const orderItems: IOrderItem[] = [];
-    for (const item of orderCreateDto.orderItems) {
-      const productId = ObjectId.createFromHexString(item.productId);
-      const product: ProductDocument = await this.productService.getDetail({ _id: productId })
-      if (!product) {
-        throw new CustomBadRequestException(`Sản phẩm với ID ${item.productId} không tồn tại`);
-      }
-
-      const orderItem: IOrderItem = {
-        productThumbnail: product?.album?.thumbnailUrl,
-        productCode: product.code,
-        productName: product.name,
-        productCategorySlug: product.productCategory?.slug,
-        productSlug: product.slug,
-        quantity: item.quantity,
-        price: product.price
-      };
-
-      orderItems.push(orderItem);
-    }
-
     const iOrder : IOrder = {
       orderItems: orderItems,
       status: OrderStatus.PENDING,
@@ -80,7 +59,7 @@ export class OrderVisitorController {
       note: orderCreateDto.note,
       delivery: orderCreateDto.delivery,
     }
-    const order: Order = new Order(iOrder);
+    const order: OrderEntity = new OrderEntity(iOrder);
     console.log(order.orderItems);
     
     return await this.orderBasicService.create(order);
@@ -93,7 +72,7 @@ export class OrderVisitorController {
   // ) {
   //   const filterQuery = { _id: id };
   //   const order = new Order(orderDto);
-  //   order.updateCustomerId = orderDto.customerId;
+  //   order.updateaccountd = orderDto.accountd;
 
   //   return await this.orderService.replace(filterQuery, order);
   // }
@@ -120,7 +99,7 @@ export class OrderVisitorController {
   //     data.total = OrderUtil.calculateTotal(subTotal, currentOrder.deliveryFee, currentOrder.discount);
   //   }
 
-  //   if (orderDto.customerId) data.customerId = ObjectId.createFromHexString(orderDto.customerId);
+  //   if (orderDto.accountd) data.accountId = ObjectId.createFromHexString(orderDto.accountd);
 
   //   if (orderDto.customerName) {
   //     data.customerName = orderDto.customerName;
@@ -154,7 +133,7 @@ export class OrderVisitorController {
     if (![OrderStatus.CONFIRMED, OrderStatus.SHIPPING, OrderStatus.COMPLETED].includes(orderDetail.status as OrderStatus)) {
       throw new CustomBadRequestException('Trạng thái của Order phải là CONFIRMED, SHIPPING, hoặc COMPLETED để in');
     }
-    const order: Order = new Order(orderDetail);
+    const order: OrderEntity = new OrderEntity(orderDetail);
 
     const footer: IFooterTemplate = this.configService.get<IFooterTemplate>('brand');
     const template: Template = new Template(order, footer);

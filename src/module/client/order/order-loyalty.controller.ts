@@ -4,8 +4,7 @@ import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ProductService } from '../product/product.service';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
-import { IOrder, IOrderItem } from 'src/shared/interface/order.interface';
-import { ProductDocument } from 'src/shared/schema/product.schema';
+import { IOrder } from 'src/shared/interface/order.interface';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
 import { OrderStatus } from 'src/constant/order.constant';
 import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
@@ -17,7 +16,12 @@ import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { UserRole } from 'src/constant/user.constant';
 import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
 import { OrderCreateDto } from 'src/module/order-basic/dto/order-create.dto';
-import { Order } from 'src/module/order-basic/schema/order.schema';
+import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
+import { OrderItemsMapClientPipe } from 'src/shared/core/pipes/order-items-map-client.pipe';
+import { OrderEntity } from 'src/module/order-basic/entity/order.entity';
+import { MailService } from 'src/module/mail/mail.service';
+import { AccountDocument } from 'src/module/auth/schemas/account.schema';
+import { OrderDocument } from 'src/module/order-basic/schema/order.schema';
 
 @Controller('/client/order')
 @Roles(UserRole.CLIENT)
@@ -28,8 +32,95 @@ export class OrderLoyaltyController {
   constructor(
     private configService: ConfigService,
     private readonly orderBasicService: OrderBasicService,
-    private readonly productService: ProductService
+    private readonly mailService: MailService,
   ) { }
+
+  @Post('test-email')
+  async testEmail() {
+    const mockOrder = {
+      _id: new Types.ObjectId('688a7a8e4ba63aa8a0ee9b2c'),
+      orderCode: 'ORD202507301c24544f',
+      orderItems: [
+        {
+          _id: new Types.ObjectId('688a7a8e4ba63aa8a0ee9b2b'),
+          productId: '6867e08e0de78fd01e16607d',
+          productThumbnail: 'media/product/1751742247897-sashimi-ca-ngu-3-thumbnail.webp',
+          productCode: 'PRD2025070470910ef6',
+          productName: 'Sashimi Cá Hồi',
+          productCategorySlug: 'sashimi',
+          productSlug: 'sashimi-ca-hoi',
+          quantity: 1,
+          price: 200000,
+          total: 200000
+        }
+      ],
+      status: 'Chờ xác nhận',
+      subTotal: 200000,
+      total: 200000,
+      discount: 0,
+      deliveryFee: 0,
+      paymentMethod: 'Tiền mặt',
+      accountId: new Types.ObjectId('685035dc0ff69f084994c917'),
+      delivery: {
+        name: 'xxxxxxxxxxxx',
+        phoneNumber: '0842 415 921',
+        "address": {
+          "province": {
+            "_id": "674bc7d3336588734e5049ee",
+            "name": "An Giang",
+            "slug": "an-giang",
+            "type": "tinh",
+            "name_with_type": "Tỉnh An Giang",
+            "code": "89",
+            "isDeleted": false
+          },
+          "district": {
+            "_id": "674bc89f336588734e504c73",
+            "name": "Châu Đốc",
+            "type": "thanh-pho",
+            "slug": "chau-doc",
+            "name_with_type": "Thành phố Châu Đốc",
+            "path": "Châu Đốc, An Giang",
+            "path_with_type": "Thành phố Châu Đốc, Tỉnh An Giang",
+            "code": "884",
+            "parent_code": "89",
+            "isDeleted": false
+          },
+          "ward": {
+            "_id": "674bc8b2336588734e507351",
+            "name": "Châu Phú B",
+            "type": "phuong",
+            "slug": "chau-phu-b",
+            "name_with_type": "Phường Châu Phú B",
+            "path": "Châu Phú B, Châu Đốc, An Giang",
+            "path_with_type": "Phường Châu Phú B, Thành phố Châu Đốc, Tỉnh An Giang",
+            "code": "30316",
+            "parent_code": "884",
+            "isDeleted": false
+          },
+          "street": "666666666"
+        }
+      },
+      note: '',
+      customerDetail: {
+        _id: new Types.ObjectId('685035dc0ff69f084994c917'),
+        email: 'vuankhanh19071992@gmail.com',
+        googleId: '8rtLyTgzWRPpyzJxl20OVHRQb0V2',
+        name: 'Vũ An Khánh',
+        avatar: 'https://graph.facebook.com/24389861960598581/picture',
+        role: 'client',
+        createdByProvider: 'google',
+        __v: 0,
+        facebookId: '2MBisiNnApTLbGtZRhAWX3kDPoU2',
+        hasPassword: 'false'
+      },
+
+      createdAt: new Date("2025-07 - 16T16: 21: 26.463+00:00"),
+      updatedAt: new Date("2025-07 - 30T17: 10:07.323 +00:00")
+    }
+
+    return await this.mailService.sendOrderReceivedEmail(mockOrder);
+  }
 
   @Get()
   async getAll(
@@ -42,7 +133,7 @@ export class OrderLoyaltyController {
     if (!accountId) {
       throw new CustomBadRequestException('Không tìm thấy thông tin tài khoản');
     }
-    
+
     const filterQuery = {};
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
     filterQuery['accountId'] = new Types.ObjectId(accountId);
@@ -68,35 +159,15 @@ export class OrderLoyaltyController {
   @Post()
   async create(
     @Req() request: Request,
-    @Body() orderCreateDto: OrderCreateDto
+    @Body() orderCreateDto: OrderCreateDto,
+    @Body('orderItems', OrderItemsMapClientPipe) orderItems: Array<OrderProductItemEntity>
   ) {
     const accountId: string = request['customParams'].accountId;
     if (!accountId) {
       throw new CustomBadRequestException('Không tìm thấy thông tin tài khoản');
     }
 
-    const orderItems: IOrderItem[] = [];
-    for (const item of orderCreateDto.orderItems) {
-      const productId = new Types.ObjectId(item.productId);
-      const product: ProductDocument = await this.productService.getDetail({ _id: productId })
-      if (!product) {
-        throw new CustomBadRequestException(`Sản phẩm với ID ${item.productId} không tồn tại`);
-      }
-
-      const orderItem: IOrderItem = {
-        productThumbnail: product?.album?.thumbnailUrl,
-        productCode: product.code,
-        productName: product.name,
-        productCategorySlug: product.productCategory?.slug,
-        productSlug: product.slug,
-        quantity: item.quantity,
-        price: product.price
-      };
-
-      orderItems.push(orderItem);
-    }
-
-    const iOrder : IOrder = {
+    const iOrder: IOrder = {
       orderItems: orderItems,
       status: OrderStatus.PENDING,
       paymentMethod: orderCreateDto.paymentMethod,
@@ -105,10 +176,20 @@ export class OrderLoyaltyController {
       note: orderCreateDto.note,
       delivery: orderCreateDto.delivery,
     }
-    const order: Order = new Order(iOrder);
+    const order: OrderEntity = new OrderEntity(iOrder);
     order.updateAccountId = new Types.ObjectId(accountId);
 
-    return await this.orderBasicService.create(order);
+    const result = await this.orderBasicService.create(order);
+    try {
+      const detail = await this.orderBasicService.getDetail({ _id: result._id });
+
+      const customerDetail: AccountDocument = detail['customerDetail'];
+      console.log(detail);
+    } catch (error) {
+      console.log('Error sending email:', error);
+    }
+
+    return result;
   }
 
   // @Put(':id')
@@ -118,7 +199,7 @@ export class OrderLoyaltyController {
   // ) {
   //   const filterQuery = { _id: id };
   //   const order = new Order(orderDto);
-  //   order.updateCustomerId = orderDto.customerId;
+  //   order.updateaccountd = orderDto.accountd;
 
   //   return await this.orderService.replace(filterQuery, order);
   // }
@@ -145,7 +226,7 @@ export class OrderLoyaltyController {
   //     data.total = OrderUtil.calculateTotal(subTotal, currentOrder.deliveryFee, currentOrder.discount);
   //   }
 
-  //   if (orderDto.customerId) data.customerId = ObjectId.createFromHexString(orderDto.customerId);
+  //   if (orderDto.accountd) data.accountId = ObjectId.createFromHexString(orderDto.accountd);
 
   //   if (orderDto.customerName) {
   //     data.customerName = orderDto.customerName;
@@ -179,7 +260,7 @@ export class OrderLoyaltyController {
     if (![OrderStatus.CONFIRMED, OrderStatus.SHIPPING, OrderStatus.COMPLETED].includes(orderDetail.status as OrderStatus)) {
       throw new CustomBadRequestException('Trạng thái của Order phải là CONFIRMED, SHIPPING, hoặc COMPLETED để in');
     }
-    const order: Order = new Order(orderDetail);
+    const order: OrderEntity = new OrderEntity(orderDetail);
 
     const footer: IFooterTemplate = this.configService.get<IFooterTemplate>('brand');
     const template: Template = new Template(order, footer);

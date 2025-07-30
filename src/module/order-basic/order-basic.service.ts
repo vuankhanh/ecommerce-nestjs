@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Template } from 'src/shared/interface/template.interface';
-import { OrderFrom, OrderStatus } from 'src/constant/order.constant';
+import { OrderFrom } from 'src/constant/order.constant';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { Account } from 'src/module/auth/schemas/account.schema';
@@ -176,7 +176,7 @@ export class OrderBasicService implements IBasicService<Order> {
         {
           $lookup: {
             from: Account.name.toLowerCase(), // Tên của collection Customer
-            localField: 'customerId',
+            localField: 'accountId',
             foreignField: '_id',
             as: 'customerDetail'
           }
