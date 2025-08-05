@@ -4,12 +4,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Template } from 'src/shared/interface/template.interface';
-import { OrderFrom } from 'src/constant/order.constant';
+import { OrderFrom, OrderStatus, OrderStatusTransition } from 'src/constant/order.constant';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { Account } from 'src/module/auth/schemas/account.schema';
 import { Order, OrderDocument } from './schema/order.schema';
 import { UserRole } from 'src/constant/user.constant';
+import { CustomBadRequestException, CustomNotFoundException } from 'src/shared/core/exception/custom-exception';
 
 @Injectable()
 export class OrderBasicService implements IBasicService<Order> {
@@ -37,12 +38,12 @@ export class OrderBasicService implements IBasicService<Order> {
             from: Account.name.toLocaleLowerCase(), // Tên của collection Customer
             localField: 'accountId',
             foreignField: '_id',
-            as: 'orderAccount'
+            as: 'customerDetail'
           }
         },
         {
           $unwind: {
-            path: '$orderAccount',
+            path: '$customerDetail',
             preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
           }
         },
@@ -52,11 +53,11 @@ export class OrderBasicService implements IBasicService<Order> {
               $switch: {
                 branches: [
                   {
-                    case: { $eq: ["$orderAccount.role", UserRole.CLIENT] },
+                    case: { $eq: ["$customerDetail.role", UserRole.CLIENT] },
                     then: OrderFrom.LOYALTY
                   },
                   {
-                    case: { $eq: ["$orderAccount.role", UserRole.ADMIN] },
+                    case: { $eq: ["$customerDetail.role", UserRole.ADMIN] },
                     then: OrderFrom.ADMIN
                   }
                 ],
@@ -104,7 +105,7 @@ export class OrderBasicService implements IBasicService<Order> {
             note: 0,
             __v: 0,
             accountId: 0,
-            orderAccount: 0
+            customerDetail: 0
             // orderAccount: {
             //   _id: 0,
             //   createdAt: 0,
@@ -148,10 +149,32 @@ export class OrderBasicService implements IBasicService<Order> {
     return product;
   }
 
+  async modifyStatus(filterQuery: FilterQuery<Order>, newStatus: string): Promise<OrderDocument> {
+    const order = await this.orderModel.findOne(filterQuery);
+    if (!order) throw new CustomNotFoundException('Đơn hàng không tồn tại');
+    const currentStatus = order.status;
+    const allowedTransitions = OrderStatusTransition[currentStatus] || [];
+
+    if (!allowedTransitions.includes(newStatus)) {
+      throw new CustomBadRequestException(
+        `Không thể chuyển trạng thái từ ${currentStatus} sang ${newStatus}`,
+      );
+    }
+
+    await this.orderModel.findOneAndUpdate(filterQuery, { status: newStatus }, { new: true });
+    return await this.tranformToDetaiData(filterQuery);
+  }
+
   async modify(filterQuery: FilterQuery<Order>, data: Partial<Order>): Promise<OrderDocument> {
+    const order = await this.orderModel.findOne(filterQuery);
+    if (!order) throw new CustomNotFoundException('Đơn hàng không tồn tại');
+
+    if(order.status != OrderStatus.PENDING) {
+      throw new CustomBadRequestException('Không thể sửa đơn hàng ở trạn thái hiện tại');
+    }
+    
     await this.orderModel.findOneAndUpdate(filterQuery, data, { new: true });
-    const product = await this.tranformToDetaiData(filterQuery);
-    return product;
+    return await this.tranformToDetaiData(filterQuery);;
   }
 
   async print(temp: Template) {
@@ -189,6 +212,21 @@ export class OrderBasicService implements IBasicService<Order> {
         },
         {
           $addFields: {
+            orderFrom: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $eq: ["$customerDetail.role", UserRole.CLIENT] },
+                    then: OrderFrom.LOYALTY
+                  },
+                  {
+                    case: { $eq: ["$customerDetail.role", UserRole.ADMIN] },
+                    then: OrderFrom.ADMIN
+                  }
+                ],
+                default: OrderFrom.VISITOR
+              }
+            },
             'subTotal': {
               $ifNull: [
                 {

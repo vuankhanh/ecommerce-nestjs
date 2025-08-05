@@ -12,7 +12,6 @@ export interface IOrderCreateRequest {
 }
 
 export interface IOrderUpdateRequest extends Partial<IOrderCreateRequest> {
-  status?: `${TOrderStatus}`;
   orderItems?: IOrderItemsRequest[];
   paymentMethod?: `${TPaymentMethod}`;
   deliveryFee?: number;

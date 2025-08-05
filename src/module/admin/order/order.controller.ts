@@ -9,7 +9,7 @@ import { FilterQuery } from 'mongoose';
 import { Order } from 'src/module/order-basic/schema/order.schema';
 import { OrderStatus } from 'src/constant/order.constant';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
-import { OrderUpdateDto } from './dto/order-update.dto';
+import { OrderUpdateDto, OrderUpdateStatusDto } from './dto/order-update.dto';
 import { OrderItemsMapAdminPipe } from 'src/shared/core/pipes/order-items-map-admin.pipe';
 import { IOrderItemsRequest } from 'src/shared/interface/order-request.interface';
 import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
@@ -33,7 +33,6 @@ export class OrderController {
     @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
   ) {
     const filterQuery: FilterQuery<Order> = {};
-    filterQuery.status = { $ne: OrderStatus.CANCELED };
 
     if(body){
       if (body.fromDate || body.toDate) {
@@ -41,7 +40,10 @@ export class OrderController {
         if (body.fromDate) filterQuery.createdAt.$gte = new Date(body.fromDate);
         if (body.toDate) filterQuery.createdAt.$lte = new Date(body.toDate);
       }
-      if (body.statuses && body.statuses.length) filterQuery.status.$in = body.statuses ;
+      if (body.statuses && body.statuses.length){
+        filterQuery.status = {};
+        filterQuery.status.$in = body.statuses ;
+      }
     }
     
     return await this.orderBasicService.getAll(filterQuery, page, size);
@@ -57,6 +59,17 @@ export class OrderController {
     return this.orderBasicService.getDetail(filterQuery);
   }
 
+  @Put('status')
+  async updateStatus(
+    @Query('id', new ParseObjectIdPipe()) id: string,
+    @Body() body: OrderUpdateStatusDto,
+  ){
+    const filterQuery: FilterQuery<Order> = {};
+    if (id) filterQuery['_id'] = id;
+    
+    return await this.orderBasicService.modifyStatus(filterQuery, body.status);
+  }
+
   @Put()
   async update(
     @Query('id', new ParseObjectIdPipe()) id: string,
@@ -65,7 +78,6 @@ export class OrderController {
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
     const orderUpdate: Partial<Order> = {};
-    if (body.status) orderUpdate.status = body.status;
     if (body.orderItems) {
       // Gọi pipe transform thủ công
       orderUpdate.orderItems = await this.orderItemsMapAdminPipe.transform(body.orderItems);
