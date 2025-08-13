@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 import { AuthenticationProvider, UserRole } from "src/constant/user.constant";
-import { IUser } from "src/shared/interface/user.interface";
+import { IMongodbDocument } from "src/shared/interface/mongo.interface";
+import { IAcctountResponse, IUser } from "src/shared/interface/user.interface";
 
-export type AccountDocument = HydratedDocument<Account>;
+export type AccountDocument = IAcctountResponse & IMongodbDocument;
 
 @Schema({
   collection: 'account',

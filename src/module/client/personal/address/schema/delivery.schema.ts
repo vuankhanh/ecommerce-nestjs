@@ -5,8 +5,9 @@ import { validatePhoneNumber } from "src/shared/custom-validator/vietnamese-phon
 import { IAddress } from "src/shared/interface/address.interface";
 import { IDelivery } from "src/shared/interface/delivery.interface";
 import { Account } from "src/module/auth/schemas/account.schema";
+import { IMongodbDocument } from "src/shared/interface/mongo.interface";
 
-export type DeliveryDocument = HydratedDocument<Delivery>;
+export type DeliveryDocument = Delivery & IMongodbDocument;
 
 @Schema({
   timestamps: true

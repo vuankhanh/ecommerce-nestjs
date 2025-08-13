@@ -14,7 +14,7 @@ export class OrderUpdateStatusDto {
 
   @ValidateIf(o => o.status === OrderStatus.CANCELED)
   @IsNotEmpty({ message: 'Lý do hủy đơn hàng là bắt buộc khi trạng thái là Đã hủy' })
-  reasonForCancallation?: string;
+  reasonForCancelReason?: string;
 }
 
 export class OrderUpdateDto implements IOrderUpdateRequest {

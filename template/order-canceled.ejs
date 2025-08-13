@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Đơn hàng đã hủy #<%= order.orderCode %>
+  </title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+    }
+
+    .cancel-notice {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+    }
+
+    .order-detail-box {
+      border: 2px solid #999999;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+    }
+
+    .order-row:last-child {
+      margin-bottom: 0 !important;
+    }
+
+    .footer {
+      margin-top: 32px;
+      font-size: 13px;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <p>Xin chào <strong>
+        <%= order.customerDetail.name %>
+      </strong>,</p>
+
+    <div class="cancel-notice">
+      <h4>Đơn hàng đã được hủy</h4>
+      <% if (order.reasonForCancellation) { %>
+        <p><strong>Lý do hủy:</strong>
+          <%= order.reasonForCancellation %>
+        </p>
+        <% } %>
+    </div>
+
+    <!-- Include order details component với showSummary = false -->
+    <div class="order-detail-box">
+      <%- include('partials/order-details', {
+        order: order,
+        frefixStatic: frefixStatic,
+        showHeader: true,
+        showStatus: true,
+        showProducts: true,
+        showDelivery: true,
+        showSummary: true
+      }) %>
+    </div>
+
+    <p>Nếu đơn hàng đã thanh toán, chúng tôi sẽ hoàn tiền trong vòng 3-5 ngày làm việc.</p>
+
+    <div class="footer">
+      Trân trọng,<br>
+      Đội ngũ <strong>
+        <%= shop.name %>
+      </strong><br>
+      Hotline: <%= shop.phone %>
+    </div>
+  </div>
+</body>
+
+</html>

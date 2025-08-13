@@ -7,8 +7,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { Product_Category } from './product-category.schema';
 import { Album } from 'src/shared/schema/album.schema';
 import { VietnameseAccentUtil } from '../util/vietnamese-accent.util';
+import { IMongodbDocument } from '../interface/mongo.interface';
 
-export type ProductDocument = HydratedDocument<Product>;
+export type ProductDocument = Product & IMongodbDocument;
 
 @Schema({ timestamps: true })
 export class Product implements IProduct {

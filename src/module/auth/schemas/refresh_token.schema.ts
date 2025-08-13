@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose from "mongoose";
+import { Types } from "mongoose";
 import { Account } from "./account.schema";
 
 @Schema({
@@ -7,8 +7,8 @@ import { Account } from "./account.schema";
   timestamps: true
 })
 export class RefreshToken {
-  @Prop({ required: true, unique: true, ref: Account.name })
-  accountId: mongoose.Types.ObjectId;
+  @Prop({ type: [Types.ObjectId, String], required: true, unique: true, ref: Account.name })
+  accountId: Types.ObjectId | string;
 
   @Prop({ required: true })
   token: string;
@@ -16,7 +16,7 @@ export class RefreshToken {
   @Prop({ required: true })
   expiresAt: Date;
 
-  constructor(accountId: mongoose.Types.ObjectId, token: string, expiresAt: Date) {
+  constructor(accountId: Types.ObjectId | string, token: string, expiresAt: Date) {
     this.accountId = accountId;
     this.token = token;
     this.expiresAt = expiresAt;

@@ -1,0 +1,102 @@
+<!-- Order Header -->
+<% if ((typeof showHeader === 'undefined' || showHeader) && order.orderCode && order.createdAt) { %>
+  <div class="order-row order-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+    <h2 style="margin: 0; font-size: 24px;">Đơn hàng #<%= order.orderCode %></h2>
+    <p style="margin: 5px 0 0 0; opacity: 0.9;">Ngày đặt: <%= new Date(order.createdAt).toLocaleDateString('vi-VN') %></p>
+  </div>
+<% } %>
+
+<!-- Status Row -->
+<% if ((typeof showStatus === 'undefined' || showStatus) && (order.status || order.paymentMethod)) { %>
+  <div class="order-row status-row" style="display: flex; justify-content: space-between; padding: 15px; background: #f8f9fa; border-radius: 6px; margin-bottom: 20px;">
+    <% if (order.status) { %>
+      <div style="display: flex; align-items: center; width: 100%;">
+        🚚 <strong style="margin-left: 5px; white-space: nowrap;"><%= order.status %></strong>
+      </div>
+    <% } %>
+    <% if (order.paymentMethod) { %>
+      <div style="display: flex; align-items: center;">
+        💳 <strong style="margin-left: 5px; white-space: nowrap;"><%= order.paymentMethod %></strong>
+      </div>
+    <% } %>
+  </div>
+<% } %>
+
+<!-- Products Section -->
+<% if (typeof showProducts === 'undefined' || showProducts === true) { %>
+  <% if (order.orderItems && order.orderItems.length > 0) { %>
+    <div class="order-row products-section" style="margin-bottom: 25px;">
+      <h3 style="color: #333; margin-bottom: 15px;">Sản phẩm</h3>
+      <% order.orderItems.forEach(function(item) { %>
+        <div class="product-item" style="display: flex; align-items: center; margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+          <div class="product-image" style="width: 60px; height: 60px; background: #ddd; border-radius: 4px; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">
+            <% if (item.productThumbnail) { %>
+              <img src="<%= frefixStatic %>/<%= item.productThumbnail %>" alt="<%= item.productName %>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+            <% } else { %>
+              IMG
+            <% } %>
+          </div>
+          <div class="product-details" style="flex: 1;">
+            <div style="font-weight: bold; margin-bottom: 5px;"><%= item.productName %></div>
+            <div style="font-size: 12px; color: #666; margin-bottom: 5px;"><%= item.productCode %></div>
+            <div style="color: #e74c3c;">(<%= item.price.toLocaleString() %>đ) x <%= item.quantity %> = <%= item.total.toLocaleString() %>đ</div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+<% } %>
+
+<!-- Delivery Info -->
+<% if (typeof showDelivery === 'undefined' || showDelivery === true) { %>
+  <% if (order.delivery) { %>
+    <div class="order-row delivery-section" style="margin-bottom: 25px;">
+      <h3 style="color: #333; margin-bottom: 15px;">Thông tin giao hàng</h3>
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 6px;">
+        <div style="display: flex; margin-bottom: 10px;">
+          <div style="width: 120px; min-width: 120px; font-weight: bold;">Người nhận:</div>
+          <div style="flex: 1;"><%= order.delivery.name %></div>
+        </div>
+        <div style="display: flex; margin-bottom: 10px;">
+          <div style="width: 120px; min-width: 120px; font-weight: bold;">Số điện thoại:</div>
+          <div style="flex: 1;"><%= order.delivery.phoneNumber %></div>
+        </div>
+        <div style="display: flex;">
+          <div style="width: 120px; min-width: 120px; font-weight: bold;">Địa chỉ:</div>
+          <div style="flex: 1;"><%= order.delivery.addressDetail %></div>
+        </div>
+      </div>
+    </div>
+  <% } %>
+<% } %>
+
+<!-- Order Summary -->
+<% if (typeof showSummary === 'undefined' || showSummary === true) { %>
+  <div class="order-row summary-section" style="margin-bottom: 25px;">
+    <h3 style="color: #333; margin-bottom: 15px;">Tổng kết đơn hàng</h3>
+    <div style="border-top: 2px solid #eee; padding-top: 20px;">
+      <% if (typeof order.subTotal !== 'undefined') { %>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span>Tạm tính: </span>
+          <span><%= order.subTotal.toLocaleString() %>đ</span>
+        </div>
+      <% } %>
+      <% if (typeof order.deliveryFee !== 'undefined') { %>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span>Phí giao hàng: </span>
+          <span><%= order.deliveryFee.toLocaleString() %>đ</span>
+        </div>
+      <% } %>
+      <% if (typeof order.discount !== 'undefined' && order.discount > 0) { %>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span>Giảm giá: </span>
+          <span>-<%= order.discount.toLocaleString() %>đ</span>
+        </div>
+      <% } %>
+      <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; color: #e74c3c; border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
+        <span>Tổng cộng: </span>
+        <span><%= order.total.toLocaleString() %>đ</span>
+      </div>
+    </div>
+  </div>
+<% } %>

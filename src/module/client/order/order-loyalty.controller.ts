@@ -22,6 +22,7 @@ import { OrderEntity } from 'src/module/order-basic/entity/order.entity';
 import { MailService } from 'src/module/mail/mail.service';
 import { AccountDocument } from 'src/module/auth/schemas/account.schema';
 import { OrderDocument } from 'src/module/order-basic/schema/order.schema';
+import { DeliveryEntity } from '../personal/address/entity/delivery.entity';
 
 @Controller('/client/order')
 @Roles(UserRole.CLIENT)
@@ -37,86 +38,99 @@ export class OrderLoyaltyController {
 
   @Post('test-email')
   async testEmail() {
-    const mockOrder = {
-      _id: new Types.ObjectId('688a7a8e4ba63aa8a0ee9b2c'),
-      orderCode: 'ORD202507301c24544f',
-      orderItems: [
-        {
-          _id: new Types.ObjectId('688a7a8e4ba63aa8a0ee9b2b'),
-          productId: '6867e08e0de78fd01e16607d',
-          productThumbnail: 'media/product/1751742247897-sashimi-ca-ngu-3-thumbnail.webp',
-          productCode: 'PRD2025070470910ef6',
-          productName: 'Sashimi Cá Hồi',
-          productCategorySlug: 'sashimi',
-          productSlug: 'sashimi-ca-hoi',
-          quantity: 1,
-          price: 200000,
-          total: 200000
-        }
-      ],
-      status: 'Chờ xác nhận',
-      subTotal: 200000,
-      total: 200000,
-      discount: 0,
-      deliveryFee: 0,
-      paymentMethod: 'Tiền mặt',
-      accountId: new Types.ObjectId('685035dc0ff69f084994c917'),
-      delivery: {
-        name: 'xxxxxxxxxxxx',
-        phoneNumber: '0842 415 921',
-        "address": {
-          "province": {
-            "_id": "674bc7d3336588734e5049ee",
-            "name": "An Giang",
-            "slug": "an-giang",
-            "type": "tinh",
-            "name_with_type": "Tỉnh An Giang",
-            "code": "89",
-            "isDeleted": false
-          },
-          "district": {
-            "_id": "674bc89f336588734e504c73",
-            "name": "Châu Đốc",
-            "type": "thanh-pho",
-            "slug": "chau-doc",
-            "name_with_type": "Thành phố Châu Đốc",
-            "path": "Châu Đốc, An Giang",
-            "path_with_type": "Thành phố Châu Đốc, Tỉnh An Giang",
-            "code": "884",
-            "parent_code": "89",
-            "isDeleted": false
-          },
-          "ward": {
-            "_id": "674bc8b2336588734e507351",
-            "name": "Châu Phú B",
-            "type": "phuong",
-            "slug": "chau-phu-b",
-            "name_with_type": "Phường Châu Phú B",
-            "path": "Châu Phú B, Châu Đốc, An Giang",
-            "path_with_type": "Phường Châu Phú B, Thành phố Châu Đốc, Tỉnh An Giang",
-            "code": "30316",
-            "parent_code": "884",
-            "isDeleted": false
-          },
-          "street": "666666666"
-        }
-      },
-      note: '',
-      customerDetail: {
-        _id: new Types.ObjectId('685035dc0ff69f084994c917'),
-        email: 'vuankhanh19071992@gmail.com',
-        googleId: '8rtLyTgzWRPpyzJxl20OVHRQb0V2',
-        name: 'Vũ An Khánh',
-        avatar: 'https://graph.facebook.com/24389861960598581/picture',
-        role: 'client',
-        createdByProvider: 'google',
-        __v: 0,
-        facebookId: '2MBisiNnApTLbGtZRhAWX3kDPoU2',
-        hasPassword: 'false'
-      },
-
-      createdAt: new Date("2025-07 - 16T16: 21: 26.463+00:00"),
-      updatedAt: new Date("2025-07 - 30T17: 10:07.323 +00:00")
+    const mockOrder: OrderDocument = {
+       "_id": "6897250e9ffd18cef125d2d2",
+        "orderCode": "ORD202508095926b08a",
+        "orderItems": [
+            {
+                "_id": "6897250e9ffd18cef125d2d0",
+                "productId": "688367e755a93e0392f63e93",
+                "productThumbnail": "media/product/khoai-lang-nhat/1753442206786-khoai-lang-16332714337561040798892-thumbnail.webp",
+                "productCode": "PRD202507251a2451c8",
+                "productName": "Khoai lang Nhật",
+                "productCategorySlug": "khoai-lang",
+                "productSlug": "khoai-lang-nhat",
+                "quantity": 1,
+                "price": 250000,
+                "total": 250000
+            },
+            {
+                "_id": "6897250e9ffd18cef125d2d1",
+                "productId": "6867e08e0de78fd01e16607d",
+                "productThumbnail": "media/product/1751742247897-sashimi-ca-ngu-3-thumbnail.webp",
+                "productCode": "PRD2025070470910ef6",
+                "productName": "Sashimi Cá Hồi",
+                "productCategorySlug": "sashimi",
+                "productSlug": "sashimi-ca-hoi",
+                "quantity": 1,
+                "price": 200000,
+                "total": 200000
+            }
+        ],
+        "status": "Chờ xác nhận",
+        "subTotal": 450000,
+        "total": 484000,
+        "discount": 21000,
+        "deliveryFee": 55000,
+        "paymentMethod": "Tiền mặt",
+        "accountId": "685035dc0ff69f084994c917",
+        "delivery": {
+            "name": "xxxxxxxxxxxx",
+            "phoneNumber": "0842 415 921",
+            "address": {
+                "province": {
+                    "_id": "674bc7d3336588734e5049ee",
+                    "name": "An Giang",
+                    "slug": "an-giang",
+                    "type": "tinh",
+                    "name_with_type": "Tỉnh An Giang",
+                    "code": "89",
+                    "isDeleted": false
+                },
+                "district": {
+                    "_id": "674bc89f336588734e504c73",
+                    "name": "Châu Đốc",
+                    "type": "thanh-pho",
+                    "slug": "chau-doc",
+                    "name_with_type": "Thành phố Châu Đốc",
+                    "path": "Châu Đốc, An Giang",
+                    "path_with_type": "Thành phố Châu Đốc, Tỉnh An Giang",
+                    "code": "884",
+                    "parent_code": "89",
+                    "isDeleted": false
+                },
+                "ward": {
+                    "_id": "674bc8b2336588734e507351",
+                    "name": "Châu Phú B",
+                    "type": "phuong",
+                    "slug": "chau-phu-b",
+                    "name_with_type": "Phường Châu Phú B",
+                    "path": "Châu Phú B, Châu Đốc, An Giang",
+                    "path_with_type": "Phường Châu Phú B, Thành phố Châu Đốc, Tỉnh An Giang",
+                    "code": "30316",
+                    "parent_code": "884",
+                    "isDeleted": false
+                },
+                "street": "666666666"
+            }
+        },
+        "note": "",
+        "createdAt": "2025-08-09T10:38:06.341Z",
+        "updatedAt": "2025-08-10T12:35:45.791Z",
+        "customerDetail": {
+            "_id": "685035dc0ff69f084994c917",
+            "email": "vuankhanh19071992@gmail.com",
+            "googleId": "8rtLyTgzWRPpyzJxl20OVHRQb0V2",
+            "name": "Vũ An Khánh",
+            "avatar": "https://graph.facebook.com/24389861960598581/picture",
+            "role": "client",
+            "createdByProvider": "google",
+            "createdAt": "2025-06-16T15:18:52.239Z",
+            "updatedAt": "2025-07-11T15:35:12.709Z",
+            "facebookId": "2MBisiNnApTLbGtZRhAWX3kDPoU2",
+            "hasPassword": false
+        },
+        "orderFrom": "Khách hàng thân thiết"
     }
 
     return await this.mailService.sendOrderReceivedEmail(mockOrder);
@@ -182,9 +196,9 @@ export class OrderLoyaltyController {
     const result = await this.orderBasicService.create(order);
     try {
       const detail = await this.orderBasicService.getDetail({ _id: result._id });
-
-      const customerDetail: AccountDocument = detail['customerDetail'];
-      console.log(detail);
+      
+      detail.delivery['addressDetail'] = DeliveryEntity.generateAddressDetail(detail.delivery.address);
+      await this.mailService.sendOrderReceivedEmail(detail);
     } catch (error) {
       console.log('Error sending email:', error);
     }

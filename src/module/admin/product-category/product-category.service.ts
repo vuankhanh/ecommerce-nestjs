@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Document, Types, FilterQuery, FlattenMaps } from 'mongoose';
+import { Document, Types, FilterQuery, FlattenMaps, HydratedDocument } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
@@ -14,7 +14,7 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
     @InjectModel(Product_Category.name) private readonly productCategoryModel: Model<Product_Category>,
   ) { }
 
-  async create(data: Product_Category): Promise<ProductCategoryDocument> {
+  async create(data: Product_Category): Promise<HydratedDocument<Product_Category>> {
     // Validate circular reference nếu có parentId
     if (data.parentId) {
       const isValid = await this.validateParentId(null, data.parentId.toString());

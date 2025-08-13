@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Types } from 'mongoose';
+import { FilterQuery, HydratedDocument, Model, Types } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Template } from 'src/shared/interface/template.interface';
 import { OrderFrom, OrderStatus, OrderStatusTransition } from 'src/constant/order.constant';
@@ -11,15 +11,17 @@ import { Account } from 'src/module/auth/schemas/account.schema';
 import { Order, OrderDocument } from './schema/order.schema';
 import { UserRole } from 'src/constant/user.constant';
 import { CustomBadRequestException, CustomNotFoundException } from 'src/shared/core/exception/custom-exception';
+import { TOrderStatus } from 'src/shared/interface/order.interface';
+import { IOrderPopulated } from 'src/shared/interface/order-response.interface';
 
 @Injectable()
-export class OrderBasicService implements IBasicService<Order> {
+export class OrderBasicService implements IBasicService<IOrderPopulated> {
   constructor(
-    @InjectModel(Order.name) private orderModel: Model<Order>,
+    @InjectModel(Order.name) private orderModel: Model<IOrderPopulated>,
     private configService: ConfigService
   ) { }
 
-  async create(data: Order): Promise<OrderDocument> {
+  async create(data: Order): Promise<HydratedDocument<IOrderPopulated>> {
     const order = new this.orderModel(data);
     await order.save();
     return order;
@@ -149,7 +151,7 @@ export class OrderBasicService implements IBasicService<Order> {
     return product;
   }
 
-  async modifyStatus(filterQuery: FilterQuery<Order>, newStatus: string): Promise<OrderDocument> {
+  async modifyStatus(filterQuery: FilterQuery<Order>, newStatus: TOrderStatus, cancelReason?: string): Promise<IOrderPopulated> {
     const order = await this.orderModel.findOne(filterQuery);
     if (!order) throw new CustomNotFoundException('Đơn hàng không tồn tại');
     const currentStatus = order.status;
@@ -161,20 +163,29 @@ export class OrderBasicService implements IBasicService<Order> {
       );
     }
 
-    await this.orderModel.findOneAndUpdate(filterQuery, { status: newStatus }, { new: true });
+    const data: Partial<OrderDocument> = {
+      status: newStatus,
+    };
+
+    if (newStatus === OrderStatus.CANCELED) {
+      if (!cancelReason) {
+        throw new CustomBadRequestException('Lý do hủy đơn hàng là bắt buộc khi chuyển sang trạng thái Đã hủy');
+      }
+      data.reasonForCancellation = cancelReason;
+    }
+
+    await this.orderModel.findOneAndUpdate(filterQuery, data, { new: true });
+    return await this.tranformToDetaiData(filterQuery);
+  }
+
+  async updateOrder(filterQuery: FilterQuery<Order>, updateOrder: Partial<Order>): Promise<IOrderPopulated> {
+
+    await this.orderModel.findOneAndUpdate(filterQuery, updateOrder, { new: true });
     return await this.tranformToDetaiData(filterQuery);
   }
 
   async modify(filterQuery: FilterQuery<Order>, data: Partial<Order>): Promise<OrderDocument> {
-    const order = await this.orderModel.findOne(filterQuery);
-    if (!order) throw new CustomNotFoundException('Đơn hàng không tồn tại');
-
-    if(order.status != OrderStatus.PENDING) {
-      throw new CustomBadRequestException('Không thể sửa đơn hàng ở trạn thái hiện tại');
-    }
-    
-    await this.orderModel.findOneAndUpdate(filterQuery, data, { new: true });
-    return await this.tranformToDetaiData(filterQuery);;
+    return;
   }
 
   async print(temp: Template) {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { Album, AlbumDocument } from '../../../../shared/schema/album.schema';
-import { Document, Types, FilterQuery, FlattenMaps, Model } from 'mongoose';
+import { Document, Types, FilterQuery, FlattenMaps, Model, HydratedDocument } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
@@ -26,7 +26,7 @@ export class MediaLogoService implements IBasicService<Album> {
     return await this.logoAlbumModel.countDocuments(this.filterQuery);
   }
 
-  async create(data: Album): Promise<AlbumDocument> {
+  async create(data: Album): Promise<HydratedDocument<Album>> {
     const newAlbum = new this.logoAlbumModel(data);
     return await newAlbum.save();
   }
@@ -84,6 +84,6 @@ export class MediaLogoService implements IBasicService<Album> {
     if (album?.relativePath) {
       await FileHelper.removeFolder(this.albumFoler, album.relativePath);
     }
-    return album;
+    return album as unknown as AlbumDocument;
   }
 }

@@ -13,6 +13,10 @@ import { OrderUpdateDto, OrderUpdateStatusDto } from './dto/order-update.dto';
 import { OrderItemsMapAdminPipe } from 'src/shared/core/pipes/order-items-map-admin.pipe';
 import { IOrderItemsRequest } from 'src/shared/interface/order-request.interface';
 import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
+import { OrderUtil } from 'src/shared/util/order.util';
+import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
+import { AddressUtil } from 'src/shared/util/address.util';
+import { MailService } from 'src/module/mail/mail.service';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
@@ -22,9 +26,10 @@ import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-prod
 export class OrderController {
   constructor(
     private readonly orderBasicService: OrderBasicService,
-    private readonly orderItemsMapAdminPipe: OrderItemsMapAdminPipe
+    private readonly orderItemsMapAdminPipe: OrderItemsMapAdminPipe,
+    private readonly mailService: MailService,
   ) { }
-  
+
   @Post()
   @HttpCode(200)
   async getAll(
@@ -34,18 +39,18 @@ export class OrderController {
   ) {
     const filterQuery: FilterQuery<Order> = {};
 
-    if(body){
+    if (body) {
       if (body.fromDate || body.toDate) {
         filterQuery.createdAt = {};
         if (body.fromDate) filterQuery.createdAt.$gte = new Date(body.fromDate);
         if (body.toDate) filterQuery.createdAt.$lte = new Date(body.toDate);
       }
-      if (body.statuses && body.statuses.length){
+      if (body.statuses && body.statuses.length) {
         filterQuery.status = {};
-        filterQuery.status.$in = body.statuses ;
+        filterQuery.status.$in = body.statuses;
       }
     }
-    
+
     return await this.orderBasicService.getAll(filterQuery, page, size);
   }
 
@@ -63,11 +68,15 @@ export class OrderController {
   async updateStatus(
     @Query('id', new ParseObjectIdPipe()) id: string,
     @Body() body: OrderUpdateStatusDto,
-  ){
+  ) {
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
-    
-    return await this.orderBasicService.modifyStatus(filterQuery, body.status);
+
+    const order = await this.orderBasicService.modifyStatus(filterQuery, body.status, body.reasonForCancelReason);
+    if (body.status === OrderStatus.CANCELED) {
+      await this.mailService.sendOrderCancelledEmail(order);
+    }
+    return order;
   }
 
   @Put()
@@ -77,16 +86,71 @@ export class OrderController {
   ) {
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
-    const orderUpdate: Partial<Order> = {};
-    if (body.orderItems) {
-      // Gọi pipe transform thủ công
-      orderUpdate.orderItems = await this.orderItemsMapAdminPipe.transform(body.orderItems);
-    }
-    if (body.paymentMethod) orderUpdate.paymentMethod = body.paymentMethod;
-    if (body.deliveryFee) orderUpdate.deliveryFee = body.deliveryFee;
-    if (body.discount) orderUpdate.discount = body.discount;
-    if (body.delivery) orderUpdate.delivery = body.delivery;
 
-    return await this.orderBasicService.modify(filterQuery, orderUpdate);
+    const oldOrder = await this.orderBasicService.getDetail(filterQuery);
+    if (!oldOrder) throw new CustomBadRequestException('Đơn hàng không tồn tại');
+
+    if (oldOrder.status != OrderStatus.PENDING) {
+      throw new CustomBadRequestException('Không thể sửa đơn hàng ở trạn thái hiện tại');
+    }
+
+    // Khởi tạo đối tượng orderUpdate
+    // Đây là đối tượng sẽ chứa các trường cần cập nhật.
+    const orderUpdate: Partial<Order> = {};
+    const orderUpdateForEmail: Partial<Order> = {};
+
+    //Kiểm tra nếu tồn tại các yếu tố ảnh hưởng đến tổng tiền. orderItems, deliveryFee, discount
+    if (body.orderItems || body.deliveryFee || body.discount) {
+      orderUpdateForEmail.subTotal = oldOrder.subTotal;
+      orderUpdateForEmail.deliveryFee = oldOrder.deliveryFee || 0;
+      orderUpdateForEmail.discount = oldOrder.discount || 0;
+
+      // Nếu có orderItems, sử dụng pipe để chuyển đổi
+      // Thêm orderItems vào orderUpdate nếu có
+      // Tính subTotal từ orderItems và gán lại cho subTotal cũ
+      if (body.orderItems) {
+        // Gọi pipe transform thủ công
+        orderUpdate.orderItems = await this.orderItemsMapAdminPipe.transform(body.orderItems);
+        const subTotal = OrderUtil.calculateSubTotal(orderUpdate.orderItems);
+        orderUpdate.subTotal = subTotal;
+        orderUpdateForEmail.subTotal = subTotal;
+      }
+
+      // Nếu có deliveryFee
+      // Thêm deliveryFee vào orderUpdate nếu có
+      // Gán lại oldOrderDeliveryFee nếu có
+      if (body.deliveryFee) {
+        orderUpdate.deliveryFee = body.deliveryFee;
+        orderUpdateForEmail.deliveryFee = body.deliveryFee;
+      }
+
+      // Nếu có discount
+      // Thêm vào orderUpdate
+      // Gán lại oldOrderDiscount nếu có
+      if (body.discount) {
+        orderUpdate.discount = body.discount;
+        orderUpdateForEmail.discount = body.discount;
+      }
+
+      // Tính tổng tiền mới
+      // Gọi hàm tính tổng tiền từ OrderUtil
+      // Gán lại tổng tiền vào orderUpdate
+      const total = OrderUtil.calculateTotal(orderUpdateForEmail.subTotal, orderUpdateForEmail.deliveryFee, orderUpdateForEmail.discount);
+      orderUpdate.total = total;
+      orderUpdateForEmail.total = total;
+    }
+    if (body.paymentMethod) {
+      orderUpdate.paymentMethod = body.paymentMethod;
+      orderUpdateForEmail.paymentMethod = body.paymentMethod;
+    }
+    if (body.delivery) {
+      orderUpdate.delivery = body.delivery;
+      orderUpdateForEmail.delivery = body.delivery;
+      orderUpdateForEmail.delivery['addressDetail'] = AddressUtil.addressDetail(body.delivery);
+    }
+
+    const order = await this.orderBasicService.updateOrder(filterQuery, orderUpdate);
+    await this.mailService.sendOrderChangedEmail(oldOrder, orderUpdateForEmail);
+    return order;
   }
 }

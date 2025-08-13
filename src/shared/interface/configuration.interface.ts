@@ -1,7 +1,5 @@
 export interface IConfiguration {
-  app: {
-    port: number;
-  };
+  app: IUrl;
   db: IUrl;
   printer: IUrl;
   client: IUrl;

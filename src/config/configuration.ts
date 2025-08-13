@@ -4,7 +4,9 @@ import { IConfiguration, IUrl } from "src/shared/interface/configuration.interfa
 export default () => {
   const dev: IConfiguration = {
     app: {
-      port: Number(process.env.DEV_APP_PORT) || 3004
+      port: Number(process.env.DEV_APP_PORT) || 3004,
+      protocol: process.env.DEV_APP_PROTOCOL || 'http',
+      host: process.env.DEV_APP_HOST || 'localhost'
     },
     db: {
       protocol: process.env.DEV_DB_PROTOCOL || 'mongodb',
@@ -26,7 +28,9 @@ export default () => {
 
   const pro: IConfiguration = {
     app: {
-      port: Number(process.env.PRO_APP_PORT)
+      port: Number(process.env.PRO_APP_PORT),
+      protocol: process.env.PRO_APP_PROTOCOL || 'https',
+      host: process.env.PRO_APP_HOST || 'bep4than.online'
     },
     db: {
       protocol: process.env.PRO_DB_PROTOCOL || 'mongodb',
@@ -85,7 +89,13 @@ export default () => {
     password: process.env.MAIL_APPLICATIOM_PASSWORD || ''
   }
 
+  const shop = {
+    name: process.env.SHOP_NAME || 'Shop',
+    phone: process.env.SHOP_PHONE || '0123 456 789',
+    address: process.env.SHOP_ADDRESS || ''
+  }
+
   const config = process.env.NODE_ENV?.trim() === 'pro' ? pro : dev;
 
-  return { ...config, folder, vnPublicApi, authenticationProvider, jwt, mail };
+  return { ...config, folder, vnPublicApi, authenticationProvider, jwt, mail, shop };
 }

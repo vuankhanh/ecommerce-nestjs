@@ -11,3 +11,7 @@ export interface IUser {
   role: `${UserRole}`
   createdByProvider: `${AuthenticationProvider}`;
 }
+
+export interface IAcctountResponse extends IUser {
+
+}

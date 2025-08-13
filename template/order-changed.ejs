@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cập nhật đơn hàng #<%= order.orderCode %></title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+    }
+    .changes {
+      background: #fffde7;
+      border: 1px dashed #ffb300;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .order-detail-box {
+      border: 2px solid #999999;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+    }
+    .order-row:last-child {
+      margin-bottom: 0 !important;
+    }
+    .footer {
+      margin-top: 32px;
+      font-size: 13px;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Xin chào <strong><%= order.customerDetail.name %></strong>,</p>
+    <p>Đơn hàng của bạn đã có cập nhật mới!</p>
+
+    <h4 style="
+    color: #ffb300;
+    margin-bottom: 0;
+    ">Những phần đã cập nhật:</h4>
+    <% if (orderChanged) { %>
+      <div class="changes">
+        <%- include('partials/order-details', {
+          order: {
+            orderCode: order.orderCode,
+            createdAt: order.createdAt,
+            status: order.status,
+            paymentMethod: order.paymentMethod,
+            orderItems: orderChanged.orderItems,
+            delivery: orderChanged.delivery || order.delivery,
+            subTotal: orderChanged.subTotal,
+            deliveryFee: orderChanged.deliveryFee,
+            discount: orderChanged.discount,
+            total: orderChanged.total
+          },
+          frefixStatic,
+          showHeader: false,
+          showStatus: false,
+          showProducts: !!orderChanged.orderItems,
+          showDelivery: !!orderChanged.delivery,
+          showSummary: orderChanged.subTotal !== undefined || orderChanged.deliveryFee !== undefined || orderChanged.discount !== undefined || orderChanged.total !== undefined
+        }) %>
+      </div>
+    <% } %>
+
+    <!-- Hiển thị trạng thái đơn hàng mới -->
+    <div class="order-detail-box">
+      <%- include('partials/order-details', {
+        orderCode: order.orderCode,
+        createdAt: order.createdAt,
+        status: order.status,
+        paymentMethod: order.paymentMethod,
+        orderItems: orderChanged.orderItems || order.orderItems,
+        frefixStatic,
+        delivery: order.delivery,
+        subTotal: orderChanged.subTotal || order.subTotal,
+        deliveryFee: orderChanged.deliveryFee || order.deliveryFee,
+        discount: orderChanged.discount || order.discount,
+        total: orderChanged.total || order.total,
+        showHeader: true,
+        showStatus: true,
+        showProducts: true,
+        showDelivery: true,
+        showSummary: true
+      }) %>
+    </div>
+
+    <div class="footer">
+      Trân trọng,<br>
+      Đội ngũ <strong><%= shop.name %></strong><br>
+      Hotline: <%= shop.phone %>
+    </div>
+  </div>
+</body>
+</html>

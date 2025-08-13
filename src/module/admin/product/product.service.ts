@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { Product, ProductDocument } from '../../../shared/schema/product.schema';
-import { FilterQuery, FlattenMaps, Model } from 'mongoose';
+import { FilterQuery, FlattenMaps, HydratedDocument, Model } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Album } from '../../../shared/schema/album.schema';
@@ -13,7 +13,7 @@ export class ProductService implements IBasicService<Product> {
     @InjectModel(Product.name) private productModel: Model<Product>,
   ) { }
 
-  async create(data: Product): Promise<ProductDocument> {
+  async create(data: Product): Promise<HydratedDocument<Product>> {
     const product = new this.productModel(data);
     await product.save();
     return product;

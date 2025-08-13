@@ -3,18 +3,19 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import * as ejs from 'ejs';
 import * as path from 'path';
-import { OrderEntity } from '../order-basic/entity/order.entity';
-import { OrderDocument } from '../order-basic/schema/order.schema';
+import { Order, OrderDocument } from '../order-basic/schema/order.schema';
+import { IUrl } from 'src/shared/interface/configuration.interface';
+import { IOrderPopulated } from 'src/shared/interface/order-response.interface';
 
 @Injectable()
 export class MailService {
   private readonly mailConfig = this.configService.get('mail');
+  private readonly shop = this.configService.get('shop');
+  private readonly app: IUrl = this.configService.get('app');
+
   constructor(
     private readonly configService: ConfigService,
-  ) { 
-    console.log(this.mailConfig);
-    
-  }
+  ) { }
 
   private transporter = nodemailer.createTransport({
     host: this.mailConfig.host, // hoặc SMTP server của bạn
@@ -27,28 +28,55 @@ export class MailService {
   });
 
   private async renderTemplate(templateName: string, data: any): Promise<string> {
+    const frefixStatic = `${this.app.protocol}://${this.app.host}:${this.app.port}/static`;
+    const templateData = Object.assign({}, data, {frefixStatic}, {shop: this.shop});
+    
     const templatePath = path.join(process.cwd(), 'template', `${templateName}.ejs`);
-    return ejs.renderFile(templatePath, data);
+    return ejs.renderFile(templatePath, templateData);
   }
 
   private async sendMail(to: string, subject: string, html: string) {
     await this.transporter.sendMail({
-      from: `Shop ${this.mailConfig.user}`, // địa chỉ email của bạn
+      from: `${this.shop.name} ${this.mailConfig.user}`, // địa chỉ email của bạn
       to,
       subject,
       html,
     });
   }
 
-  async sendOrderReceivedEmail(order: any) {
+  async sendOrderReceivedEmail(order: OrderDocument) {
     try {
-      const html = await this.renderTemplate('order-received', order);
-      console.log(html);
-      
-      await this.sendMail(order.customerDetail.email, 'Đơn hàng mới', html);
+      const data = { order };
+      const html = await this.renderTemplate('order-received', data);
+
+      await this.sendMail(order.customerDetail.email, `Đơn hàng ${order.orderCode} mới đã được tạo thành công`, html);
     } catch (error) {
-      console.log(error);
-      
+      console.error(error);
+    }
+  }
+
+  async sendOrderChangedEmail(order: IOrderPopulated, orderChanged: Partial<Order>) {
+    try {
+      const data = {
+        order,
+        orderChanged
+      };
+      const html = await this.renderTemplate('order-changed', data);
+
+      await this.sendMail(order.customerDetail.email, `Đơn hàng ${order.orderCode} đã thay đổi`, html);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async sendOrderCancelledEmail(order: IOrderPopulated) {
+    try {
+      const data = { order };
+      const html = await this.renderTemplate('order-canceled', data);
+
+      await this.sendMail(order.customerDetail.email, `Đơn hàng ${order.orderCode} đã hủy`, html);
+    } catch (error) {
+      console.error(error);
     }
   }
 }

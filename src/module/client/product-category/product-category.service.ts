@@ -7,13 +7,14 @@ import { Product_Category, ProductCategoryDocument } from 'src/shared/schema/pro
 import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
 import { Album } from '../../../shared/schema/album.schema';
 import { Product } from 'src/shared/schema/product.schema';
+import { HydratedDocument } from 'mongoose';
 
 export class ProductCategoryService implements IBasicService<Product_Category> {
   constructor(
     @InjectModel(Product_Category.name) private readonly productCategoryModel: Model<Product_Category>,
   ) { }
 
-  async create(data: Product_Category): Promise<ProductCategoryDocument> {
+  async create(data: Product_Category): Promise<HydratedDocument<Product_Category>> {
     // Validate circular reference nếu có parentId
     if (data.parentId) {
       const isValid = await this.validateParentId(null, data.parentId.toString());

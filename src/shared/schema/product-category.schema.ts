@@ -5,8 +5,9 @@ import { ObjectId } from 'mongodb';
 
 import { VietnameseAccentUtil } from "../util/vietnamese-accent.util";
 import { Album } from "src/shared/schema/album.schema";
+import { IMongodbDocument } from "../interface/mongo.interface";
 
-export type ProductCategoryDocument = HydratedDocument<Product_Category>;
+export type ProductCategoryDocument = Product_Category & IMongodbDocument;
 
 @Schema({ timestamps: true })
 export class Product_Category implements IProductCategory {

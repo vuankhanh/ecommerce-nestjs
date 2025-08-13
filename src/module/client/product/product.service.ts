@@ -8,6 +8,7 @@ import { Album } from '../../../shared/schema/album.schema';
 import { Product_Category } from 'src/shared/schema/product-category.schema';
 import { ProductCategoryService } from '../product-category/product-category.service';
 import { CustomNotFoundException } from 'src/shared/core/exception/custom-exception';
+import { HydratedDocument } from 'mongoose';
 
 @Injectable()
 export class ProductService implements IBasicService<Product> {
@@ -16,7 +17,7 @@ export class ProductService implements IBasicService<Product> {
     private readonly productCategoryService: ProductCategoryService
   ) { }
 
-  async create(data: Product): Promise<ProductDocument> {
+  async create(data: Product): Promise<HydratedDocument<Product>> {
     const product = new this.productModel(data);
     await product.save();
     return product;

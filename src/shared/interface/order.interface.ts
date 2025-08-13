@@ -1,9 +1,10 @@
-import { OrderStatus } from "src/constant/order.constant";
+import { OrderFrom, OrderStatus } from "src/constant/order.constant";
 import { TPaymentMethod } from "./payment.interface";
 import { IDelivery } from "./delivery.interface";
 import { Types } from "mongoose";
 
 export type TOrderStatus = `${OrderStatus}`;
+export type TOrderFrom = `${OrderFrom}`
 
 export interface IOrder {
   orderItems: IOrderItem[];

@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { IOrderItem } from "src/shared/interface/order.interface";
 
 export class OrderProductItemEntity implements IOrderItem {
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
   productId: string | Types.ObjectId;
   productThumbnail: string;
   productCode: string;

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { Delivery, DeliveryDocument } from './schema/delivery.schema';
-import { Document, Types, FilterQuery, FlattenMaps, Model } from 'mongoose';
+import { Document, Types, FilterQuery, FlattenMaps, Model, HydratedDocument } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -12,7 +12,7 @@ export class AddressService implements IBasicService<Delivery> {
     @InjectModel(Delivery.name) private deliveryModel: Model<Delivery>,
   ) { }
 
-  async create(data: Delivery): Promise<DeliveryDocument> {
+  async create(data: Delivery): Promise<HydratedDocument<Delivery>> {
     const existingCount = await this.deliveryModel.countDocuments({
       accountId: data.accountId
     });

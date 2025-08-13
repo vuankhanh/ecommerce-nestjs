@@ -101,7 +101,7 @@ export class AuthController {
     }
     try {
       const query = { email };
-      let account: AccountDocument = await this.accountService.findOne(query);
+      let account = await this.accountService.findOne(query);
 
       if (!account) {
         this.logger.log('Creating new user from Firebase authentication.');

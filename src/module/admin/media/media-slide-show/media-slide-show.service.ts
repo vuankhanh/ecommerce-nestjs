@@ -10,6 +10,7 @@ import { PurposeOfMedia } from 'src/constant/media.constant';
 import { IMedia } from 'src/shared/interface/media.interface';
 import { FileHelper } from 'src/shared/helper/file.helper';
 import { SortUtil } from 'src/shared/util/sort_util';
+import { HydratedDocument } from 'mongoose';
 
 @Injectable()
 export class MediaSlideShowService implements IBasicService<Album> {
@@ -26,7 +27,7 @@ export class MediaSlideShowService implements IBasicService<Album> {
     return await this.slideShowAlbumModel.countDocuments(this.filterQuery);
   }
 
-  async create(data: Album): Promise<AlbumDocument> {
+  async create(data: Album): Promise<HydratedDocument<Album>> {
     const newAlbum = new this.slideShowAlbumModel(data);
     return await newAlbum.save();
   }
@@ -40,8 +41,8 @@ export class MediaSlideShowService implements IBasicService<Album> {
   }
 
   async replace(data: Album) {
-    const milestone = await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true });
-    return milestone;
+    const slideShow = await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true });
+    return slideShow as unknown as AlbumDocument;
   }
 
   async addNewFiles(
@@ -99,16 +100,17 @@ export class MediaSlideShowService implements IBasicService<Album> {
 
   async modify(data: Partial<Album>) {
 
-    return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true });;
+    const slideShow = await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true });
+    return slideShow as unknown as AlbumDocument;
   }
 
   async remove() {
-    const album = await this.slideShowAlbumModel.findOneAndDelete(this.filterQuery);
-    if (album?.relativePath) {
-      await FileHelper.removeFolder(this.albumFoler, album.relativePath);
+    const slideShow = await this.slideShowAlbumModel.findOneAndDelete(this.filterQuery);
+    if (slideShow?.relativePath) {
+      await FileHelper.removeFolder(this.albumFoler, slideShow.relativePath);
     }
 
-    return album;
+    return slideShow as unknown as AlbumDocument;
   }
 
   async filterMediaItems(itemIds: Array<mongoose.Types.ObjectId | string>): Promise<Array<{ url: string, thumbnailUrl: string }>> {

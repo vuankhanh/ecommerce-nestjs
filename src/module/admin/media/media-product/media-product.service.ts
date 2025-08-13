@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Album, AlbumDocument } from '../../../../shared/schema/album.schema';
-import mongoose, { FilterQuery, FlattenMaps, Model, Types } from 'mongoose';
+import mongoose, { FilterQuery, FlattenMaps, HydratedDocument, Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { PurposeOfMedia } from 'src/constant/media.constant';
 import { Media, MediaDocument } from '../../../../shared/schema/media.schema';
@@ -23,7 +23,7 @@ export class MediaProductService {
     return await this.productAlbumModel.countDocuments(filterQuery);
   }
 
-  async create(data: Album): Promise<AlbumDocument> {
+  async create(data: Album): Promise<HydratedDocument<Album>> {
     const newAlbum = new this.productAlbumModel(data);
     return await newAlbum.save();
   }
@@ -151,7 +151,7 @@ export class MediaProductService {
     if (album?.relativePath) {
       await FileHelper.removeFolder(this.albumFoler, album.relativePath);
     }
-    return album;
+    return album as unknown as AlbumDocument;
   }
 
   async filterMediaItems(filterQuery: FilterQuery<Album>, itemIds: Array<mongoose.Types.ObjectId | string>): Promise<Array<{ url: string, thumbnailUrl: string }>> {

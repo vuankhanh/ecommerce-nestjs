@@ -1,4 +1,3 @@
-import { OrderItem } from "src/module/order-basic/schema/order_product_item.schema";
 import { IOrderItem } from "../interface/order.interface";
 import { OrderProductItemEntity } from "src/module/order-basic/entity/order-product-item.entity";
 
@@ -11,10 +10,9 @@ export class OrderUtil {
     deliveryFee: number,
     discount: number
   ): number {
-    const amoutAfterDiscount = subTotal * discount / 100;
     let total = subTotal;
     total += deliveryFee;
-    total -= amoutAfterDiscount;
+    total -= discount;
 
     return total;
   }

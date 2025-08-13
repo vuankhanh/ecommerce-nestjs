@@ -9,8 +9,10 @@ import { PaymentMethod } from "src/constant/payment.constant";
 import { IDelivery } from "src/shared/interface/delivery.interface";
 import { Account } from "src/module/auth/schemas/account.schema";
 import { OrderProductItemEntity } from "../entity/order-product-item.entity";
+import { IOrderPopulated } from "src/shared/interface/order-response.interface";
+import { IMongodbDocument } from "src/shared/interface/mongo.interface";
 
-export type OrderDocument = HydratedDocument<Order>;
+export type OrderDocument = IOrderPopulated & IMongodbDocument;
 
 @Schema({ timestamps: true })
 export class Order implements IOrder {
@@ -22,6 +24,9 @@ export class Order implements IOrder {
 
   @Prop({ type: String, required: true, default: OrderStatus.PENDING })
   status: TOrderStatus;
+
+  @Prop({type: String})
+  reasonForCancellation?: string;
 
   @Prop({ type: Number, required: true })
   subTotal: number;
@@ -38,8 +43,8 @@ export class Order implements IOrder {
   @Prop({ type: String, enum: PaymentMethod, required: true })
   paymentMethod: TPaymentMethod;
 
-  @Prop({ type: Types.ObjectId, ref: Account.name })
-  accountId?: Types.ObjectId;
+  @Prop({ type: [Types.ObjectId, String], ref: Account.name })
+  accountId?: Types.ObjectId | string;
 
   @Prop({ type: Object})
   delivery: IDelivery;

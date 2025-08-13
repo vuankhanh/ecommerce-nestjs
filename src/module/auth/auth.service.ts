@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AccountDocument } from './schemas/account.schema';
-import mongoose from 'mongoose';
+import { Account, AccountDocument } from './schemas/account.schema';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { RefreshTokenService } from 'src/shared/service/refresh_token.service';
 import { AccountService } from 'src/shared/service/account.service';
 import { CustomForbiddenException, CustomUnauthorizedException } from 'src/shared/core/exception/custom-exception';
@@ -18,7 +18,7 @@ export class AuthService {
     private accountService: AccountService,
   ) { }
 
-  createAccessToken(account: AccountDocument): string {
+  createAccessToken(account: HydratedDocument<Account>): string {
     const { email, name, avatar, role } = account;
     const payload = { email, name, avatar, role };
 
@@ -30,7 +30,7 @@ export class AuthService {
     return token;
   }
 
-  async createRefreshToken(account: AccountDocument): Promise<string> {
+  async createRefreshToken(account: HydratedDocument<Account>): Promise<string> {
     const { email, name, avatar, role } = account;
     const payload = { email, name, avatar, role };
 
@@ -43,7 +43,7 @@ export class AuthService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + refreshTokenLife);
 
-    const accountId: mongoose.Types.ObjectId = account._id;
+    const accountId: Types.ObjectId = account._id;
     await this.refreshTokenService.findOneAndRemove(accountId);
     await this.refreshTokenService.create(accountId, refreshToken, expiresAt);
 

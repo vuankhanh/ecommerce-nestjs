@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { Album, AlbumDocument } from '../../../../shared/schema/album.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document, FilterQuery, FlattenMaps, Model, Types } from 'mongoose';
+import { Document, FilterQuery, FlattenMaps, HydratedDocument, Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { PurposeOfMedia } from 'src/constant/media.constant';
@@ -24,7 +24,7 @@ export class MediaPromotionService implements IBasicService<Album> {
     return await this.promotionAlbumModel.countDocuments(this.filterQuery);
   }
 
-  async create(data: Album): Promise<AlbumDocument> {
+  async create(data: Album): Promise<HydratedDocument<Album>> {
     const createdAlbum = new this.promotionAlbumModel(data);
     return createdAlbum.save();
   }
@@ -51,11 +51,13 @@ export class MediaPromotionService implements IBasicService<Album> {
   }
 
   async replace(data: Album): Promise<AlbumDocument> {
-    return this.promotionAlbumModel.findOneAndReplace(this.filterQuery, data, { new: true }).exec();
+    const slideShow = this.promotionAlbumModel.findOneAndReplace(this.filterQuery, data, { new: true }).exec();
+    return slideShow as unknown as AlbumDocument;
   }
 
   async modify(data: Partial<Album>): Promise<AlbumDocument> {
-    return this.promotionAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true }).exec();
+    const slideShow =  this.promotionAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true }).exec();
+    return slideShow as unknown as AlbumDocument;
   }
 
   async insert(data: Media): Promise<AlbumDocument> {
@@ -78,11 +80,11 @@ export class MediaPromotionService implements IBasicService<Album> {
   }
 
   async remove(): Promise<AlbumDocument> {
-    const album = await this.promotionAlbumModel.findOne(this.filterQuery)
-    if (album?.relativePath) {
-      await FileHelper.removeFolder(this.albumFoler, album.relativePath);
+    const slideShow = await this.promotionAlbumModel.findOne(this.filterQuery)
+    if (slideShow?.relativePath) {
+      await FileHelper.removeFolder(this.albumFoler, slideShow.relativePath);
     }
-    return album;
+    return slideShow as unknown as AlbumDocument;
   }
 
 }
