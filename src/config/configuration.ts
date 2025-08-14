@@ -30,7 +30,7 @@ export default () => {
     app: {
       port: Number(process.env.PRO_APP_PORT),
       protocol: process.env.PRO_APP_PROTOCOL || 'https',
-      host: process.env.PRO_APP_HOST || 'bep4than.online'
+      host: process.env.PRO_APP_HOST || 'bep4than.vn'
     },
     db: {
       protocol: process.env.PRO_DB_PROTOCOL || 'mongodb',

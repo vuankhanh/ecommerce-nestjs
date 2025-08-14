@@ -97,6 +97,10 @@ export class OrderController {
     // Khởi tạo đối tượng orderUpdate
     // Đây là đối tượng sẽ chứa các trường cần cập nhật.
     const orderUpdate: Partial<Order> = {};
+
+    // Khởi tạo đối tượng orderUpdateForEmail
+    // Đây là đối tượng sẽ chứa các trường cần gửi qua email.
+    // Sử dụng Partial để chỉ định rằng đây là một phần của Order, không cần đầy đủ tất cả các trường.
     const orderUpdateForEmail: Partial<Order> = {};
 
     //Kiểm tra nếu tồn tại các yếu tố ảnh hưởng đến tổng tiền. orderItems, deliveryFee, discount
@@ -111,6 +115,7 @@ export class OrderController {
       if (body.orderItems) {
         // Gọi pipe transform thủ công
         orderUpdate.orderItems = await this.orderItemsMapAdminPipe.transform(body.orderItems);
+        orderUpdateForEmail.orderItems = orderUpdate.orderItems.map(item => new OrderProductItemEntity(item));
         const subTotal = OrderUtil.calculateSubTotal(orderUpdate.orderItems);
         orderUpdate.subTotal = subTotal;
         orderUpdateForEmail.subTotal = subTotal;
@@ -149,6 +154,7 @@ export class OrderController {
       orderUpdateForEmail.delivery['addressDetail'] = AddressUtil.addressDetail(body.delivery);
     }
 
+    oldOrder.delivery['addressDetail'] = AddressUtil.addressDetail(oldOrder.delivery);
     const order = await this.orderBasicService.updateOrder(filterQuery, orderUpdate);
     await this.mailService.sendOrderChangedEmail(oldOrder, orderUpdateForEmail);
     return order;

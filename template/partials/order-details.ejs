@@ -6,17 +6,69 @@
   </div>
 <% } %>
 
+<%
+// Xử lý màu và icon cho status
+let statusBg = '#E0E0E0';
+let statusColor = '#333';
+let statusIcon = '⏳';
+switch (order.status) {
+  case 'Chờ xác nhận':
+    statusBg = '#FFA000'; statusColor = '#fff'; statusIcon = '⏳'; break;
+  case 'Đã xác nhận':
+    statusBg = '#1976D2'; statusColor = '#fff'; statusIcon = '✅'; break;
+  case 'Đang giao':
+    statusBg = '#00BCD4'; statusColor = '#fff'; statusIcon = '🚚'; break;
+  case 'Hoàn thành':
+    statusBg = '#388E3C'; statusColor = '#fff'; statusIcon = '🎉'; break;
+  case 'Đã hủy':
+    statusBg = '#D32F2F'; statusColor = '#fff'; statusIcon = '❌'; break;
+  default:
+    statusBg = '#E0E0E0'; statusColor = '#333'; statusIcon = '⏳';
+}
+%>
+
+<%
+let paymentIcon = '💳';
+switch (order.paymentMethod) {
+  case 'Tiền mặt':
+    paymentIcon = '💵'; break;
+  case 'Chuyển khoản':
+    paymentIcon = '🏦'; break;
+  case 'PENDING':
+    paymentIcon = '⏳'; break;
+  default:
+    paymentIcon = '💳';
+}
+%>
+
 <!-- Status Row -->
 <% if ((typeof showStatus === 'undefined' || showStatus) && (order.status || order.paymentMethod)) { %>
   <div class="order-row status-row" style="display: flex; justify-content: space-between; padding: 15px; background: #f8f9fa; border-radius: 6px; margin-bottom: 20px;">
     <% if (order.status) { %>
       <div style="display: flex; align-items: center; width: 100%;">
-        🚚 <strong style="margin-left: 5px; white-space: nowrap;"><%= order.status %></strong>
+        <span style="font-size: 20px; margin-right: 8px;"><%= statusIcon %></span>
+        <strong style="
+          white-space: nowrap;
+          border-radius: 16px;
+          padding: 5px 16px;
+          font-weight: 500;
+          font-size: 15px;
+          background: <%= statusBg %>;
+          color: <%= statusColor %>;
+          display: inline-block;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+          letter-spacing: 0.5px;"
+        >
+          <%= order.status %>
+        </strong>
       </div>
     <% } %>
     <% if (order.paymentMethod) { %>
       <div style="display: flex; align-items: center;">
-        💳 <strong style="margin-left: 5px; white-space: nowrap;"><%= order.paymentMethod %></strong>
+        <span style="font-size: 20px; margin-right: 8px;"><%= paymentIcon %></span>
+        <strong style="white-space: nowrap;">
+          <%= order.paymentMethod %>
+        </strong>
       </div>
     <% } %>
   </div>
@@ -74,27 +126,27 @@
 <% if (typeof showSummary === 'undefined' || showSummary === true) { %>
   <div class="order-row summary-section" style="margin-bottom: 25px;">
     <h3 style="color: #333; margin-bottom: 15px;">Tổng kết đơn hàng</h3>
-    <div style="border-top: 2px solid #eee; padding-top: 20px;">
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 6px;">
       <% if (typeof order.subTotal !== 'undefined') { %>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span>Tạm tính: </span>
+        <div style="display: flex; margin-bottom: 10px;">
+          <span style="width: 120px; min-width: 120px; font-weight: bold;">Tạm tính: </span>
           <span><%= order.subTotal.toLocaleString() %>đ</span>
         </div>
       <% } %>
       <% if (typeof order.deliveryFee !== 'undefined') { %>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span>Phí giao hàng: </span>
+        <div style="display: flex; margin-bottom: 10px;">
+          <span style="width: 120px; min-width: 120px; font-weight: bold;">Phí giao hàng: </span>
           <span><%= order.deliveryFee.toLocaleString() %>đ</span>
         </div>
       <% } %>
       <% if (typeof order.discount !== 'undefined' && order.discount > 0) { %>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span>Giảm giá: </span>
+        <div style="display: flex; margin-bottom: 10px;">
+          <span style="width: 120px; min-width: 120px; font-weight: bold;">Giảm giá: </span>
           <span>-<%= order.discount.toLocaleString() %>đ</span>
         </div>
       <% } %>
-      <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; color: #e74c3c; border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
-        <span>Tổng cộng: </span>
+      <div style="display: flex; font-size: 18px; font-weight: bold; color: #e74c3c; border-top: 1px solid #999999; padding-top: 10px; margin-top: 10px;">
+        <span style="width: 120px; min-width: 120px; font-weight: bold;">Tổng cộng: </span>
         <span><%= order.total.toLocaleString() %>đ</span>
       </div>
     </div>
