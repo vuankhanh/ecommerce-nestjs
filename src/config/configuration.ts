@@ -14,6 +14,11 @@ export default () => {
       port: Number(process.env.DEV_DB_PORT) || 27017,
       path: process.env.DEV_DB_NAME || 'pos_dev'
     },
+    redis: {
+      protocol: process.env.DEV_REDIS_PROTOCOL || 'redis',
+      host: process.env.DEV_REDIS_HOST || 'localhost',
+      port: Number(process.env.DEV_REDIS_PORT) || 6379
+    },
     printer: {
       protocol: process.env.DEV_PRINTER_PROTOCOL || 'http',
       host: process.env.DEV_PRINTER_HOST || 'localhost',
@@ -37,6 +42,11 @@ export default () => {
       host: process.env.PRO_DB_HOST,
       port: Number(process.env.PRO_DB_PORT),
       path: process.env.PRO_DB_NAME
+    },
+    redis: {
+      protocol: process.env.PRO_REDIS_PROTOCOL || 'redis',
+      host: process.env.PRO_REDIS_HOST || 'localhost',
+      port: Number(process.env.PRO_REDIS_PORT) || 6379
     },
     printer: {
       protocol: process.env.PRO_PRINTER_PROTOCOL || 'http',

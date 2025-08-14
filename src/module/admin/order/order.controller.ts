@@ -74,7 +74,7 @@ export class OrderController {
 
     const order = await this.orderBasicService.modifyStatus(filterQuery, body.status, body.reasonForCancelReason);
     if (body.status === OrderStatus.CANCELED) {
-      await this.mailService.sendOrderCancelledEmail(order);
+      this.mailService.queueOrderCancelledEmail(order);
     }
     return order;
   }
@@ -156,7 +156,7 @@ export class OrderController {
 
     oldOrder.delivery['addressDetail'] = AddressUtil.addressDetail(oldOrder.delivery);
     const order = await this.orderBasicService.updateOrder(filterQuery, orderUpdate);
-    await this.mailService.sendOrderChangedEmail(oldOrder, orderUpdateForEmail);
+    this.mailService.queueOrderChangedEmail(order, orderUpdateForEmail);
     return order;
   }
 }

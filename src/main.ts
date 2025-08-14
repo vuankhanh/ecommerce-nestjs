@@ -2,11 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
+import { Queue } from 'bull';
+import { getQueueToken } from '@nestjs/bull';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
   const staticPath = configService.get('folder.uploads');
+
+  // Lấy queue (ví dụ: mail)
+  const mailQueue = app.get<Queue>(getQueueToken('mail'));
+  mailQueue.on('error', (err) => {
+    console.error('Bull queue error:', err);
+  });
 
   app.enableCors();
   app.setGlobalPrefix('api');

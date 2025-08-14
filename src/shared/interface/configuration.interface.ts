@@ -1,6 +1,7 @@
 export interface IConfiguration {
   app: IUrl;
   db: IUrl;
+  redis: IUrl;
   printer: IUrl;
   client: IUrl;
   folder?: {

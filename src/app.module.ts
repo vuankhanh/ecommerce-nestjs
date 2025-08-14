@@ -15,6 +15,8 @@ import { SocketGateway } from './gateway/socket/socket.gateway';
 import { AdminModule } from './module/admin/admin.module';
 import { ClientModule } from './module/client/client.module';
 import { MailModule } from './module/mail/mail.module';
+import { BullModule } from '@nestjs/bull';
+import { BullConfigProvider } from './provider/database/redis.provider';
 
 @Module({
   imports: [
@@ -25,6 +27,10 @@ import { MailModule } from './module/mail/mail.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useClass: MongodbProvider,
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: BullConfigProvider,
     }),
     JwtModule.register({ global: true }),
     AdminModule,
