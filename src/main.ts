@@ -12,6 +12,7 @@ async function bootstrap() {
 
   // Lấy queue (ví dụ: mail)
   const mailQueue = app.get<Queue>(getQueueToken('mail'));
+
   mailQueue.on('error', (err) => {
     console.error('Bull queue error:', err);
   });
@@ -21,7 +22,7 @@ async function bootstrap() {
   app.useStaticAssets(staticPath, {
     prefix: '/static/',
   });
-  
+
   const port = AppModule.port || 3004;
   console.log(`App is running on port ${port}`);
   await app.listen(port);
