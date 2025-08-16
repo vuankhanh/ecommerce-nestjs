@@ -156,7 +156,7 @@ export class OrderController {
 
     oldOrder.delivery['addressDetail'] = AddressUtil.addressDetail(oldOrder.delivery);
     const order = await this.orderBasicService.updateOrder(filterQuery, orderUpdate);
-    this.mailService.queueOrderChangedEmail(order, orderUpdateForEmail);
+    this.mailService.queueOrderChangedEmail(oldOrder, orderUpdateForEmail);
     return order;
   }
 }

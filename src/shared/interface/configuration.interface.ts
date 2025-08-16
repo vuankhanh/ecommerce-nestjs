@@ -1,5 +1,8 @@
 export interface IConfiguration {
-  app: IUrl;
+  app: {
+    port: number;
+  };
+  endpoint: string;
   db: IUrl;
   redis: IUrl;
   printer: IUrl;

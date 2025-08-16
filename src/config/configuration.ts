@@ -5,9 +5,8 @@ export default () => {
   const dev: IConfiguration = {
     app: {
       port: Number(process.env.DEV_APP_PORT) || 3004,
-      protocol: process.env.DEV_APP_PROTOCOL || 'http',
-      host: process.env.DEV_APP_HOST || 'localhost'
     },
+    endpoint: process.env.DEV_APP_ENDPOINT,
     db: {
       protocol: process.env.DEV_DB_PROTOCOL || 'mongodb',
       host: process.env.DEV_DB_HOST || 'localhost',
@@ -33,10 +32,9 @@ export default () => {
 
   const pro: IConfiguration = {
     app: {
-      port: Number(process.env.PRO_APP_PORT),
-      protocol: process.env.PRO_APP_PROTOCOL || 'https',
-      host: process.env.PRO_APP_HOST || 'bep4than.vn'
+      port: Number(process.env.PRO_APP_PORT)
     },
+    endpoint: process.env.PRO_APP_ENDPOINT,
     db: {
       protocol: process.env.PRO_DB_PROTOCOL || 'mongodb',
       host: process.env.PRO_DB_HOST,

@@ -11,11 +11,14 @@ import { IOrderPopulated } from 'src/shared/interface/order-response.interface';
 export class MailSenderService {
   private readonly mailConfig = this.configService.get('mail');
   private readonly shop = this.configService.get('shop');
-  private readonly app: IUrl = this.configService.get('app');
+  private readonly endpoint: string = this.configService.get('endpoint');
 
   constructor(
     private readonly configService: ConfigService,
-  ) { }
+  ) {
+    console.log(`endpoint: ${this.endpoint}`);
+    
+  }
 
   private transporter = nodemailer.createTransport({
     host: this.mailConfig.host, // hoặc SMTP server của bạn
@@ -28,7 +31,7 @@ export class MailSenderService {
   });
 
   private async renderTemplate(templateName: string, data: any): Promise<string> {
-    const frefixStatic = `${this.app.protocol}://${this.app.host}:${this.app.port}/static`;
+    const frefixStatic = `${this.endpoint}/static`;
     const templateData = Object.assign({}, data, { frefixStatic }, { shop: this.shop });
 
     const templatePath = path.join(process.cwd(), 'template', `${templateName}.ejs`);
