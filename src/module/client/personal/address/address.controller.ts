@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Get, ParseIntPipe, Patch, Post, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, ParseIntPipe, Patch, Post, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserRole } from 'src/constant/user.constant';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
@@ -127,5 +127,23 @@ export class AddressController {
     }
 
     return this.addressService.setDefaultAddress(accountId, deliveryId);
+  }
+
+  @Delete()
+  async deleteAddress(
+    @Req() request: Request,
+    @Query('deliveryId') deliveryId: string
+  ) {
+    const accountId: string = request['customParams'].accountId;
+    if (!accountId) {
+      throw new CustomBadRequestException('Không tìm thấy thông tin tài khoản');
+    }
+
+    if (!deliveryId) {
+      throw new CustomBadRequestException('Delivery ID là bắt buộc');
+    }
+
+    const filterQuery = { _id: new Types.ObjectId(deliveryId), accountId: new Types.ObjectId(accountId) };
+    return await this.addressService.remove(filterQuery);
   }
 }

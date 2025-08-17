@@ -4,6 +4,8 @@ import { Delivery, DeliveryDocument } from './schema/delivery.schema';
 import { Document, Types, FilterQuery, FlattenMaps, Model, HydratedDocument } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
+import { is } from 'cheerio/dist/commonjs/api/traversing';
+import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
 
 @Injectable()
 export class AddressService implements IBasicService<Delivery> {
@@ -81,8 +83,14 @@ export class AddressService implements IBasicService<Delivery> {
     );
   }
 
-  remove(filterQuery: FilterQuery<Delivery>): Promise<DeliveryDocument> {
-    throw new Error('Method not implemented.');
+  async remove(filterQuery: FilterQuery<Delivery>): Promise<DeliveryDocument> {
+    const address = await this.deliveryModel.findOne(filterQuery, 'isDefault');
+    const isDefaultAddress = address?.isDefault ?? false;
+    if (isDefaultAddress) {
+      throw new CustomBadRequestException('Không thể xóa địa chỉ không phải là mặc định');
+    }
+
+    return await this.deliveryModel.findOneAndDelete(filterQuery);
   }
 
 }
