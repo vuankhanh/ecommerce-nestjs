@@ -1,12 +1,13 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Transform } from "class-transformer";
-import { IsBoolean, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Validate } from "class-validator";
+import { HasDefaultLangConstraint } from "src/shared/custom-validator/multiple-lang.validator";
 import { IProduct } from "src/shared/interface/product.interface";
 
 export class ProductDto implements IProduct {
   @IsNotEmpty({ message: 'Tên sản phẩm không được để trống' })
-  @IsString({ message: 'Tên sản phẩm phải là chuỗi' })
-  name: string;
+  @Validate(HasDefaultLangConstraint)
+  name: { [lang: string]: string };
 
   @IsOptional()
   @IsMongoId({ message: 'Id danh mục sản phẩm phải là chuỗi ObjectId' })
@@ -14,12 +15,12 @@ export class ProductDto implements IProduct {
   productCategoryId?: string;
 
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
-  @IsString({ message: 'Mô tả phải là chuỗi' })
-  description: string;
+  @Validate(HasDefaultLangConstraint)
+  description: { [lang: string]: string };
 
   @IsNotEmpty({ message: 'Mô tả ngắn không được để trống' })
-  @IsString({ message: 'Mô tả ngắn phải là chuỗi' })
-  shortDescription: string;
+  @Validate(HasDefaultLangConstraint)
+  shortDescription: { [lang: string]: string };
 
   @IsMongoId({ message: 'Id album phải là chuỗi ObjectId' })
   @Transform(({ value }) => value === '' ? undefined : value)

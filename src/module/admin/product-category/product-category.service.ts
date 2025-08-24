@@ -1,15 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { Document, Types, FilterQuery, FlattenMaps, HydratedDocument } from 'mongoose';
+import { FilterQuery, FlattenMaps, HydratedDocument } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { IBasicService } from 'src/shared/interface/basic_service.interface';
+import { IBasicAdminService } from 'src/shared/interface/basic_admin_service.interface';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Product_Category, ProductCategoryDocument } from 'src/shared/schema/product-category.schema';
 import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
 import { Album } from '../../../shared/schema/album.schema';
 import { Product } from 'src/shared/schema/product.schema';
 
-export class ProductCategoryService implements IBasicService<Product_Category> {
+export class ProductCategoryService implements IBasicAdminService<Product_Category> {
   constructor(
     @InjectModel(Product_Category.name) private readonly productCategoryModel: Model<Product_Category>,
   ) { }

@@ -20,7 +20,7 @@ export interface IOrderItem {
   productId: string | Types.ObjectId;
   productThumbnail: string;
   productCode: string;
-  productName: string;
+  productName: { [lang: string]: string };
   productCategorySlug: string;
   productSlug: string;
   quantity: number;

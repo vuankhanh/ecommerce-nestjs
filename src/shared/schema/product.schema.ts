@@ -16,9 +16,13 @@ export class Product implements IProduct {
   @Prop({
     type: String,
     unique: true,
-    required: true
+    required: true,
+    validate: {
+      validator: (name: any) => name && typeof name.vi === 'string' && name.vi.length > 0,
+      message: 'Trường này phải có giá trị cho ngôn ngữ mặc định (vi)'
+    }
   })
-  name: string;
+  name: { [lang: string]: string };;
 
   @Prop({
     type: String,
@@ -42,11 +46,25 @@ export class Product implements IProduct {
 
   productCategory?: Product_Category;
 
-  @Prop({ type: String, required: true })
-  description: string;
+  @Prop({
+    type: Object,
+    required: true,
+    validate: {
+      validator: (desc: any) => desc && typeof desc.vi === 'string' && desc.vi.length > 0,
+      message: 'Description phải có trường vi (ngôn ngữ mặc định)'
+    }
+  })
+  description: { [lang: string]: string };
 
-  @Prop({ type: String, required: true })
-  shortDescription: string;
+  @Prop({
+    type: Object,
+    required: true,
+    validate: {
+      validator: (desc: any) => desc && typeof desc.vi === 'string' && desc.vi.length > 0,
+      message: 'ShortDescription phải có trường vi (ngôn ngữ mặc định)'
+    }
+  })
+  shortDescription: { [lang: string]: string };
 
   @Prop({ type: Types.ObjectId, ref: Album.name })
   albumId?: Types.ObjectId | string;
@@ -103,7 +121,7 @@ export class Product implements IProduct {
   }
 
   private generateSlug(): string {
-    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(this.name);
+    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(this.name.vi);
     const slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
     return slug;
   }

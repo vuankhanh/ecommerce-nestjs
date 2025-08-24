@@ -16,8 +16,12 @@ export class Product_Category implements IProductCategory {
     required: true,
     unique: true,
     trim: true,
+    validate: {
+      validator: (name: any) => name && typeof name.vi === 'string' && name.vi.length > 0,
+      message: 'Trường này phải có giá trị cho ngôn ngữ mặc định (vi)'
+    }
   })
-  name: string;
+  name: { [lang: string]: string };
 
   @Prop({
     type: Types.ObjectId,
@@ -33,8 +37,8 @@ export class Product_Category implements IProductCategory {
   })
   slug: string;
 
-  @Prop({ type: String, required: false })
-  description?: string;
+  @Prop({ type: Object, required: false })
+  description?: { [lang: string]: string };
 
   @Prop({ type: Types.ObjectId, ref: Product_Category.name, required: false })
   parentId?: string | Types.ObjectId;
@@ -50,7 +54,7 @@ export class Product_Category implements IProductCategory {
   }
 
   private generateSlug(): string {
-    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(this.name);
+    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(this.name.vi);
     const slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
     return slug;
   }

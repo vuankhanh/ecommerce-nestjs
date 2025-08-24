@@ -20,8 +20,15 @@ export class OrderItem implements IOrderItem {
   @Prop({ type: String, required: true })
   productCode: string;
 
-  @Prop({ type: String, required: true })
-  productName: string;
+  @Prop({
+    type: Object,
+    required: true,
+    validate: {
+      validator: (pName: any) => pName && typeof pName.vi === 'string' && pName.vi.length > 0,
+      message: 'Product Name phải có giá trị cho ngôn ngữ mặc định (vi)'
+    }
+  })
+  productName: { [lang: string]: string };
 
   @Prop({ type: String, required: true })
   productCategorySlug: string;

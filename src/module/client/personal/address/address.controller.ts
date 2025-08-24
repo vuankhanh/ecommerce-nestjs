@@ -34,7 +34,7 @@ export class AddressController {
     }
 
     const filterQuery = { accountId: new Types.ObjectId(accountId) };
-    return await this.addressService.getAll(filterQuery, page, size);
+    return await this.addressService.getAll(filterQuery, 'vi', page, size);
   }
 
   @Get('detail')
@@ -53,7 +53,7 @@ export class AddressController {
 
     const filterQuery = { _id: new Types.ObjectId(deliveryId), accountId: new Types.ObjectId(accountId) };
 
-    return this.addressService.getDetail(filterQuery);
+    return this.addressService.getDetail(filterQuery, 'vi');
   }
 
   @Get('default')
@@ -70,7 +70,7 @@ export class AddressController {
       isDefault: true 
     };
     
-    return this.addressService.getDetail(filterQuery);
+    return this.addressService.getDetail(filterQuery, 'vi');
   }
 
   @Post()

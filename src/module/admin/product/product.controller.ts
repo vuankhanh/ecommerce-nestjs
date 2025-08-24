@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductDto, UpdateProductDto } from './dto/product.dto';
 import { Product } from '../../../shared/schema/product.schema';
@@ -86,7 +86,7 @@ export class ProductController {
     if (productDto.albumId) data.albumId = ObjectId.createFromHexString(productDto.albumId);
     if (productDto.productCategoryId) data.productCategoryId = ObjectId.createFromHexString(productDto.productCategoryId);
     if (productDto.name) {
-      const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(productDto.name);
+      const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(productDto.name.vi);
       data.slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
     }
 

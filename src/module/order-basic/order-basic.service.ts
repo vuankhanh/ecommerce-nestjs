@@ -27,7 +27,7 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
     return order;
   }
 
-  async getAll(filterQuery: FilterQuery<Order>, page: number, size: number): Promise<{ data: OrderDocument[]; paging: IPaging; }> {
+  async getAll(filterQuery: FilterQuery<Order>, lang: string, page: number, size: number): Promise<{ data: OrderDocument[]; paging: IPaging; }> {
     const countTotal = await this.orderModel.countDocuments(filterQuery);
     const orderAggregate = await this.orderModel.aggregate(
       [
@@ -137,7 +137,7 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
     return metaData;
   }
 
-  async getDetail(filterQuery: FilterQuery<Order>): Promise<OrderDocument> {
+  async getDetail(filterQuery: FilterQuery<Order>, lang: string): Promise<OrderDocument> {
     return await this.tranformToDetaiData(filterQuery);
   }
 

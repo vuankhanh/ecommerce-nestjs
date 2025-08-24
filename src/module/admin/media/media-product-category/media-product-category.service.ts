@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IBasicService } from 'src/shared/interface/basic_service.interface';
+import { IBasicAdminService } from 'src/shared/interface/basic_admin_service.interface';
 import { Album, AlbumDocument } from '../../../../shared/schema/album.schema';
 import mongoose, { Document, FilterQuery, FlattenMaps, HydratedDocument, Model, Types } from 'mongoose';
 import { PurposeOfMedia } from 'src/constant/media.constant';
@@ -11,7 +11,7 @@ import { Media, MediaDocument } from '../../../../shared/schema/media.schema';
 import { SortUtil } from 'src/shared/util/sort_util';
 
 @Injectable()
-export class MediaProductCategoryService implements IBasicService<Album> {
+export class MediaProductCategoryService implements IBasicAdminService<Album> {
   private albumFoler: string;
   constructor(
     @InjectModel(Album.name) private productCategoryAlbumModel: Model<Album>,

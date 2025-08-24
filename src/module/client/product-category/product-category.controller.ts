@@ -20,7 +20,7 @@ export class ProductCategoryController {
     const filterQuery = {};
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
 
-    return await this.productCategoryService.getAll(filterQuery, page, size);
+    return await this.productCategoryService.getAll(filterQuery, 'vi', page, size);
   }
 
   @Get('detail')
@@ -29,6 +29,6 @@ export class ProductCategoryController {
   ) {
     const filterQuery = { slug };
     
-    return await this.productCategoryService.getDetail(filterQuery);
+    return await this.productCategoryService.getDetail(filterQuery, 'vi');
   }
 }

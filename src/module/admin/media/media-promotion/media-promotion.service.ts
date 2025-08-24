@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { IBasicService } from 'src/shared/interface/basic_service.interface';
+import { IBasicAdminService } from 'src/shared/interface/basic_admin_service.interface';
 import { Album, AlbumDocument } from '../../../../shared/schema/album.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document, FilterQuery, FlattenMaps, HydratedDocument, Model, Types } from 'mongoose';
+import { FilterQuery, FlattenMaps, HydratedDocument, Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { PurposeOfMedia } from 'src/constant/media.constant';
@@ -10,7 +10,7 @@ import { FileHelper } from 'src/shared/helper/file.helper';
 import { Media } from '../../../../shared/schema/media.schema';
 
 @Injectable()
-export class MediaPromotionService implements IBasicService<Album> {
+export class MediaPromotionService implements IBasicAdminService<Album> {
   private albumFoler: string;
   private readonly filterQuery: FilterQuery<Album> = { purposeOfMedia: PurposeOfMedia.PROMOTION };
   constructor(

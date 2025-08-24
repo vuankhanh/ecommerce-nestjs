@@ -25,8 +25,6 @@ export class DiskStoragePipe implements PipeTransform {
   }
 
   private saveToDisk(processedMedia: TProcessedMedia, fileInfo: any): IMedia {
-    console.log(this.request.body);
-    
     const customParams = this.request['customParams'];
     const destination = customParams.uploadsFolder;
     

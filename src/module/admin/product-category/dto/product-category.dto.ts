@@ -1,13 +1,14 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Transform } from "class-transformer";
-import { IsBoolean, IsMongoId, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsMongoId, IsNotEmpty, IsOptional, IsString, Validate } from "class-validator";
+import { HasDefaultLangConstraint } from "src/shared/custom-validator/multiple-lang.validator";
 import { IProductCategory } from "src/shared/interface/product.interface";
 
 
 export class ProductCategoryDto implements IProductCategory {
   @IsNotEmpty({ message: 'Tên danh mục không được để trống' })
-  @IsString({ message: 'Tên danh mục phải là chuỗi' })
-  name: string;
+  @Validate(HasDefaultLangConstraint)
+  name: { [lang: string]: string };
 
   @IsOptional()
   @IsMongoId({ message: 'Id Product Category album phải là chuỗi ObjectId' })
@@ -15,8 +16,8 @@ export class ProductCategoryDto implements IProductCategory {
   albumId?: string; // ID của album chứa ảnh danh mục
 
   @IsOptional()
-  @IsString({ message: 'Mô tả Product Category không được để trống' })
-  description?: string;
+  @Validate(HasDefaultLangConstraint)
+  description?: { [lang: string]: string };
 
   @IsOptional()
   @IsMongoId({ message: 'Id Product Category parent phải là chuỗi ObjectId' })

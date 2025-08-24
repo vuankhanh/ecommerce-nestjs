@@ -52,7 +52,7 @@ export class OrderLoyaltyController {
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
     filterQuery['accountId'] = new Types.ObjectId(accountId);
 
-    return await this.orderBasicService.getAll(filterQuery, page, size);
+    return await this.orderBasicService.getAll(filterQuery, 'vi', page, size);
   }
 
   @Get('detail')
@@ -67,7 +67,7 @@ export class OrderLoyaltyController {
 
     const filterQuery = { _id: id, accountId: new Types.ObjectId(accountId) };
 
-    return await this.orderBasicService.getDetail(filterQuery);
+    return await this.orderBasicService.getDetail(filterQuery, 'vi');
   }
 
   @Post()
@@ -95,7 +95,7 @@ export class OrderLoyaltyController {
 
     const result = await this.orderBasicService.create(order);
     try {
-      const detail = await this.orderBasicService.getDetail({ _id: result._id });
+      const detail = await this.orderBasicService.getDetail({ _id: result._id }, 'vi');
       
       detail.delivery['addressDetail'] = DeliveryEntity.generateAddressDetail(detail.delivery.address);
       this.mailService.queueOrderReceivedEmail(detail);
@@ -170,7 +170,7 @@ export class OrderLoyaltyController {
   async print(
     @Param('id', new ParseObjectIdPipe()) id: string
   ) {
-    const orderDetail = await this.orderBasicService.getDetail({ _id: id });
+    const orderDetail = await this.orderBasicService.getDetail({ _id: id }, 'vi');
     if (![OrderStatus.CONFIRMED, OrderStatus.SHIPPING, OrderStatus.COMPLETED].includes(orderDetail.status as OrderStatus)) {
       throw new CustomBadRequestException('Trạng thái của Order phải là CONFIRMED, SHIPPING, hoặc COMPLETED để in');
     }

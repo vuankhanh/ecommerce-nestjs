@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
+import { I18nModule, QueryResolver, HeaderResolver } from 'nestjs-i18n';
 import { AuthModule } from './module/auth/auth.module';
 
 import { LoggerMiddleware } from './shared/middleware/logger.middleware';
@@ -17,6 +18,7 @@ import { ClientModule } from './module/client/client.module';
 import { MailModule } from './module/mail/mail.module';
 import { BullModule } from '@nestjs/bull';
 import { BullConfigProvider } from './provider/database/redis.provider';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -33,6 +35,14 @@ import { BullConfigProvider } from './provider/database/redis.provider';
       useClass: BullConfigProvider,
     }),
     JwtModule.register({ global: true }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'vi',
+      loaderOptions: { path: join(process.cwd(), '/i18n/'), watch: true },
+      resolvers: [
+        { use: QueryResolver, options: ['lang'] },
+        HeaderResolver,
+      ],
+    }),
     AdminModule,
     AuthModule,
     CustomLoggerModule,

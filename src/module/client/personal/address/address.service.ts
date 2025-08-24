@@ -28,7 +28,7 @@ export class AddressService implements IBasicService<Delivery> {
     return delivery;
   }
 
-  async getAll(filterQuery: FilterQuery<Delivery>, page: number, size: number): Promise<{ data: FlattenMaps<Delivery>[]; paging: IPaging; }> {
+  async getAll(filterQuery: FilterQuery<Delivery>, lang: string, page: number, size: number): Promise<{ data: FlattenMaps<Delivery>[]; paging: IPaging; }> {
     const countTotal = await this.deliveryModel.countDocuments(filterQuery);
 
     const deliveryAggregate = await this.deliveryModel.aggregate([
@@ -54,7 +54,7 @@ export class AddressService implements IBasicService<Delivery> {
     return metaData;
   }
 
-  getDetail(filterQuery: FilterQuery<Delivery>): Promise<DeliveryDocument> {
+  getDetail(filterQuery: FilterQuery<Delivery>, lang: string): Promise<DeliveryDocument> {
     return this.deliveryModel.findOne(filterQuery);
   }
 

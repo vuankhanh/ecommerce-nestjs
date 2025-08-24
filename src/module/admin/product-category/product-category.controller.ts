@@ -114,7 +114,7 @@ export class ProductCategoryController {
     if (body.parentId) data.parentId = ObjectId.createFromHexString(body.parentId.toString());
     if (body.albumId) data.albumId = ObjectId.createFromHexString(body.albumId.toString());
     if (body.name) {
-      const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(body.name);
+      const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(body.name.vi);
       data.slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
     }
 

@@ -62,4 +62,4 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 #scripts
-/scripts/seed-admin.ts
+scripts

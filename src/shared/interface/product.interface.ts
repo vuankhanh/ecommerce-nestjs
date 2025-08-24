@@ -4,9 +4,9 @@ import { Product } from "../schema/product.schema";
 import { Product_Category } from "../schema/product-category.schema";
 
 export interface IProductCategory {
-  name: string;
+  name: { [lang: string]: string };
   albumId?: Types.ObjectId | string; // ID của album chứa ảnh danh mục
-  description?: string;
+  description?: { [lang: string]: string };
   parentId?: Types.ObjectId | string; // ID của danh mục cha
   isActive: boolean; // Trạng thái hoạt động của danh mục
 }
@@ -17,10 +17,10 @@ export interface IProductReview {
 }
 
 export interface IProduct {
-  name: string;
+  name: { [lang: string]: string };
   slug?: string; // Tự động sinh ra từ tên sản phẩm
-  description: string;
-  shortDescription: string;
+  description: { [lang: string]: string };
+  shortDescription: { [lang: string]: string };
   albumId?: Types.ObjectId | string; // ID của album chứa ảnh sản phẩm
   album?: Album;
   price: number;

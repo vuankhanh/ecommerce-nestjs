@@ -51,7 +51,7 @@ export class OrderController {
       }
     }
 
-    return await this.orderBasicService.getAll(filterQuery, page, size);
+    return await this.orderBasicService.getAll(filterQuery, 'vi', page, size);
   }
 
   @Get('detail')
@@ -61,7 +61,7 @@ export class OrderController {
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
 
-    return this.orderBasicService.getDetail(filterQuery);
+    return this.orderBasicService.getDetail(filterQuery, 'vi');
   }
 
   @Put('status')
@@ -87,7 +87,7 @@ export class OrderController {
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
 
-    const oldOrder = await this.orderBasicService.getDetail(filterQuery);
+    const oldOrder = await this.orderBasicService.getDetail(filterQuery, 'vi');
     if (!oldOrder) throw new CustomBadRequestException('Đơn hàng không tồn tại');
 
     if (oldOrder.status != OrderStatus.PENDING) {

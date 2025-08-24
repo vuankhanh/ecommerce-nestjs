@@ -33,7 +33,7 @@ export class OrderVisitorController {
     const filterQuery = {};
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
 
-    return await this.orderBasicService.getAll(filterQuery, page, size);
+    return await this.orderBasicService.getAll(filterQuery, 'vi', page, size);
   }
 
   @Get(':id')
@@ -42,7 +42,7 @@ export class OrderVisitorController {
   ) {
     const filterQuery = { _id: id };
 
-    return await this.orderBasicService.getDetail(filterQuery);
+    return await this.orderBasicService.getDetail(filterQuery, 'vi');
   }
 
   @Post()
@@ -129,7 +129,7 @@ export class OrderVisitorController {
   async print(
     @Param('id', new ParseObjectIdPipe()) id: string
   ) {
-    const orderDetail = await this.orderBasicService.getDetail({ _id: id });
+    const orderDetail = await this.orderBasicService.getDetail({ _id: id }, 'vi');
     if (![OrderStatus.CONFIRMED, OrderStatus.SHIPPING, OrderStatus.COMPLETED].includes(orderDetail.status as OrderStatus)) {
       throw new CustomBadRequestException('Trạng thái của Order phải là CONFIRMED, SHIPPING, hoặc COMPLETED để in');
     }

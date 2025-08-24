@@ -30,8 +30,9 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
 
   async getAll(
     filterQuery: FilterQuery<Product_Category>,
+    lang: string,
     page: number,
-    size: number
+    size: number,
   ): Promise<{ data: FlattenMaps<Product_Category>[]; paging: IPaging }> {
     filterQuery.isActive = true;
     const countTotal = await this.productCategoryModel.countDocuments(filterQuery);
@@ -58,6 +59,11 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
         }
       },
       {
+        $addFields: {
+          name: { $ifNull: ["$name." + lang, "$name.vi"] },
+        }
+      },
+      {
         $project: {
           description: 0, // Loại bỏ trường description,
           'album.media': 0 // Loại bỏ trường media trong album
@@ -81,7 +87,8 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
   }
 
   async getDetail(
-    filterQuery: FilterQuery<Product_Category>
+    filterQuery: FilterQuery<Product_Category>,
+    lang: string
   ): Promise<ProductCategoryDocument> {
     const [data] = await this.productCategoryModel.aggregate([
       {
@@ -126,6 +133,9 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
       },
       {
         $addFields: {
+          name: { $ifNull: ["$name." + lang, "$name.vi"] },
+          description: { $ifNull: ["$description." + lang, "$description.vi"] },
+          "parent.description": { $ifNull: ["$parent.description." + lang, "$parent.description.vi"] },
           productCount: { $size: '$products' }
         }
       },

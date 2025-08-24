@@ -23,7 +23,7 @@ export class ProductService implements IBasicService<Product> {
     return product;
   }
 
-  async getAll(filterQuery: FilterQuery<Product>, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
+  async getAll(filterQuery: FilterQuery<Product>, lang: string, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
     const countTotal = await this.productModel.countDocuments(filterQuery);
     const productAggregate = await this.productModel.aggregate(
       [
@@ -58,6 +58,8 @@ export class ProductService implements IBasicService<Product> {
         },
         {
           $addFields: {
+            name: { $ifNull: ["$name." + lang, "$name.vi"] },
+            shortDescription: { $ifNull: ["$shortDescription." + lang, "$shortDescription.vi"] },
             'album.mediaItems': { $size: { $ifNull: ['$album.media', []] } }
           }
         },
@@ -89,9 +91,9 @@ export class ProductService implements IBasicService<Product> {
     return metaData;
   }
 
-  async getProductsByCategorySlug(categorySlug: string, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
+  async getProductsByCategorySlug(categorySlug: string, lang: string, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
 
-    const productCategory = await this.productCategoryService.getDetail({ slug: categorySlug });
+    const productCategory = await this.productCategoryService.getDetail({ slug: categorySlug }, lang);
     if (!productCategory) {
       throw new CustomNotFoundException('Không tìm thấy danh mục sản phẩm');
     }
@@ -99,30 +101,26 @@ export class ProductService implements IBasicService<Product> {
     const productCategoryId = productCategory._id;
 
     const filterQuery: FilterQuery<Product> = { productCategoryId };
-    return this.getAll(filterQuery, page, size);
+    return this.getAll(filterQuery, lang, page, size);
   }
 
-  async getDetail(filterQuery: FilterQuery<Product>): Promise<ProductDocument> {
-    return await this.tranformToDetaiData(filterQuery);
+  async getDetail(filterQuery: FilterQuery<Product>, lang: string): Promise<ProductDocument> {
+    return await this.tranformToDetaiData(filterQuery, lang);
   }
 
   async replace(filterQuery: FilterQuery<Product>, data: Product): Promise<ProductDocument> {
-    await this.productModel.findOneAndReplace(filterQuery, data);
-    const product = await this.tranformToDetaiData(filterQuery);
-    return product;
+    return;
   }
 
   async modify(filterQuery: FilterQuery<Product>, data: Partial<Product>): Promise<ProductDocument> {
-    await this.productModel.findOneAndUpdate(filterQuery, data, { new: true });
-    const product = await this.tranformToDetaiData(filterQuery);
-    return product;
+    return;
   }
 
   async remove(filterQuery: FilterQuery<Product>): Promise<ProductDocument> {
     return await this.productModel.findOneAndDelete(filterQuery);
   }
 
-  private async tranformToDetaiData(filterQuery: FilterQuery<Product>): Promise<ProductDocument> {
+  private async tranformToDetaiData(filterQuery: FilterQuery<Product>, lang: string): Promise<ProductDocument> {
     return await this.productModel.aggregate(
       [
         { $match: filterQuery },
@@ -156,6 +154,9 @@ export class ProductService implements IBasicService<Product> {
         },
         {
           $addFields: {
+            name: { $ifNull: ["$name." + lang, "$name.vi"] },
+            shortDescription: { $ifNull: ["$shortDescription." + lang, "$shortDescription.vi"] },
+            description: { $ifNull: ["$description." + lang, "$description.vi"] },
             'album.mediaItems': { $size: { $ifNull: ['$albumDetail.media', []] } }
           }
         },

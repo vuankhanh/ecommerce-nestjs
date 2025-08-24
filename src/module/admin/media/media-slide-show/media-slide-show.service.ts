@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IBasicService } from 'src/shared/interface/basic_service.interface';
+import { IBasicAdminService } from 'src/shared/interface/basic_admin_service.interface';
 import { Album, AlbumDocument } from '../../../../shared/schema/album.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { FilterQuery, FlattenMaps, Model, Types } from 'mongoose';
@@ -13,7 +13,7 @@ import { SortUtil } from 'src/shared/util/sort_util';
 import { HydratedDocument } from 'mongoose';
 
 @Injectable()
-export class MediaSlideShowService implements IBasicService<Album> {
+export class MediaSlideShowService implements IBasicAdminService<Album> {
   private albumFoler: string;
   private readonly filterQuery: FilterQuery<Album> = { purposeOfMedia: PurposeOfMedia.SLIDE_SHOW };
   constructor(

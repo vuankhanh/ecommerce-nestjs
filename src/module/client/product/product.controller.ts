@@ -20,25 +20,27 @@ export class ProductController {
     @Query('name') name: string,
     @Query('productCategoryId', new ParseObjectIdPipe()) productCategoryId: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
+    @Query('lang', new DefaultValuePipe('vi')) lang?: string,
   ) {
     const filterQuery = {};
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
     if (productCategoryId) filterQuery['productCategoryId'] = productCategoryId;
 
-    return await this.productService.getAll(filterQuery, page, size);
+    return await this.productService.getAll(filterQuery, lang, page, size);
   }
 
   @Get('detail')
   async getDetail(
     @Query('id', new ParseObjectIdPipe()) id?: string,
-    @Query('slug') slug?: string
+    @Query('slug') slug?: string,
+    @Query('lang', new DefaultValuePipe('vi')) lang?: string
   ) {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
 
-    return await this.productService.getDetail(filterQuery);
+    return await this.productService.getDetail(filterQuery, lang);
   }
 
   @Get('/by-category-slug')
@@ -47,6 +49,6 @@ export class ProductController {
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
   ){
-    return await this.productService.getProductsByCategorySlug(slug, page, size);
+    return await this.productService.getProductsByCategorySlug(slug, 'vi', page, size);
   }
 }
