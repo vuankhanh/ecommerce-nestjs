@@ -82,8 +82,12 @@ export class MediaLogoService implements IBasicAdminService<Album> {
   async remove(): Promise<AlbumDocument> {
     const album = await this.logoAlbumModel.findOne(this.filterQuery)
     if (album?.relativePath) {
-      await FileHelper.removeFolder(this.albumFoler, album.relativePath);
+      try {
+        await FileHelper.removeFolder(this.albumFoler, album.relativePath);
+      } catch (error) {
+        console.error('Error removing folder:', error);
+      }
     }
-    return album as unknown as AlbumDocument;
+    return await this.logoAlbumModel.findOneAndDelete(this.filterQuery);
   }
 }

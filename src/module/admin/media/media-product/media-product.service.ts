@@ -149,9 +149,13 @@ export class MediaProductService {
     filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT;
     const album = await this.productAlbumModel.findOne(filterQuery)
     if (album?.relativePath) {
-      await FileHelper.removeFolder(this.albumFoler, album.relativePath);
+      try {
+        await FileHelper.removeFolder(this.albumFoler, album.relativePath);
+      } catch (error) {
+        console.error('Error removing folder:', error);
+      }
     }
-    return album as unknown as AlbumDocument;
+    return await this.productAlbumModel.findOneAndDelete(filterQuery);
   }
 
   async filterMediaItems(filterQuery: FilterQuery<Album>, itemIds: Array<mongoose.Types.ObjectId | string>): Promise<Array<{ url: string, thumbnailUrl: string }>> {

@@ -51,13 +51,13 @@ export class MediaPromotionService implements IBasicAdminService<Album> {
   }
 
   async replace(data: Album): Promise<AlbumDocument> {
-    const slideShow = this.promotionAlbumModel.findOneAndReplace(this.filterQuery, data, { new: true }).exec();
-    return slideShow as unknown as AlbumDocument;
+    const promotion = this.promotionAlbumModel.findOneAndReplace(this.filterQuery, data, { new: true }).exec();
+    return promotion as unknown as AlbumDocument;
   }
 
   async modify(data: Partial<Album>): Promise<AlbumDocument> {
-    const slideShow =  this.promotionAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true }).exec();
-    return slideShow as unknown as AlbumDocument;
+    const promotion = this.promotionAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true }).exec();
+    return promotion as unknown as AlbumDocument;
   }
 
   async insert(data: Media): Promise<AlbumDocument> {
@@ -80,11 +80,15 @@ export class MediaPromotionService implements IBasicAdminService<Album> {
   }
 
   async remove(): Promise<AlbumDocument> {
-    const slideShow = await this.promotionAlbumModel.findOne(this.filterQuery)
-    if (slideShow?.relativePath) {
-      await FileHelper.removeFolder(this.albumFoler, slideShow.relativePath);
+    const promotion = await this.promotionAlbumModel.findOne(this.filterQuery)
+    if (promotion?.relativePath) {
+      try {
+        await FileHelper.removeFolder(this.albumFoler, promotion.relativePath);
+      } catch (error) {
+        console.error('Error removing folder:', error);
+      }
     }
-    return slideShow as unknown as AlbumDocument;
+    return await this.promotionAlbumModel.findOneAndDelete(this.filterQuery);
   }
 
 }

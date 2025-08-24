@@ -104,13 +104,17 @@ export class MediaSlideShowService implements IBasicAdminService<Album> {
     return slideShow as unknown as AlbumDocument;
   }
 
-  async remove() {
+  async remove(): Promise<AlbumDocument> {
     const slideShow = await this.slideShowAlbumModel.findOneAndDelete(this.filterQuery);
     if (slideShow?.relativePath) {
-      await FileHelper.removeFolder(this.albumFoler, slideShow.relativePath);
+      try {
+        await FileHelper.removeFolder(this.albumFoler, slideShow.relativePath);
+      } catch (error) {
+        console.error('Error removing folder:', error);
+      }
     }
 
-    return slideShow as unknown as AlbumDocument;
+    return await this.slideShowAlbumModel.findOneAndDelete(this.filterQuery);
   }
 
   async filterMediaItems(itemIds: Array<mongoose.Types.ObjectId | string>): Promise<Array<{ url: string, thumbnailUrl: string }>> {

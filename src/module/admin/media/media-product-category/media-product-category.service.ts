@@ -151,9 +151,13 @@ export class MediaProductCategoryService implements IBasicAdminService<Album> {
     filterQuery.purposeOfMedia = PurposeOfMedia.PRODUCT_CATEGORY;
     const album = await this.productCategoryAlbumModel.findOne(filterQuery)
     if (album?.relativePath) {
-      await FileHelper.removeFolder(this.albumFoler, album.relativePath);
+      try {
+        await FileHelper.removeFolder(this.albumFoler, album.relativePath);
+      } catch (error) {
+        console.error('Error removing folder:', error);
+      }
     }
-    return album as unknown as AlbumDocument;
+    return await this.productCategoryAlbumModel.findOneAndDelete(filterQuery);
   }
 
   async filterMediaItems(filterQuery: FilterQuery<Album>, itemIds: Array<mongoose.Types.ObjectId | string>): Promise<Array<{ url: string, thumbnailUrl: string }>> {
