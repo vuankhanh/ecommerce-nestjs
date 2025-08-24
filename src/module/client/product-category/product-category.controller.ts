@@ -1,4 +1,4 @@
-import { Controller, DefaultValuePipe, Get, ParseIntPipe, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, Headers, ParseIntPipe, Query, UseInterceptors } from '@nestjs/common';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ProductCategoryService } from './product-category.service';
 import { Product_Category } from 'src/shared/schema/product-category.schema';
@@ -14,21 +14,23 @@ export class ProductCategoryController {
   @Get()
   async getAll(
     @Query('name') name: string,
+    @Headers('accept-language') lang: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
   ) {
     const filterQuery = {};
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
 
-    return await this.productCategoryService.getAll(filterQuery, 'vi', page, size);
+    return await this.productCategoryService.getAll(filterQuery, lang, page, size);
   }
 
   @Get('detail')
   async getDetail(
-    @Query('slug') slug?: string
+    @Query('slug') slug: string,
+    @Headers('accept-language') lang: string,
   ) {
     const filterQuery = { slug };
     
-    return await this.productCategoryService.getDetail(filterQuery, 'vi');
+    return await this.productCategoryService.getDetail(filterQuery, lang);
   }
 }

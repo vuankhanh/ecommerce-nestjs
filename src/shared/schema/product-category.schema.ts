@@ -12,13 +12,13 @@ export type ProductCategoryDocument = Product_Category & IMongodbDocument;
 @Schema({ timestamps: true })
 export class Product_Category implements IProductCategory {
   @Prop({
-    type: String,
+    type: Object,
     required: true,
     unique: true,
     trim: true,
     validate: {
       validator: (name: any) => name && typeof name.vi === 'string' && name.vi.length > 0,
-      message: 'Trường này phải có giá trị cho ngôn ngữ mặc định (vi)'
+      message: 'Trường name phải có giá trị cho ngôn ngữ mặc định (vi)'
     }
   })
   name: { [lang: string]: string };
@@ -37,7 +37,14 @@ export class Product_Category implements IProductCategory {
   })
   slug: string;
 
-  @Prop({ type: Object, required: false })
+  @Prop({
+    type: Object,
+    required: false,
+    validate: {
+      validator: (desc: any) => desc && typeof desc.vi === 'string' && desc.vi.length > 0,
+      message: 'Trường description phải có giá trị cho ngôn ngữ mặc định (vi)'
+    }
+  })
   description?: { [lang: string]: string };
 
   @Prop({ type: Types.ObjectId, ref: Product_Category.name, required: false })
@@ -64,7 +71,7 @@ export class Product_Category implements IProductCategory {
   }
 
   set updateParentId(parentId: string) {
-    this.parentId =  parentId ? ObjectId.createFromHexString(parentId.toString()) : null;
+    this.parentId = parentId ? ObjectId.createFromHexString(parentId.toString()) : null;
   }
 }
 

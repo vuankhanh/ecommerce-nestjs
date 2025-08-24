@@ -57,6 +57,7 @@ export class AuthController {
     try {
       this.logger.log('Signing in user.');
       const { email, password } = signInDto;
+      console.log(signInDto)
       const account = await this.accountService.validateAccount(email, password);
       if (!account) {
         throw new CustomUnauthorizedException('Sai tên đăng nhập hoặc mật khẩu');

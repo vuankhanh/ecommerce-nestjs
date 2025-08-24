@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, Headers, Param, ParseIntPipe, Post, Query, Req, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
@@ -41,7 +41,8 @@ export class OrderLoyaltyController {
     @Req() request: Request,
     @Query('name') name: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
+    @Headers('accept-language') lang: string
   ) {
     const accountId: string = request['customParams'].accountId;
     if (!accountId) {
@@ -52,7 +53,7 @@ export class OrderLoyaltyController {
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
     filterQuery['accountId'] = new Types.ObjectId(accountId);
 
-    return await this.orderBasicService.getAll(filterQuery, 'vi', page, size);
+    return await this.orderBasicService.getAll(filterQuery, lang, page, size);
   }
 
   @Get('detail')

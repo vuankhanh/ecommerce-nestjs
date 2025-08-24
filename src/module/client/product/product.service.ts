@@ -92,7 +92,6 @@ export class ProductService implements IBasicService<Product> {
   }
 
   async getProductsByCategorySlug(categorySlug: string, lang: string, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
-
     const productCategory = await this.productCategoryService.getDetail({ slug: categorySlug }, lang);
     if (!productCategory) {
       throw new CustomNotFoundException('Không tìm thấy danh mục sản phẩm');
@@ -157,6 +156,7 @@ export class ProductService implements IBasicService<Product> {
             name: { $ifNull: ["$name." + lang, "$name.vi"] },
             shortDescription: { $ifNull: ["$shortDescription." + lang, "$shortDescription.vi"] },
             description: { $ifNull: ["$description." + lang, "$description.vi"] },
+            'productCategory.name': { $ifNull: ["$productCategory.name." + lang, "$productCategory.name.vi"] },
             'album.mediaItems': { $size: { $ifNull: ['$albumDetail.media', []] } }
           }
         },

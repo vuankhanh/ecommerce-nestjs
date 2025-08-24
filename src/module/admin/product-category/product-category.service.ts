@@ -145,6 +145,8 @@ export class ProductCategoryService implements IBasicAdminService<Product_Catego
     filterQuery: FilterQuery<Product_Category>,
     data: Partial<Product_Category>
   ): Promise<ProductCategoryDocument> {
+    console.log(data);
+    
     // Validate circular reference nếu có parentId trong data update
     if (data.parentId) {
       const currentCategory = await this.productCategoryModel.findOne(filterQuery);
@@ -163,6 +165,9 @@ export class ProductCategoryService implements IBasicAdminService<Product_Catego
       if (error.code === 11000) {
         throw new CustomBadRequestException('Tên danh mục đã tồn tại, vui lòng chọn tên khác');
       }
+
+      console.log(error);
+      
       throw new CustomInternalServerErrorException('Lỗi khi cập nhật danh mục sản phẩm');
     }
   }

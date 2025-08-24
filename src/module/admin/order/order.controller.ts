@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Get, HttpCode, ParseIntPipe, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Headers, HttpCode, ParseIntPipe, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserRole } from 'src/constant/user.constant';
 import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
@@ -35,7 +35,8 @@ export class OrderController {
   async getAll(
     @Body() body: FilterDto,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
+    @Headers('accept-language') lang: string
   ) {
     const filterQuery: FilterQuery<Order> = {};
 
@@ -51,17 +52,18 @@ export class OrderController {
       }
     }
 
-    return await this.orderBasicService.getAll(filterQuery, 'vi', page, size);
+    return await this.orderBasicService.getAll(filterQuery, lang, page, size);
   }
 
   @Get('detail')
   getDetail(
-    @Query('id', new ParseObjectIdPipe()) id?: string,
+    @Query('id', new ParseObjectIdPipe()) id: string,
+    @Query('lang', new DefaultValuePipe('vi')) lang: string
   ) {
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
 
-    return this.orderBasicService.getDetail(filterQuery, 'vi');
+    return this.orderBasicService.getDetail(filterQuery, lang);
   }
 
   @Put('status')
@@ -83,11 +85,12 @@ export class OrderController {
   async update(
     @Query('id', new ParseObjectIdPipe()) id: string,
     @Body() body: OrderUpdateDto,
+    @Query('lang', new DefaultValuePipe('vi')) lang: string
   ) {
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
 
-    const oldOrder = await this.orderBasicService.getDetail(filterQuery, 'vi');
+    const oldOrder = await this.orderBasicService.getDetail(filterQuery, lang);
     if (!oldOrder) throw new CustomBadRequestException('Đơn hàng không tồn tại');
 
     if (oldOrder.status != OrderStatus.PENDING) {

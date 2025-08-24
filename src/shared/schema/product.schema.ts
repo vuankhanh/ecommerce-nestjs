@@ -14,7 +14,7 @@ export type ProductDocument = Product & IMongodbDocument;
 @Schema({ timestamps: true })
 export class Product implements IProduct {
   @Prop({
-    type: String,
+    type: Object,
     unique: true,
     required: true,
     validate: {
