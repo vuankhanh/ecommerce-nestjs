@@ -14,6 +14,7 @@ export interface IOrder {
   discount: number;
   deliveryFee: number;
   delivery: IDelivery;
+  lang: string;
 }
 
 export interface IOrderItem {

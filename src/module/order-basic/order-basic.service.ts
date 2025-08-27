@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, HydratedDocument, Model, Types } from 'mongoose';
+import { FilterQuery, HydratedDocument, Model } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Template } from 'src/shared/interface/template.interface';
 import { OrderFrom, OrderStatus, OrderStatusTransition } from 'src/constant/order.constant';
@@ -200,7 +200,7 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
   }
 
   async remove(filterQuery: FilterQuery<Order>): Promise<OrderDocument> {
-    return null
+    return null;
   }
 
   private async tranformToDetaiData(filterQuery: FilterQuery<Order>): Promise<OrderDocument> {

@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { IDistrict, IProvince, IWard } from "../interface/vn-public-apis.interface";
+// import { IDistrict, IProvince, IWard } from "../interface/vn-public-apis.interface";
+import { IDistrict, IProvince, IWard } from "../interface/tinhthanhpho_com_api.interface";
 import { IAddress } from "../interface/address.interface";
 import { IsValid } from "../custom-validator/custom-validator";
 import { validateAddressDistrict, validateAddressProvince, validateAddressWard } from "../custom-validator/address.validator";

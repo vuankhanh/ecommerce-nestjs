@@ -68,6 +68,13 @@ export default () => {
     port: Number(process.env.VN_PUBLIC_API_PORT) || 443,
   }
 
+  const tinhthanhphoComApi = {
+    protocol: process.env.TINHTHANHPHO_COM_API_PROTOCOL || 'https',
+    host: process.env.TINHTHANHPHO_COM_API_HOST || 'tinhthanhpho.com',
+    port: Number(process.env.TINHTHANHPHO_COM_API_PORT) || 443,
+    key: process.env.TINHTHANHPHO_COM_API_KEY || ''
+  }
+
   const authenticationProvider = {
     google: {
       clientID: process.env.GOOGLE_CLIENT_ID || '',
@@ -105,5 +112,5 @@ export default () => {
 
   const config = process.env.NODE_ENV?.trim() === 'pro' ? pro : dev;
 
-  return { ...config, folder, vnPublicApi, authenticationProvider, jwt, mail, shop };
+  return { ...config, folder, vnPublicApi, tinhthanhphoComApi, authenticationProvider, jwt, mail, shop };
 }

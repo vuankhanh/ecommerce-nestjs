@@ -23,6 +23,9 @@ import { MailService } from 'src/module/mail/mail.service';
 import { AccountDocument } from 'src/module/auth/schemas/account.schema';
 import { OrderDocument } from 'src/module/order-basic/schema/order.schema';
 import { DeliveryEntity } from '../personal/address/entity/delivery.entity';
+import { LangDto } from 'src/shared/dto/lang.dto';
+import { Language } from 'src/constant/lang.constant';
+import { AcceptLanguageValidationPipe } from 'src/shared/core/pipes/accept-language-validation/accept-language-validation.pipe';
 
 @Controller('/client/order')
 @Roles(UserRole.CLIENT)
@@ -74,6 +77,7 @@ export class OrderLoyaltyController {
   @Post()
   async create(
     @Req() request: Request,
+    @Headers('accept-language') lang: Language,
     @Body() orderCreateDto: OrderCreateDto,
     @Body('orderItems', OrderItemsMapClientPipe) orderItems: Array<OrderProductItemEntity>
   ) {
@@ -82,6 +86,7 @@ export class OrderLoyaltyController {
       throw new CustomBadRequestException('Không tìm thấy thông tin tài khoản');
     }
 
+    const validatedLang: Language = new AcceptLanguageValidationPipe().transform(lang);
     const iOrder: IOrder = {
       orderItems: orderItems,
       status: OrderStatus.PENDING,
@@ -90,6 +95,7 @@ export class OrderLoyaltyController {
       discount: orderCreateDto.discount,
       note: orderCreateDto.note,
       delivery: orderCreateDto.delivery,
+      lang: validatedLang
     }
     const order: OrderEntity = new OrderEntity(iOrder);
     order.updateAccountId = new Types.ObjectId(accountId);

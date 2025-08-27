@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Logger, Post, Req, UseGuards, U
 import { SignUpDto } from './dto/signup.dto';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/signin.dto';
-import { Account, AccountDocument } from './schemas/account.schema';
+import { Account } from './schemas/account.schema';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 
 import { AccountService } from 'src/shared/service/account.service';

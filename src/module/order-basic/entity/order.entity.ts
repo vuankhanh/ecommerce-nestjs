@@ -16,6 +16,7 @@ export class OrderEntity implements IOrder {
   deliveryFee: number;
   paymentMethod: TPaymentMethod;
   accountId?: Types.ObjectId;
+  lang: string;
   delivery: IDelivery;
   note: string;
 
@@ -28,6 +29,7 @@ export class OrderEntity implements IOrder {
     this.discount = order.discount;
     this.deliveryFee = order.deliveryFee;
     this.paymentMethod = order.paymentMethod;
+    this.lang = order.lang;
     this.delivery = order.delivery;
     this.note = order.note;
   }

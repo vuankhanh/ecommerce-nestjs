@@ -1,40 +1,29 @@
-import { IDistrict, IProvince, IWard } from "../interface/vn-public-apis.interface";
+// import { IDistrict, IProvince, IWard } from "../interface/vn-public-apis.interface";
+import { IDistrict, IProvince, IWard } from "../interface/tinhthanhpho_com_api.interface";
 
 export const validateAddressProvince = (province: IProvince) => {
   return typeof province === 'object' &&
-    typeof province._id === 'string' &&
+    typeof province.province_id === 'number' &&
     typeof province.name === 'string' &&
-    typeof province.slug === 'string' &&
     typeof province.type === 'string' &&
-    typeof province.name_with_type === 'string' &&
-    typeof province.code === 'string' &&
-    typeof province.isDeleted === 'boolean';
+    typeof province.code === 'string'
 }
 
 export const validateAddressDistrict = (district: IDistrict) => {
   return typeof district === 'object' &&
-    typeof district._id === 'string' &&
+    typeof district.district_id === 'number' &&
+    typeof district.code === 'string' &&
     typeof district.name === 'string' &&
     typeof district.type === 'string' &&
-    typeof district.slug === 'string' &&
-    typeof district.name_with_type === 'string' &&
-    typeof district.path === 'string' &&
-    typeof district.path_with_type === 'string' &&
-    typeof district.code === 'string' &&
-    typeof district.parent_code === 'string' &&
-    typeof district.isDeleted === 'boolean';
+    typeof district.province_code === 'string'
 }
 
 export const validateAddressWard = (ward: IWard) => {
   return typeof ward === 'object' &&
-    typeof ward._id === 'string' &&
+    typeof ward.ward_id === 'number' &&
+    typeof ward.code === 'string' &&
     typeof ward.name === 'string' &&
     typeof ward.type === 'string' &&
-    typeof ward.slug === 'string' &&
-    typeof ward.name_with_type === 'string' &&
-    typeof ward.path === 'string' &&
-    typeof ward.path_with_type === 'string' &&
-    typeof ward.code === 'string' &&
-    typeof ward.parent_code === 'string' &&
-    typeof ward.isDeleted === 'boolean';
+    typeof ward.district_code === 'string' &&
+    typeof ward.province_code === 'string'
 }

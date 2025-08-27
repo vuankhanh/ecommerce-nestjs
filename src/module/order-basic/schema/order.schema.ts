@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, Types } from "mongoose";
+import { Types } from "mongoose";
 import { OrderStatus } from "src/constant/order.constant";
 import { IOrder, TOrderStatus } from "src/shared/interface/order.interface";
 import { TPaymentMethod } from "src/shared/interface/payment.interface";
@@ -45,6 +45,9 @@ export class Order implements IOrder {
 
   @Prop({ type: [Types.ObjectId, String], ref: Account.name })
   accountId?: Types.ObjectId | string;
+  
+  @Prop({ type: String, required: true })
+  lang: string;
 
   @Prop({ type: Object})
   delivery: IDelivery;

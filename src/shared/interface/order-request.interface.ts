@@ -1,10 +1,9 @@
 import { IDelivery } from "./delivery.interface";
-import { TOrderStatus } from "./order.interface";
 import { TPaymentMethod } from "./payment.interface";
 
 export interface IOrderCreateRequest {
   orderItems: IOrderItemsRequest[];
-  paymentMethod: `${TPaymentMethod}`;
+  paymentMethod: TPaymentMethod;
   deliveryFee: number;
   discount: number;
   note?: string;
@@ -13,7 +12,7 @@ export interface IOrderCreateRequest {
 
 export interface IOrderUpdateRequest extends Partial<IOrderCreateRequest> {
   orderItems?: IOrderItemsRequest[];
-  paymentMethod?: `${TPaymentMethod}`;
+  paymentMethod?: TPaymentMethod;
   deliveryFee?: number;
   discount?: number;
   delivery?: IDelivery;

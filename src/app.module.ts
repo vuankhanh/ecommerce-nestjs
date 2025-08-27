@@ -12,6 +12,8 @@ import { CustomLoggerModule } from './module/custom_logger/custom_logger.module'
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './shared/core/exception/http_exception.filter';
 import { VnPublicApisModule } from './module/vn-public-apis/vn-public-apis.module';
+import { TinhthanhphoComApiModule } from './module/tinhthanhpho_com_api/tinhthanhpho_com_api.module';
+
 import { SocketGateway } from './gateway/socket/socket.gateway';
 import { AdminModule } from './module/admin/admin.module';
 import { ClientModule } from './module/client/client.module';
@@ -47,6 +49,7 @@ import { join } from 'path';
     AuthModule,
     CustomLoggerModule,
     VnPublicApisModule,
+    TinhthanhphoComApiModule,
     ClientModule,
     MailModule
   ],

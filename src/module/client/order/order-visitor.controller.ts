@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, Headers, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
@@ -9,10 +9,12 @@ import { IOrder } from 'src/shared/interface/order.interface';
 import { ProductService } from '../product/product.service';
 import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
 import { OrderCreateDto } from 'src/module/order-basic/dto/order-create.dto';
-import { Order } from 'src/module/order-basic/schema/order.schema';
 import { OrderItemsMapClientPipe } from 'src/shared/core/pipes/order-items-map-client.pipe';
 import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
 import { OrderEntity } from 'src/module/order-basic/entity/order.entity';
+import { LangDto } from 'src/shared/dto/lang.dto';
+import { AcceptLanguageValidationPipe } from 'src/shared/core/pipes/accept-language-validation/accept-language-validation.pipe';
+import { Language } from 'src/constant/lang.constant';
 
 @Controller('order')
 @UseInterceptors(FormatResponseInterceptor)
@@ -47,9 +49,11 @@ export class OrderVisitorController {
 
   @Post()
   async create(
+    @Headers('accept-language') lang: Language,
     @Body() orderCreateDto: OrderCreateDto,
     @Body('orderItems', OrderItemsMapClientPipe) orderItems: Array<OrderProductItemEntity>
   ) {
+    const validatedLang: Language = new AcceptLanguageValidationPipe().transform(lang);
     const iOrder : IOrder = {
       orderItems: orderItems,
       status: OrderStatus.PENDING,
@@ -58,6 +62,7 @@ export class OrderVisitorController {
       discount: orderCreateDto.discount,
       note: orderCreateDto.note,
       delivery: orderCreateDto.delivery,
+      lang: validatedLang
     }
     const order: OrderEntity = new OrderEntity(iOrder);
     console.log(order.orderItems);
