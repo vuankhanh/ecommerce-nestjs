@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, HydratedDocument, Model } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Template } from 'src/shared/interface/template.interface';
-import { getOrderStatusLabel, ORDER_FROM_LABEL, ORDER_STATUS_LABEL, OrderFrom, OrderStatus, OrderStatusTransition } from 'src/constant/order.constant';
+import { OrderFrom, OrderStatus, OrderStatusTransition } from 'src/constant/order.constant';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { Account } from 'src/module/auth/schemas/account.schema';
@@ -52,18 +52,6 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
         },
         {
           $addFields: {
-            // status: {
-            //   $switch: {
-            //     branches: [
-            //       { case: { $eq: ["$status", "PENDING"] }, then: ORDER_STATUS_LABEL.PENDING[lang] },
-            //       { case: { $eq: ["$status", "CONFIRMED"] }, then: ORDER_STATUS_LABEL.CONFIRMED[lang] },
-            //       { case: { $eq: ["$status", "SHIPPING"] }, then: ORDER_STATUS_LABEL.SHIPPING[lang] },
-            //       { case: { $eq: ["$status", "COMPLETED"] }, then: ORDER_STATUS_LABEL.COMPLETED[lang] },
-            //       { case: { $eq: ["$status", "CANCELED"] }, then: ORDER_STATUS_LABEL.CANCELED[lang] },
-            //     ],
-            //     default: "$status"
-            //   }
-            // },
             orderFrom: {
               $switch: {
                 branches: [
@@ -121,18 +109,6 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
             __v: 0,
             accountId: 0,
             customerDetail: 0
-            // orderAccount: {
-            //   _id: 0,
-            //   createdAt: 0,
-            //   updatedAt: 0,
-            //   facebookId: 0,
-            //   googleId: 0,
-            //   role: 0,
-            //   createdByProvider: 0,
-            //   hasPassword: 0,
-            //   password: 0,
-            //   __v: 0
-            // }
           }
         }
       ]
@@ -235,18 +211,6 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
         },
         {
           $addFields: {
-            // status: {
-            //   $switch: {
-            //     branches: [
-            //       { case: { $eq: ["$status", OrderStatus.PENDING] }, then: ORDER_STATUS_LABEL.PENDING[lang] },
-            //       { case: { $eq: ["$status", OrderStatus.CONFIRMED] }, then: ORDER_STATUS_LABEL.CONFIRMED[lang] },
-            //       { case: { $eq: ["$status", OrderStatus.SHIPPING] }, then: ORDER_STATUS_LABEL.SHIPPING[lang] },
-            //       { case: { $eq: ["$status", OrderStatus.COMPLETED] }, then: ORDER_STATUS_LABEL.COMPLETED[lang] },
-            //       { case: { $eq: ["$status", OrderStatus.CANCELED] }, then: ORDER_STATUS_LABEL.CANCELED[lang] },
-            //     ],
-            //     default: "$status"
-            //   }
-            // },
             orderFrom: {
               $switch: {
                 branches: [

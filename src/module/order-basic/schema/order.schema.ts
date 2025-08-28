@@ -45,7 +45,7 @@ export class Order implements IOrder {
   @Prop({ type: String, enum: PaymentMethod, required: true })
   paymentMethod: TPaymentMethod;
 
-  @Prop({ type: [Types.ObjectId, String], ref: Account.name })
+  @Prop({ type: Types.ObjectId, ref: Account.name })
   accountId?: Types.ObjectId | string;
   
   @Prop({
