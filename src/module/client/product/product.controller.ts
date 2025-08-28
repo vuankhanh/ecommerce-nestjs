@@ -3,6 +3,7 @@ import { ProductService } from './product.service';
 import { Product } from '../../../shared/schema/product.schema';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
+import { TLanguage } from 'src/shared/interface/lang.interface';
 
 //1. Guards: Được sử dụng để bảo vệ các slug.
 //2. Interceptors: Được sử dụng để thay đổi hoặc mở rộng hành vi của các method.
@@ -19,7 +20,7 @@ export class ProductController {
   async getAll(
     @Query('name') name: string,
     @Query('productCategoryId', new ParseObjectIdPipe()) productCategoryId: string,
-    @Headers('accept-language') lang: string,
+    @Headers('accept-language') lang: TLanguage,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
   ) {
@@ -32,7 +33,7 @@ export class ProductController {
 
   @Get('detail')
   async getDetail(
-    @Headers('accept-language') lang: string,
+    @Headers('accept-language') lang: TLanguage,
     @Query('id', new ParseObjectIdPipe()) id?: string,
     @Query('slug') slug?: string,
   ) {
@@ -46,7 +47,7 @@ export class ProductController {
 
   @Get('/by-category-slug')
   async getProductsByCategorySlug(
-    @Headers('accept-language') lang: string,
+    @Headers('accept-language') lang: TLanguage,
     @Query('slug') slug: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number

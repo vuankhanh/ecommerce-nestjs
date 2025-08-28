@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Headers, Param, ParseIntPipe, Post, Query, Req, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, Headers, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
@@ -9,7 +9,7 @@ import { CustomBadRequestException } from 'src/shared/core/exception/custom-exce
 import { OrderStatus } from 'src/constant/order.constant';
 import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
 
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import { Request } from 'express';
 import { AccountIdGuard } from '../personal/guard/account_id.guard';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
@@ -20,12 +20,12 @@ import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-prod
 import { OrderItemsMapClientPipe } from 'src/shared/core/pipes/order-items-map-client.pipe';
 import { OrderEntity } from 'src/module/order-basic/entity/order.entity';
 import { MailService } from 'src/module/mail/mail.service';
-import { AccountDocument } from 'src/module/auth/schemas/account.schema';
-import { OrderDocument } from 'src/module/order-basic/schema/order.schema';
+import { Order, OrderDocument } from 'src/module/order-basic/schema/order.schema';
 import { DeliveryEntity } from '../personal/address/entity/delivery.entity';
-import { LangDto } from 'src/shared/dto/lang.dto';
 import { Language } from 'src/constant/lang.constant';
 import { AcceptLanguageValidationPipe } from 'src/shared/core/pipes/accept-language-validation/accept-language-validation.pipe';
+import { TLanguage } from 'src/shared/interface/lang.interface';
+import { OrderUpdateStatusDto } from 'src/shared/dto/order-update.dto';
 
 @Controller('/client/order')
 @Roles(UserRole.CLIENT)
@@ -45,7 +45,7 @@ export class OrderLoyaltyController {
     @Query('name') name: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
-    @Headers('accept-language') lang: string
+    @Headers('accept-language') lang: TLanguage
   ) {
     const accountId: string = request['customParams'].accountId;
     if (!accountId) {
@@ -103,7 +103,7 @@ export class OrderLoyaltyController {
     const result = await this.orderBasicService.create(order);
     try {
       const detail = await this.orderBasicService.getDetail({ _id: result._id }, 'vi');
-      
+
       detail.delivery['addressDetail'] = DeliveryEntity.generateAddressDetail(detail.delivery.address);
       this.mailService.queueOrderReceivedEmail(detail);
     } catch (error) {
@@ -111,6 +111,28 @@ export class OrderLoyaltyController {
     }
 
     return result;
+  }
+
+  @Put('status')
+  async updateStatus(
+    @Req() request: Request,
+    @Query('id', new ParseObjectIdPipe()) id: string,
+    @Body() body: OrderUpdateStatusDto,
+  ) {
+    const accountId: string = request['customParams'].accountId;
+    if (!accountId) {
+      throw new CustomBadRequestException('Không tìm thấy thông tin tài khoản');
+    }
+    const lang: TLanguage = 'vi';
+    const filterQuery: FilterQuery<Order> = {};
+    if (id) filterQuery['_id'] = id;
+    filterQuery['accountId'] = new Types.ObjectId(accountId);
+
+    const order = await this.orderBasicService.modifyStatus(filterQuery, lang, body.status, body.reasonForCancelReason);
+    if (body.status === OrderStatus.CANCELED) {
+      this.mailService.queueOrderCancelledEmail(order);
+    }
+    return order;
   }
 
   // @Put(':id')

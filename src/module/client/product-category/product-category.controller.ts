@@ -3,6 +3,7 @@ import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_r
 import { ProductCategoryService } from './product-category.service';
 import { Product_Category } from 'src/shared/schema/product-category.schema';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { TLanguage } from 'src/shared/interface/lang.interface';
 
 @Controller('product-category')
 @UseInterceptors(FormatResponseInterceptor)
@@ -14,7 +15,7 @@ export class ProductCategoryController {
   @Get()
   async getAll(
     @Query('name') name: string,
-    @Headers('accept-language') lang: string,
+    @Headers('accept-language') lang: TLanguage,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
   ) {
@@ -27,7 +28,7 @@ export class ProductCategoryController {
   @Get('detail')
   async getDetail(
     @Query('slug') slug: string,
-    @Headers('accept-language') lang: string,
+    @Headers('accept-language') lang: TLanguage,
   ) {
     const filterQuery = { slug };
     

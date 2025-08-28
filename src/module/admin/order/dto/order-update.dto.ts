@@ -7,16 +7,6 @@ import { IOrderItemsRequest, IOrderUpdateRequest } from "src/shared/interface/or
 import { TOrderStatus } from "src/shared/interface/order.interface";
 import { TPaymentMethod } from "src/shared/interface/payment.interface";
 
-export class OrderUpdateStatusDto {
-  @IsString({ message: 'Trạng thái đơn hàng phải là một chuỗi' })
-  @IsEnum(OrderStatus, { message: 'Trạng thái đơn hàng không hợp lệ' })
-  status: TOrderStatus;
-
-  @ValidateIf(o => o.status === OrderStatus.CANCELED)
-  @IsNotEmpty({ message: 'Lý do hủy đơn hàng là bắt buộc khi trạng thái là Đã hủy' })
-  reasonForCancelReason?: string;
-}
-
 export class OrderUpdateDto implements IOrderUpdateRequest {
   @IsOptional()
   @IsArray({ message: 'Danh sách sản phẩm trong đơn hàng phải là một mảng' })

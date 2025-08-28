@@ -2,11 +2,12 @@ import { Types } from "mongoose";
 import { Album } from "../schema/album.schema";
 import { Product } from "../schema/product.schema";
 import { Product_Category } from "../schema/product-category.schema";
+import { TLanguage } from "./lang.interface";
 
 export interface IProductCategory {
-  name: { [lang: string]: string };
+  name: { [key in TLanguage]: string };
   albumId?: Types.ObjectId | string; // ID của album chứa ảnh danh mục
-  description?: { [lang: string]: string };
+  description?: { [key in TLanguage]: string };
   parentId?: Types.ObjectId | string; // ID của danh mục cha
   isActive: boolean; // Trạng thái hoạt động của danh mục
 }
@@ -17,10 +18,10 @@ export interface IProductReview {
 }
 
 export interface IProduct {
-  name: { [lang: string]: string };
+  name: { [key in TLanguage]: string };
   slug?: string; // Tự động sinh ra từ tên sản phẩm
-  description: { [lang: string]: string };
-  shortDescription: { [lang: string]: string };
+  description: { [key in TLanguage]: string };
+  shortDescription: { [key in TLanguage]: string };
   albumId?: Types.ObjectId | string; // ID của album chứa ảnh sản phẩm
   album?: Album;
   price: number;

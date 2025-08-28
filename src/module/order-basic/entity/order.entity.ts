@@ -5,6 +5,7 @@ import { Types } from "mongoose";
 import { IDelivery } from "src/shared/interface/delivery.interface";
 import { v4 as uuidv4 } from 'uuid';
 import { OrderUtil } from "src/shared/util/order.util";
+import { TLanguage } from "src/shared/interface/lang.interface";
 
 export class OrderEntity implements IOrder {
   orderCode: string;
@@ -16,7 +17,7 @@ export class OrderEntity implements IOrder {
   deliveryFee: number;
   paymentMethod: TPaymentMethod;
   accountId?: Types.ObjectId;
-  lang: string;
+  lang: TLanguage;
   delivery: IDelivery;
   note: string;
 

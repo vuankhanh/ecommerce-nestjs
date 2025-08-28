@@ -8,6 +8,7 @@ import { CustomBadRequestException, CustomInternalServerErrorException } from 's
 import { Album } from '../../../shared/schema/album.schema';
 import { Product } from 'src/shared/schema/product.schema';
 import { HydratedDocument } from 'mongoose';
+import { TLanguage } from 'src/shared/interface/lang.interface';
 
 export class ProductCategoryService implements IBasicService<Product_Category> {
   constructor(
@@ -30,7 +31,7 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
 
   async getAll(
     filterQuery: FilterQuery<Product_Category>,
-    lang: string,
+    lang: TLanguage,
     page: number,
     size: number,
   ): Promise<{ data: FlattenMaps<Product_Category>[]; paging: IPaging }> {
@@ -88,7 +89,7 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
 
   async getDetail(
     filterQuery: FilterQuery<Product_Category>,
-    lang: string
+    lang: TLanguage
   ): Promise<ProductCategoryDocument> {
     const [data] = await this.productCategoryModel.aggregate([
       {

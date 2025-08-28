@@ -5,6 +5,7 @@ import { CustomBadRequestException } from '../exception/custom-exception';
 import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
 import { Types } from 'mongoose';
 import { Request } from 'express';
+import { TLanguage } from 'src/shared/interface/lang.interface';
 
 @Injectable({
   scope: Scope.REQUEST
@@ -20,7 +21,7 @@ export class OrderItemsMapClientPipe implements PipeTransform {
       throw new CustomBadRequestException('orderItems không hợp lệ');
     }
 
-    const lang = this.request.query.lang ? String(this.request.query.lang) : 'vi';
+    const lang: TLanguage = this.request.query.lang ? this.request.query.lang as TLanguage : 'vi';
     const mappedOrderItems: Array<OrderProductItemEntity> = [];
 
     for (const orderItemRequest of orderItemsRequest) {

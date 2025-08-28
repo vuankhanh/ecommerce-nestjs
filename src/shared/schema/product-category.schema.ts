@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb';
 import { VietnameseAccentUtil } from "../util/vietnamese-accent.util";
 import { Album } from "src/shared/schema/album.schema";
 import { IMongodbDocument } from "../interface/mongo.interface";
+import { TLanguage } from "../interface/lang.interface";
 
 export type ProductCategoryDocument = Product_Category & IMongodbDocument;
 
@@ -21,7 +22,7 @@ export class Product_Category implements IProductCategory {
       message: 'Trường name phải có giá trị cho ngôn ngữ mặc định (vi)'
     }
   })
-  name: { [lang: string]: string };
+  name: { [key in TLanguage]: string };
 
   @Prop({
     type: Types.ObjectId,
@@ -45,7 +46,7 @@ export class Product_Category implements IProductCategory {
       message: 'Trường description phải có giá trị cho ngôn ngữ mặc định (vi)'
     }
   })
-  description?: { [lang: string]: string };
+  description?: { [key in TLanguage]: string };
 
   @Prop({ type: Types.ObjectId, ref: Product_Category.name, required: false })
   parentId?: string | Types.ObjectId;

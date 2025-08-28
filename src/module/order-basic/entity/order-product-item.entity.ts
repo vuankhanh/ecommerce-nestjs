@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { TLanguage } from "src/shared/interface/lang.interface";
 import { IOrderItem } from "src/shared/interface/order.interface";
 
 export class OrderProductItemEntity implements IOrderItem {
@@ -6,7 +7,7 @@ export class OrderProductItemEntity implements IOrderItem {
   productId: string | Types.ObjectId;
   productThumbnail: string;
   productCode: string;
-  productName: { [lang: string]: string };
+  productName: { [key in TLanguage]: string };
   productCategorySlug: string;
   productSlug: string;
   quantity: number;

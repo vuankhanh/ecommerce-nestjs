@@ -9,6 +9,7 @@ import { Product_Category } from 'src/shared/schema/product-category.schema';
 import { ProductCategoryService } from '../product-category/product-category.service';
 import { CustomNotFoundException } from 'src/shared/core/exception/custom-exception';
 import { HydratedDocument } from 'mongoose';
+import { TLanguage } from 'src/shared/interface/lang.interface';
 
 @Injectable()
 export class ProductService implements IBasicService<Product> {
@@ -23,7 +24,7 @@ export class ProductService implements IBasicService<Product> {
     return product;
   }
 
-  async getAll(filterQuery: FilterQuery<Product>, lang: string, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
+  async getAll(filterQuery: FilterQuery<Product>, lang: TLanguage, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
     const countTotal = await this.productModel.countDocuments(filterQuery);
     const productAggregate = await this.productModel.aggregate(
       [
@@ -91,7 +92,7 @@ export class ProductService implements IBasicService<Product> {
     return metaData;
   }
 
-  async getProductsByCategorySlug(categorySlug: string, lang: string, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
+  async getProductsByCategorySlug(categorySlug: string, lang: TLanguage, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
     const productCategory = await this.productCategoryService.getDetail({ slug: categorySlug }, lang);
     if (!productCategory) {
       throw new CustomNotFoundException('Không tìm thấy danh mục sản phẩm');
@@ -103,7 +104,7 @@ export class ProductService implements IBasicService<Product> {
     return this.getAll(filterQuery, lang, page, size);
   }
 
-  async getDetail(filterQuery: FilterQuery<Product>, lang: string): Promise<ProductDocument> {
+  async getDetail(filterQuery: FilterQuery<Product>, lang: TLanguage): Promise<ProductDocument> {
     return await this.tranformToDetaiData(filterQuery, lang);
   }
 
@@ -119,7 +120,7 @@ export class ProductService implements IBasicService<Product> {
     return await this.productModel.findOneAndDelete(filterQuery);
   }
 
-  private async tranformToDetaiData(filterQuery: FilterQuery<Product>, lang: string): Promise<ProductDocument> {
+  private async tranformToDetaiData(filterQuery: FilterQuery<Product>, lang: TLanguage): Promise<ProductDocument> {
     return await this.productModel.aggregate(
       [
         { $match: filterQuery },

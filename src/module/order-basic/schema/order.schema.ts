@@ -11,6 +11,8 @@ import { Account } from "src/module/auth/schemas/account.schema";
 import { OrderProductItemEntity } from "../entity/order-product-item.entity";
 import { IOrderPopulated } from "src/shared/interface/order-response.interface";
 import { IMongodbDocument } from "src/shared/interface/mongo.interface";
+import { TLanguage } from "src/shared/interface/lang.interface";
+import { Language } from "src/constant/lang.constant";
 
 export type OrderDocument = IOrderPopulated & IMongodbDocument;
 
@@ -46,8 +48,12 @@ export class Order implements IOrder {
   @Prop({ type: [Types.ObjectId, String], ref: Account.name })
   accountId?: Types.ObjectId | string;
   
-  @Prop({ type: String, required: true })
-  lang: string;
+  @Prop({
+    type: String,
+    enum: Language,
+    required: true
+  })
+  lang: TLanguage;
 
   @Prop({ type: Object})
   delivery: IDelivery;

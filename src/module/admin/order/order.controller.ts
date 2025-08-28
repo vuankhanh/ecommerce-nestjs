@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Get, Headers, HttpCode, ParseIntPipe, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, HttpCode, HttpStatus, ParseIntPipe, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserRole } from 'src/constant/user.constant';
 import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
@@ -9,14 +9,15 @@ import { FilterQuery } from 'mongoose';
 import { Order } from 'src/module/order-basic/schema/order.schema';
 import { OrderStatus } from 'src/constant/order.constant';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
-import { OrderUpdateDto, OrderUpdateStatusDto } from './dto/order-update.dto';
+import { OrderUpdateDto } from './dto/order-update.dto';
+import { OrderUpdateStatusDto } from 'src/shared/dto/order-update.dto';
 import { OrderItemsMapAdminPipe } from 'src/shared/core/pipes/order-items-map-admin.pipe';
-import { IOrderItemsRequest } from 'src/shared/interface/order-request.interface';
 import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
 import { OrderUtil } from 'src/shared/util/order.util';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
 import { AddressUtil } from 'src/shared/util/address.util';
 import { MailService } from 'src/module/mail/mail.service';
+import { TLanguage } from 'src/shared/interface/lang.interface';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
@@ -31,13 +32,13 @@ export class OrderController {
   ) { }
 
   @Post()
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async getAll(
     @Body() body: FilterDto,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
-    @Headers('accept-language') lang: string
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
   ) {
+    const lang: TLanguage = 'vi';
     const filterQuery: FilterQuery<Order> = {};
 
     if (body) {
@@ -58,8 +59,8 @@ export class OrderController {
   @Get('detail')
   getDetail(
     @Query('id', new ParseObjectIdPipe()) id: string,
-    @Query('lang', new DefaultValuePipe('vi')) lang: string
   ) {
+    const lang: TLanguage = 'vi';
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
 
@@ -71,10 +72,11 @@ export class OrderController {
     @Query('id', new ParseObjectIdPipe()) id: string,
     @Body() body: OrderUpdateStatusDto,
   ) {
+    const lang: TLanguage = 'vi';
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
 
-    const order = await this.orderBasicService.modifyStatus(filterQuery, body.status, body.reasonForCancelReason);
+    const order = await this.orderBasicService.modifyStatus(filterQuery, lang, body.status, body.reasonForCancelReason);
     if (body.status === OrderStatus.CANCELED) {
       this.mailService.queueOrderCancelledEmail(order);
     }
@@ -85,8 +87,8 @@ export class OrderController {
   async update(
     @Query('id', new ParseObjectIdPipe()) id: string,
     @Body() body: OrderUpdateDto,
-    @Query('lang', new DefaultValuePipe('vi')) lang: string
   ) {
+    const lang: TLanguage = 'vi';
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
 
@@ -158,7 +160,7 @@ export class OrderController {
     }
 
     oldOrder.delivery['addressDetail'] = AddressUtil.addressDetail(oldOrder.delivery);
-    const order = await this.orderBasicService.updateOrder(filterQuery, orderUpdate);
+    const order = await this.orderBasicService.updateOrder(filterQuery, lang, orderUpdate);
     this.mailService.queueOrderChangedEmail(oldOrder, orderUpdateForEmail);
     return order;
   }

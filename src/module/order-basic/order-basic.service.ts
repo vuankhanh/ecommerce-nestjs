@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, HydratedDocument, Model } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Template } from 'src/shared/interface/template.interface';
-import { OrderFrom, OrderStatus, OrderStatusTransition } from 'src/constant/order.constant';
+import { getOrderStatusLabel, ORDER_FROM_LABEL, ORDER_STATUS_LABEL, OrderFrom, OrderStatus, OrderStatusTransition } from 'src/constant/order.constant';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { Account } from 'src/module/auth/schemas/account.schema';
@@ -13,6 +13,7 @@ import { UserRole } from 'src/constant/user.constant';
 import { CustomBadRequestException, CustomNotFoundException } from 'src/shared/core/exception/custom-exception';
 import { TOrderStatus } from 'src/shared/interface/order.interface';
 import { IOrderPopulated } from 'src/shared/interface/order-response.interface';
+import { TLanguage } from 'src/shared/interface/lang.interface';
 
 @Injectable()
 export class OrderBasicService implements IBasicService<IOrderPopulated> {
@@ -27,7 +28,7 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
     return order;
   }
 
-  async getAll(filterQuery: FilterQuery<Order>, lang: string, page: number, size: number): Promise<{ data: OrderDocument[]; paging: IPaging; }> {
+  async getAll(filterQuery: FilterQuery<Order>, lang: TLanguage, page: number, size: number): Promise<{ data: OrderDocument[]; paging: IPaging; }> {
     const countTotal = await this.orderModel.countDocuments(filterQuery);
     const orderAggregate = await this.orderModel.aggregate(
       [
@@ -51,6 +52,18 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
         },
         {
           $addFields: {
+            // status: {
+            //   $switch: {
+            //     branches: [
+            //       { case: { $eq: ["$status", "PENDING"] }, then: ORDER_STATUS_LABEL.PENDING[lang] },
+            //       { case: { $eq: ["$status", "CONFIRMED"] }, then: ORDER_STATUS_LABEL.CONFIRMED[lang] },
+            //       { case: { $eq: ["$status", "SHIPPING"] }, then: ORDER_STATUS_LABEL.SHIPPING[lang] },
+            //       { case: { $eq: ["$status", "COMPLETED"] }, then: ORDER_STATUS_LABEL.COMPLETED[lang] },
+            //       { case: { $eq: ["$status", "CANCELED"] }, then: ORDER_STATUS_LABEL.CANCELED[lang] },
+            //     ],
+            //     default: "$status"
+            //   }
+            // },
             orderFrom: {
               $switch: {
                 branches: [
@@ -124,7 +137,6 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
         }
       ]
     );
-
     const metaData = {
       data: orderAggregate,
       paging: {
@@ -137,21 +149,21 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
     return metaData;
   }
 
-  async getDetail(filterQuery: FilterQuery<Order>, lang: string): Promise<OrderDocument> {
-    return await this.tranformToDetaiData(filterQuery);
+  async getDetail(filterQuery: FilterQuery<Order>, lang: TLanguage): Promise<OrderDocument> {
+    return await this.tranformToDetaiData(filterQuery, lang);
   }
 
   async findById(id: string): Promise<OrderDocument> {
     return await this.orderModel.findById(id);
   }
 
-  async replace(filterQuery: FilterQuery<Order>, data: Order): Promise<OrderDocument> {
+  async replace(filterQuery: FilterQuery<Order>, data: Order, lang: TLanguage): Promise<OrderDocument> {
     await this.orderModel.findOneAndReplace(filterQuery, data);
-    const product = await this.tranformToDetaiData(filterQuery);
+    const product = await this.tranformToDetaiData(filterQuery, lang);
     return product;
   }
 
-  async modifyStatus(filterQuery: FilterQuery<Order>, newStatus: TOrderStatus, cancelReason?: string): Promise<IOrderPopulated> {
+  async modifyStatus(filterQuery: FilterQuery<Order>, lang: TLanguage, newStatus: TOrderStatus, cancelReason?: string): Promise<IOrderPopulated> {
     const order = await this.orderModel.findOne(filterQuery);
     if (!order) throw new CustomNotFoundException('Đơn hàng không tồn tại');
     const currentStatus = order.status;
@@ -175,13 +187,13 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
     }
 
     await this.orderModel.findOneAndUpdate(filterQuery, data, { new: true });
-    return await this.tranformToDetaiData(filterQuery);
+    return await this.tranformToDetaiData(filterQuery, lang);
   }
 
-  async updateOrder(filterQuery: FilterQuery<Order>, updateOrder: Partial<Order>): Promise<IOrderPopulated> {
+  async updateOrder(filterQuery: FilterQuery<Order>, lang: TLanguage, updateOrder: Partial<Order>): Promise<IOrderPopulated> {
 
     await this.orderModel.findOneAndUpdate(filterQuery, updateOrder, { new: true });
-    return await this.tranformToDetaiData(filterQuery);
+    return await this.tranformToDetaiData(filterQuery, lang);
   }
 
   async modify(filterQuery: FilterQuery<Order>, data: Partial<Order>): Promise<OrderDocument> {
@@ -203,7 +215,7 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
     return null;
   }
 
-  private async tranformToDetaiData(filterQuery: FilterQuery<Order>): Promise<OrderDocument> {
+  private async tranformToDetaiData(filterQuery: FilterQuery<Order>, lang: TLanguage): Promise<OrderDocument> {
     return await this.orderModel.aggregate(
       [
         { $match: filterQuery },
@@ -223,6 +235,18 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
         },
         {
           $addFields: {
+            // status: {
+            //   $switch: {
+            //     branches: [
+            //       { case: { $eq: ["$status", OrderStatus.PENDING] }, then: ORDER_STATUS_LABEL.PENDING[lang] },
+            //       { case: { $eq: ["$status", OrderStatus.CONFIRMED] }, then: ORDER_STATUS_LABEL.CONFIRMED[lang] },
+            //       { case: { $eq: ["$status", OrderStatus.SHIPPING] }, then: ORDER_STATUS_LABEL.SHIPPING[lang] },
+            //       { case: { $eq: ["$status", OrderStatus.COMPLETED] }, then: ORDER_STATUS_LABEL.COMPLETED[lang] },
+            //       { case: { $eq: ["$status", OrderStatus.CANCELED] }, then: ORDER_STATUS_LABEL.CANCELED[lang] },
+            //     ],
+            //     default: "$status"
+            //   }
+            // },
             orderFrom: {
               $switch: {
                 branches: [
@@ -254,7 +278,26 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
             }
           }
         },
+        {
+          $project: {
+            __v: 0,
+            accountId: 0,
+            customerDetail: 0
+            // orderAccount: {
+            //   _id: 0,
+            //   createdAt: 0,
+            //   updatedAt: 0,
+            //   facebookId: 0,
+            //   googleId: 0,
+            //   role: 0,
+            //   createdByProvider: 0,
+            //   hasPassword: 0,
+            //   password: 0,
+            //   __v: 0
+            // }
+          }
+        }
       ]
-    ).then((data) => data[0]);
+    ).then((data) => data[0])
   }
 }

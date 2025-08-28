@@ -8,6 +8,7 @@ import { Product_Category } from './product-category.schema';
 import { Album } from 'src/shared/schema/album.schema';
 import { VietnameseAccentUtil } from '../util/vietnamese-accent.util';
 import { IMongodbDocument } from '../interface/mongo.interface';
+import { TLanguage } from '../interface/lang.interface';
 
 export type ProductDocument = Product & IMongodbDocument;
 
@@ -22,7 +23,7 @@ export class Product implements IProduct {
       message: 'Trường này phải có giá trị cho ngôn ngữ mặc định (vi)'
     }
   })
-  name: { [lang: string]: string };;
+  name: { [key in TLanguage]: string };;
 
   @Prop({
     type: String,
@@ -54,7 +55,7 @@ export class Product implements IProduct {
       message: 'Description phải có trường vi (ngôn ngữ mặc định)'
     }
   })
-  description: { [lang: string]: string };
+  description: { [key in TLanguage]: string };
 
   @Prop({
     type: Object,
@@ -64,7 +65,7 @@ export class Product implements IProduct {
       message: 'ShortDescription phải có trường vi (ngôn ngữ mặc định)'
     }
   })
-  shortDescription: { [lang: string]: string };
+  shortDescription: { [key in TLanguage]: string };
 
   @Prop({ type: Types.ObjectId, ref: Album.name })
   albumId?: Types.ObjectId | string;

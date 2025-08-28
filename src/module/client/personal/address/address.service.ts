@@ -6,6 +6,7 @@ import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { is } from 'cheerio/dist/commonjs/api/traversing';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
+import { TLanguage } from 'src/shared/interface/lang.interface';
 
 @Injectable()
 export class AddressService implements IBasicService<Delivery> {
@@ -28,7 +29,7 @@ export class AddressService implements IBasicService<Delivery> {
     return delivery;
   }
 
-  async getAll(filterQuery: FilterQuery<Delivery>, lang: string, page: number, size: number): Promise<{ data: FlattenMaps<Delivery>[]; paging: IPaging; }> {
+  async getAll(filterQuery: FilterQuery<Delivery>, lang: TLanguage, page: number, size: number): Promise<{ data: FlattenMaps<Delivery>[]; paging: IPaging; }> {
     const countTotal = await this.deliveryModel.countDocuments(filterQuery);
 
     const deliveryAggregate = await this.deliveryModel.aggregate([
@@ -54,7 +55,7 @@ export class AddressService implements IBasicService<Delivery> {
     return metaData;
   }
 
-  getDetail(filterQuery: FilterQuery<Delivery>, lang: string): Promise<DeliveryDocument> {
+  getDetail(filterQuery: FilterQuery<Delivery>, lang: TLanguage): Promise<DeliveryDocument> {
     return this.deliveryModel.findOne(filterQuery);
   }
 
