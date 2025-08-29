@@ -58,7 +58,7 @@ export class MediaSlideShowService implements IBasicAdminService<Album> {
       }
     };
 
-    return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, updateQuery, { safe: true, new: true });;
+    return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, updateQuery, { safe: true, new: true });
   }
 
   async removeFiles(
@@ -84,7 +84,7 @@ export class MediaSlideShowService implements IBasicAdminService<Album> {
       }
     });
 
-    return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, updateQuery, { safe: true, new: true });;
+    return await this.slideShowAlbumModel.findOneAndUpdate(this.filterQuery, updateQuery, { safe: true, new: true });
   }
 
   async itemIndexChange(itemIndexChanges: Array<string | mongoose.Types.ObjectId>) {
@@ -95,7 +95,7 @@ export class MediaSlideShowService implements IBasicAdminService<Album> {
 
     album.media = SortUtil.sortDocumentArrayByIndex<Media>(album.media as Array<MediaDocument>, itemIndexChanges);
 
-    return await album.save();;
+    return await album.save();
   }
 
   async modify(data: Partial<Album>) {

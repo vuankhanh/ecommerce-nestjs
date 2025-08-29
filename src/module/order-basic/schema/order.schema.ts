@@ -8,7 +8,7 @@ import { OrderItem } from "./order_product_item.schema";
 import { PaymentMethod } from "src/constant/payment.constant";
 import { IDelivery } from "src/shared/interface/delivery.interface";
 import { Account } from "src/module/auth/schemas/account.schema";
-import { OrderProductItemEntity } from "../entity/order-product-item.entity";
+import { OrderItemEntity } from "../entity/order-item.entity";
 import { IOrderPopulated, IOrderDetailPopulated } from "src/shared/interface/order-response.interface";
 import { TLanguage } from "src/shared/interface/lang.interface";
 import { Language } from "src/constant/lang.constant";
@@ -23,7 +23,7 @@ export class Order implements IOrder {
   orderCode: string;
 
   @Prop({ type: Array<OrderItem>, required: true })
-  orderItems: Array<OrderProductItemEntity>;
+  orderItems: Array<OrderItemEntity>;
 
   @Prop({ type: String, required: true, default: OrderStatus.PENDING })
   status: TOrderStatus;

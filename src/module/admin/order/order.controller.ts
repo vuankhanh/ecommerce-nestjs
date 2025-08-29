@@ -9,15 +9,14 @@ import { FilterQuery } from 'mongoose';
 import { Order } from 'src/module/order-basic/schema/order.schema';
 import { OrderStatus } from 'src/constant/order.constant';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
-import { OrderUpdateDto } from './dto/order-update.dto';
-import { OrderUpdateStatusDto } from 'src/shared/dto/order-update.dto';
+import { OrderUpdateDto, OrderUpdateStatusDto } from 'src/shared/dto/order-update.dto';
 import { OrderItemsMapAdminPipe } from 'src/shared/core/pipes/order-items-map-admin.pipe';
-import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
 import { OrderUtil } from 'src/shared/util/order.util';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
 import { AddressUtil } from 'src/shared/util/address.util';
 import { MailService } from 'src/module/mail/mail.service';
 import { TLanguage } from 'src/shared/interface/lang.interface';
+import { OrderPlainEntity } from 'src/module/order-basic/entity/order-plain.entity';
 
 @Controller()
 @UseGuards(LocalAuthGuard)
@@ -78,7 +77,9 @@ export class OrderController {
 
     const order = await this.orderBasicService.modifyStatus(filterQuery, lang, body.status, body.reasonForCancelReason);
     if (body.status === OrderStatus.CANCELED) {
-      this.mailService.queueOrderCancelledEmail(order);
+      const lang: TLanguage = order.lang || 'vi';
+      const orderPlainEntity: OrderPlainEntity = new OrderPlainEntity(order, lang);
+      this.mailService.queueOrderCancelledEmail(orderPlainEntity);
     }
     return order;
   }
@@ -99,6 +100,8 @@ export class OrderController {
       throw new CustomBadRequestException('Không thể sửa đơn hàng ở trạn thái hiện tại');
     }
 
+    const oldOrderLang: TLanguage = oldOrder.lang || lang;
+
     // Khởi tạo đối tượng orderUpdate
     // Đây là đối tượng sẽ chứa các trường cần cập nhật.
     const orderUpdate: Partial<Order> = {};
@@ -106,7 +109,7 @@ export class OrderController {
     // Khởi tạo đối tượng orderUpdateForEmail
     // Đây là đối tượng sẽ chứa các trường cần gửi qua email.
     // Sử dụng Partial để chỉ định rằng đây là một phần của Order, không cần đầy đủ tất cả các trường.
-    const orderUpdateForEmail: Partial<Order> = {};
+    const orderUpdateForEmail: Partial<OrderPlainEntity> = {};
 
     //Kiểm tra nếu tồn tại các yếu tố ảnh hưởng đến tổng tiền. orderItems, deliveryFee, discount
     if (body.orderItems || body.deliveryFee || body.discount) {
@@ -120,7 +123,7 @@ export class OrderController {
       if (body.orderItems) {
         // Gọi pipe transform thủ công
         orderUpdate.orderItems = await this.orderItemsMapAdminPipe.transform(body.orderItems);
-        orderUpdateForEmail.orderItems = orderUpdate.orderItems.map(item => new OrderProductItemEntity(item));
+        orderUpdateForEmail.orderItems = OrderPlainEntity.getOrderItemsPlain(orderUpdate.orderItems, lang);
         const subTotal = OrderUtil.calculateSubTotal(orderUpdate.orderItems);
         orderUpdate.subTotal = subTotal;
         orderUpdateForEmail.subTotal = subTotal;
@@ -151,7 +154,7 @@ export class OrderController {
     }
     if (body.paymentMethod) {
       orderUpdate.paymentMethod = body.paymentMethod;
-      orderUpdateForEmail.paymentMethod = body.paymentMethod;
+      orderUpdateForEmail.paymentMethod = OrderPlainEntity.getPaymentMethodPlain(body.paymentMethod, oldOrderLang);
     }
     if (body.delivery) {
       orderUpdate.delivery = body.delivery;
@@ -159,9 +162,9 @@ export class OrderController {
       orderUpdateForEmail.delivery['addressDetail'] = AddressUtil.addressDetail(body.delivery);
     }
 
-    oldOrder.delivery['addressDetail'] = AddressUtil.addressDetail(oldOrder.delivery);
     const order = await this.orderBasicService.updateOrder(filterQuery, lang, orderUpdate);
-    this.mailService.queueOrderChangedEmail(oldOrder, orderUpdateForEmail);
+    const orderPlainEntity: OrderPlainEntity = new OrderPlainEntity(oldOrder, oldOrderLang);
+    this.mailService.queueOrderChangedEmail(orderPlainEntity, orderUpdateForEmail);
     return order;
   }
 }

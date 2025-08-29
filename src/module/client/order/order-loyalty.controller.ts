@@ -2,7 +2,6 @@ import { Body, Controller, DefaultValuePipe, Delete, Get, Headers, Param, ParseI
 import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
-import { ProductService } from '../product/product.service';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { IOrder } from 'src/shared/interface/order.interface';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
@@ -16,16 +15,17 @@ import { Roles } from 'src/shared/core/decorator/roles.decorator';
 import { UserRole } from 'src/constant/user.constant';
 import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
 import { OrderCreateDto } from 'src/module/order-basic/dto/order-create.dto';
-import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
+import { OrderItemEntity } from 'src/module/order-basic/entity/order-item.entity';
 import { OrderItemsMapClientPipe } from 'src/shared/core/pipes/order-items-map-client.pipe';
 import { OrderEntity } from 'src/module/order-basic/entity/order.entity';
 import { MailService } from 'src/module/mail/mail.service';
-import { Order, OrderDocument } from 'src/module/order-basic/schema/order.schema';
+import { Order } from 'src/module/order-basic/schema/order.schema';
 import { DeliveryEntity } from '../personal/address/entity/delivery.entity';
 import { Language } from 'src/constant/lang.constant';
 import { AcceptLanguageValidationPipe } from 'src/shared/core/pipes/accept-language-validation/accept-language-validation.pipe';
 import { TLanguage } from 'src/shared/interface/lang.interface';
 import { OrderUpdateStatusDto } from 'src/shared/dto/order-update.dto';
+import { OrderPlainEntity } from 'src/module/order-basic/entity/order-plain.entity';
 
 @Controller('/client/order')
 @Roles(UserRole.CLIENT)
@@ -79,7 +79,7 @@ export class OrderLoyaltyController {
     @Req() request: Request,
     @Headers('accept-language') lang: Language,
     @Body() orderCreateDto: OrderCreateDto,
-    @Body('orderItems', OrderItemsMapClientPipe) orderItems: Array<OrderProductItemEntity>
+    @Body('orderItems', OrderItemsMapClientPipe) orderItems: Array<OrderItemEntity>
   ) {
     const accountId: string = request['customParams'].accountId;
     if (!accountId) {
@@ -103,9 +103,8 @@ export class OrderLoyaltyController {
     const result = await this.orderBasicService.create(order);
     try {
       const detail = await this.orderBasicService.getDetail({ _id: result._id }, 'vi');
-
-      detail.delivery['addressDetail'] = DeliveryEntity.generateAddressDetail(detail.delivery.address);
-      this.mailService.queueOrderReceivedEmail(detail);
+      const orderPlainEntity: OrderPlainEntity = new OrderPlainEntity(detail, validatedLang);
+      this.mailService.queueOrderReceivedEmail(orderPlainEntity);
     } catch (error) {
       console.log('Error sending email:', error);
     }
@@ -116,6 +115,7 @@ export class OrderLoyaltyController {
   @Put('status')
   async updateStatus(
     @Req() request: Request,
+    @Headers('accept-language') lang: Language,
     @Query('id', new ParseObjectIdPipe()) id: string,
     @Body() body: OrderUpdateStatusDto,
   ) {
@@ -123,68 +123,20 @@ export class OrderLoyaltyController {
     if (!accountId) {
       throw new CustomBadRequestException('Không tìm thấy thông tin tài khoản');
     }
-    const lang: TLanguage = 'vi';
+
+    const validatedLang: Language = new AcceptLanguageValidationPipe().transform(lang);
+
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
     filterQuery['accountId'] = new Types.ObjectId(accountId);
 
     const order = await this.orderBasicService.modifyStatus(filterQuery, lang, body.status, body.reasonForCancelReason);
     if (body.status === OrderStatus.CANCELED) {
-      this.mailService.queueOrderCancelledEmail(order);
+      const orderPlainEntity: OrderPlainEntity = new OrderPlainEntity(order, validatedLang);
+      this.mailService.queueOrderCancelledEmail(orderPlainEntity);
     }
     return order;
   }
-
-  // @Put(':id')
-  // async replace(
-  //   @Param('id', new ParseObjectIdPipe()) id: string,
-  //   @Body() orderDto: OrderDto
-  // ) {
-  //   const filterQuery = { _id: id };
-  //   const order = new Order(orderDto);
-  //   order.updateaccountd = orderDto.accountd;
-
-  //   return await this.orderService.replace(filterQuery, order);
-  // }
-
-  // @Patch(':id')
-  // async modify(
-  //   @Param('id', new ParseObjectIdPipe()) id: string,
-  //   @Body() orderDto: UpdateOrderDto
-  // ) {
-  //   const filterQuery = { _id: id };
-
-  //   const data: UpdateOrderDto = orderDto;
-  //   // Lấy đơn hàng hiện tại từ cơ sở dữ liệu
-  //   const currentOrder = await this.orderService.findById(id);
-
-  //   // Cập nhật các thuộc tính thay đổi
-  //   if (orderDto.orderItems) currentOrder.orderItems = OrderUtil.transformOrderItems(orderDto.orderItems);
-  //   if (orderDto.deliveryFee !== undefined) currentOrder.deliveryFee = orderDto.deliveryFee;
-  //   if (orderDto.discount !== undefined) currentOrder.discount = orderDto.discount;
-
-  //   // Tính lại tổng số nếu các thuộc tính liên quan thay đổi
-  //   if (orderDto.orderItems || orderDto.deliveryFee !== undefined || orderDto.discount !== undefined) {
-  //     const subTotal = OrderUtil.calculateSubTotal(currentOrder.orderItems);
-  //     data.total = OrderUtil.calculateTotal(subTotal, currentOrder.deliveryFee, currentOrder.discount);
-  //   }
-
-  //   if (orderDto.accountd) data.accountId = ObjectId.createFromHexString(orderDto.accountd);
-
-  //   if (orderDto.customerName) {
-  //     data.customerName = orderDto.customerName;
-  //   }
-
-  //   if (orderDto.customerAddress) {
-  //     data.customerAddress = orderDto.customerAddress;
-  //   }
-
-  //   if (orderDto.customerPhoneNumber) {
-  //     data.customerPhoneNumber = orderDto.customerPhoneNumber;
-  //   }
-
-  //   return await this.orderService.modify(filterQuery, data);
-  // }
 
   @Delete(':id')
   async remove(

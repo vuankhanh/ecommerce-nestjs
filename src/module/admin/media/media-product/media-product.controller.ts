@@ -66,7 +66,7 @@ export class MediaProductController {
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
 
-    return await this.mediaProductService.getMainProduct(filterQuery);;
+    return await this.mediaProductService.getMainProduct(filterQuery);
   }
 
   @Post()

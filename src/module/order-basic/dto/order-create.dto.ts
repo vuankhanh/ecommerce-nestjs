@@ -3,13 +3,10 @@ import { IsEnum, IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-va
 import { TPaymentMethod } from "../../../shared/interface/payment.interface";
 import { PaymentMethod } from "src/constant/payment.constant";
 import { IsValid } from "../../../shared/custom-validator/custom-validator";
-import { PartialType } from "@nestjs/mapped-types";
 import { DeliveryInfoDto } from "src/shared/dto/delivery.dto";
 import { Type } from "class-transformer";
 import { IOrderCreateRequest, IOrderItemsRequest } from "src/shared/interface/order-request.interface";
 import { validateOrderItems } from "src/shared/custom-validator/order.validator";
-import { TLanguage } from "src/shared/interface/lang.interface";
-import { Language } from "src/constant/lang.constant";
 
 export class OrderCreateDto implements IOrderCreateRequest {
   @IsNotEmpty({ message: 'Danh sách sản phẩm trong đơn hàng là bắt buộc' })

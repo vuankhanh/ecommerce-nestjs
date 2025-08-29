@@ -35,7 +35,7 @@ export class MediaLogoController {
 
   @Get('main')
   async getMainLogo() {
-    return await this.mediaLogoService.getMainLogo();;
+    return await this.mediaLogoService.getMainLogo();
   }
 
   @Post()

@@ -1,5 +1,5 @@
 import { IOrder, TOrderStatus } from "src/shared/interface/order.interface";
-import { OrderProductItemEntity } from "./order-product-item.entity";
+import { OrderItemEntity } from "./order-item.entity";
 import { TPaymentMethod } from "src/shared/interface/payment.interface";
 import { Types } from "mongoose";
 import { IDelivery } from "src/shared/interface/delivery.interface";
@@ -9,7 +9,7 @@ import { TLanguage } from "src/shared/interface/lang.interface";
 
 export class OrderEntity implements IOrder {
   orderCode: string;
-  orderItems: Array<OrderProductItemEntity>;
+  orderItems: Array<OrderItemEntity>;
   status: TOrderStatus;
   subTotal: number;
   total: number;

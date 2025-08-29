@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AccountService {
-  logger: Logger = new Logger(AccountService.name);;
+  logger: Logger = new Logger(AccountService.name);
   constructor(
     @InjectModel(Account.name) private accountModel: Model<Account>,
   ) { }

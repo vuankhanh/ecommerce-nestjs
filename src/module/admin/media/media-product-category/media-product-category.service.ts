@@ -128,7 +128,7 @@ export class MediaProductCategoryService implements IBasicAdminService<Album> {
       }
     });
 
-    return await this.productCategoryAlbumModel.findOneAndUpdate(filterQuery, updateQuery, { safe: true, new: true });;
+    return await this.productCategoryAlbumModel.findOneAndUpdate(filterQuery, updateQuery, { safe: true, new: true });
   }
 
   async itemIndexChange(filterQuery: FilterQuery<Album>, itemIndexChanges: Array<string | mongoose.Types.ObjectId>) {
@@ -139,7 +139,7 @@ export class MediaProductCategoryService implements IBasicAdminService<Album> {
 
     album.media = SortUtil.sortDocumentArrayByIndex<Media>(album.media as Array<MediaDocument>, itemIndexChanges);
 
-    return await album.save();;
+    return await album.save();
   }
 
   modify(filterQuery: FilterQuery<Album>, data: Partial<Album>): Promise<AlbumDocument> {

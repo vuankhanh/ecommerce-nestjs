@@ -1,8 +1,8 @@
 import { IOrderItem } from "../interface/order.interface";
-import { OrderProductItemEntity } from "src/module/order-basic/entity/order-product-item.entity";
+import { OrderItemEntity } from "src/module/order-basic/entity/order-item.entity";
 
 export class OrderUtil {
-  static calculateSubTotal(orderItems: OrderProductItemEntity[]): number {
+  static calculateSubTotal(orderItems: OrderItemEntity[]): number {
     return orderItems.reduce((acc, cur) => acc + cur.total, 0);
   }
   static calculateTotal(
@@ -17,7 +17,7 @@ export class OrderUtil {
     return total;
   }
 
-  static transformOrderItems(orderItems: IOrderItem[]): OrderProductItemEntity[] {
-    return orderItems.map(item => new OrderProductItemEntity(item));
+  static transformOrderItems(orderItems: IOrderItem[]): OrderItemEntity[] {
+    return orderItems.map(item => new OrderItemEntity(item));
   }
 }

@@ -25,7 +25,7 @@ export class Product implements IProduct {
       message: 'Trường này phải có giá trị cho ngôn ngữ mặc định (vi)'
     }
   })
-  name: { [key in TLanguage]: string };;
+  name: { [key in TLanguage]: string };
 
   @Prop({
     type: String,
@@ -132,13 +132,13 @@ export class Product implements IProduct {
   private generateProductCode(): string {
     const prefix = 'PRD';
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Lấy ngày hiện tại và chuyển định dạng thành 'yyyymmdd'
-    const randomNumber = uuidv4().split('-')[0];; // Phần đầu của UUID
+    const randomNumber = uuidv4().split('-')[0]; // Phần đầu của UUID
     const productCode = `${prefix}${date}${randomNumber}`; // 'PRD20231015123e4567'
     return productCode;
   }
 
   set updateAlbumId(albumId: string) {
-    this.albumId = albumId ? ObjectId.createFromHexString(albumId.toString()) : null;;
+    this.albumId = albumId ? ObjectId.createFromHexString(albumId.toString()) : null;
   }
 
   set updateProductCategoryId(productCategoryId: string) {

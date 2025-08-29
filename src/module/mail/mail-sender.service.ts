@@ -4,7 +4,7 @@ import * as nodemailer from 'nodemailer';
 import * as ejs from 'ejs';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { Order, OrderDetailPopulatedDocument } from '../order-basic/schema/order.schema';
+import { OrderPlainEntity } from '../order-basic/entity/order-plain.entity';
 
 @Injectable()
 export class MailSenderService {
@@ -53,7 +53,7 @@ export class MailSenderService {
     }
   }
 
-  async sendOrderReceivedEmail(order: OrderDetailPopulatedDocument) {
+  async sendOrderReceivedEmail(order: OrderPlainEntity) {
     const data = { order };
     try {
       const html = await this.renderTemplate('order-received', data);
@@ -65,7 +65,7 @@ export class MailSenderService {
     }
   }
 
-  async sendOrderChangedEmail(order: OrderDetailPopulatedDocument, orderChanged: Partial<Order>) {
+  async sendOrderChangedEmail(order: OrderPlainEntity, orderChanged: Partial<OrderPlainEntity>) {
     const data = {
       order,
       orderChanged
@@ -80,7 +80,7 @@ export class MailSenderService {
     }
   }
 
-  async sendOrderCancelledEmail(order: OrderDetailPopulatedDocument) {
+  async sendOrderCancelledEmail(order: OrderPlainEntity) {
     const data = { order };
     try {
       const html = await this.renderTemplate('order-canceled', data);

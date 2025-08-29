@@ -65,21 +65,6 @@ export class OrderBasicService implements IBasicService<Order, OrderPopulatedDoc
                 default: OrderFrom.VISITOR
               }
             },
-            'productName': {
-              $ifNull: [
-                { $arrayElemAt: ["$orderItems.productName", 0] }, null
-              ]
-            },
-            'productThumbnail': {
-              $ifNull: [
-                { $arrayElemAt: ["$orderItems.productThumbnail", 0] }, null
-              ]
-            },
-            'productQuantity': {
-              $ifNull: [
-                { $sum: "$orderItems.quantity" }, 0
-              ]
-            },
             'subTotal': {
               $ifNull: [
                 {
@@ -100,10 +85,9 @@ export class OrderBasicService implements IBasicService<Order, OrderPopulatedDoc
         { $limit: size },
         {
           $project: {
-            orderItems: {
-              _id: 0
-            },
+            // orderItems: 0,
             note: 0,
+            delivery: 0,
             __v: 0,
             accountId: 0,
             customerDetail: 0

@@ -10,7 +10,7 @@ import { ProductService } from '../product/product.service';
 import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
 import { OrderCreateDto } from 'src/module/order-basic/dto/order-create.dto';
 import { OrderItemsMapClientPipe } from 'src/shared/core/pipes/order-items-map-client.pipe';
-import { OrderProductItemEntity } from 'src/module/order-basic/entity/order-product-item.entity';
+import { OrderItemEntity } from 'src/module/order-basic/entity/order-item.entity';
 import { OrderEntity } from 'src/module/order-basic/entity/order.entity';
 import { LangDto } from 'src/shared/dto/lang.dto';
 import { AcceptLanguageValidationPipe } from 'src/shared/core/pipes/accept-language-validation/accept-language-validation.pipe';
@@ -51,7 +51,7 @@ export class OrderVisitorController {
   async create(
     @Headers('accept-language') lang: Language,
     @Body() orderCreateDto: OrderCreateDto,
-    @Body('orderItems', OrderItemsMapClientPipe) orderItems: Array<OrderProductItemEntity>
+    @Body('orderItems', OrderItemsMapClientPipe) orderItems: Array<OrderItemEntity>
   ) {
     const validatedLang: Language = new AcceptLanguageValidationPipe().transform(lang);
     const iOrder : IOrder = {
