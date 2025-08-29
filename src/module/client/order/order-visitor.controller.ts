@@ -65,8 +65,7 @@ export class OrderVisitorController {
       lang: validatedLang
     }
     const order: OrderEntity = new OrderEntity(iOrder);
-    console.log(order.orderItems);
-    
+
     return await this.orderBasicService.create(order);
   }
 
@@ -138,10 +137,9 @@ export class OrderVisitorController {
     if (![OrderStatus.CONFIRMED, OrderStatus.SHIPPING, OrderStatus.COMPLETED].includes(orderDetail.status as OrderStatus)) {
       throw new CustomBadRequestException('Trạng thái của Order phải là CONFIRMED, SHIPPING, hoặc COMPLETED để in');
     }
-    const order: OrderEntity = new OrderEntity(orderDetail);
 
     const footer: IFooterTemplate = this.configService.get<IFooterTemplate>('brand');
-    const template: Template = new Template(order, footer);
+    const template: Template = new Template(orderDetail, footer);
     return await this.orderBasicService.print(template);
   }
 }

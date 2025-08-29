@@ -1,34 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, HydratedDocument, Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Template } from 'src/shared/interface/template.interface';
 import { OrderFrom, OrderStatus, OrderStatusTransition } from 'src/constant/order.constant';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { Account } from 'src/module/auth/schemas/account.schema';
-import { Order, OrderDocument } from './schema/order.schema';
+import { Order, OrderDocument, OrderPopulatedDocument, OrderDetailPopulatedDocument } from './schema/order.schema';
 import { UserRole } from 'src/constant/user.constant';
 import { CustomBadRequestException, CustomNotFoundException } from 'src/shared/core/exception/custom-exception';
 import { TOrderStatus } from 'src/shared/interface/order.interface';
-import { IOrderPopulated } from 'src/shared/interface/order-response.interface';
 import { TLanguage } from 'src/shared/interface/lang.interface';
 
 @Injectable()
-export class OrderBasicService implements IBasicService<IOrderPopulated> {
+export class OrderBasicService implements IBasicService<Order, OrderPopulatedDocument, OrderDetailPopulatedDocument> {
   constructor(
-    @InjectModel(Order.name) private orderModel: Model<IOrderPopulated>,
+    @InjectModel(Order.name) private orderModel: Model<Order>,
     private configService: ConfigService
   ) { }
 
-  async create(data: Order): Promise<HydratedDocument<IOrderPopulated>> {
-    const order = new this.orderModel(data);
-    await order.save();
-    return order;
+  async create(data: Order): Promise<OrderDocument> {
+    const order = await this.orderModel.create(data);
+    return order
   }
 
-  async getAll(filterQuery: FilterQuery<Order>, lang: TLanguage, page: number, size: number): Promise<{ data: OrderDocument[]; paging: IPaging; }> {
+  async getAll(filterQuery: FilterQuery<Order>, lang: TLanguage, page: number, size: number): Promise<{ data: OrderPopulatedDocument[]; paging: IPaging; }> {
     const countTotal = await this.orderModel.countDocuments(filterQuery);
     const orderAggregate = await this.orderModel.aggregate(
       [
@@ -125,21 +123,24 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
     return metaData;
   }
 
-  async getDetail(filterQuery: FilterQuery<Order>, lang: TLanguage): Promise<OrderDocument> {
+  async getRawData(filterQuery: FilterQuery<Order>): Promise<OrderDocument> {
+    const order = await this.orderModel.findOne(filterQuery);
+
+    if (!order) throw new CustomNotFoundException('Đơn hàng không tồn tại');
+    return order;
+  }
+
+  async getDetail(filterQuery: FilterQuery<Order>, lang: TLanguage): Promise<OrderDetailPopulatedDocument> {
     return await this.tranformToDetaiData(filterQuery, lang);
   }
 
-  async findById(id: string): Promise<OrderDocument> {
-    return await this.orderModel.findById(id);
-  }
-
-  async replace(filterQuery: FilterQuery<Order>, data: Order, lang: TLanguage): Promise<OrderDocument> {
+  async replace(filterQuery: FilterQuery<Order>, data: Order, lang: TLanguage): Promise<OrderDetailPopulatedDocument> {
     await this.orderModel.findOneAndReplace(filterQuery, data);
     const product = await this.tranformToDetaiData(filterQuery, lang);
     return product;
   }
 
-  async modifyStatus(filterQuery: FilterQuery<Order>, lang: TLanguage, newStatus: TOrderStatus, cancelReason?: string): Promise<IOrderPopulated> {
+  async modifyStatus(filterQuery: FilterQuery<Order>, lang: TLanguage, newStatus: TOrderStatus, cancelReason?: string): Promise<OrderDetailPopulatedDocument> {
     const order = await this.orderModel.findOne(filterQuery);
     if (!order) throw new CustomNotFoundException('Đơn hàng không tồn tại');
     const currentStatus = order.status;
@@ -166,13 +167,13 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
     return await this.tranformToDetaiData(filterQuery, lang);
   }
 
-  async updateOrder(filterQuery: FilterQuery<Order>, lang: TLanguage, updateOrder: Partial<Order>): Promise<IOrderPopulated> {
+  async updateOrder(filterQuery: FilterQuery<Order>, lang: TLanguage, updateOrder: Partial<Order>): Promise<OrderDetailPopulatedDocument> {
 
     await this.orderModel.findOneAndUpdate(filterQuery, updateOrder, { new: true });
     return await this.tranformToDetaiData(filterQuery, lang);
   }
 
-  async modify(filterQuery: FilterQuery<Order>, data: Partial<Order>): Promise<OrderDocument> {
+  async modify(filterQuery: FilterQuery<Order>, data: Partial<Order>): Promise<OrderDetailPopulatedDocument> {
     return;
   }
 
@@ -187,11 +188,11 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
     return await axios.post(url, temp).then(res => res.data);
   }
 
-  async remove(filterQuery: FilterQuery<Order>): Promise<OrderDocument> {
+  async remove(filterQuery: FilterQuery<Order>): Promise<OrderDetailPopulatedDocument> {
     return null;
   }
 
-  private async tranformToDetaiData(filterQuery: FilterQuery<Order>, lang: TLanguage): Promise<OrderDocument> {
+  private async tranformToDetaiData(filterQuery: FilterQuery<Order>, lang: TLanguage): Promise<OrderDetailPopulatedDocument> {
     return await this.orderModel.aggregate(
       [
         { $match: filterQuery },
@@ -211,6 +212,8 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
         },
         {
           $addFields: {
+            customerEmail: { $ifNull: ["$customerDetail.email", null] },
+            customerName: { $ifNull: ["$customerDetail.name", null] },
             orderFrom: {
               $switch: {
                 branches: [
@@ -247,18 +250,6 @@ export class OrderBasicService implements IBasicService<IOrderPopulated> {
             __v: 0,
             accountId: 0,
             customerDetail: 0
-            // orderAccount: {
-            //   _id: 0,
-            //   createdAt: 0,
-            //   updatedAt: 0,
-            //   facebookId: 0,
-            //   googleId: 0,
-            //   role: 0,
-            //   createdByProvider: 0,
-            //   hasPassword: 0,
-            //   password: 0,
-            //   __v: 0
-            // }
           }
         }
       ]

@@ -1,13 +1,11 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
-import { ObjectId } from "mongodb";
 import { validatePhoneNumber } from "src/shared/custom-validator/vietnamese-phone-number.validator";
 import { IAddress } from "src/shared/interface/address.interface";
 import { IDelivery } from "src/shared/interface/delivery.interface";
 import { Account } from "src/module/auth/schemas/account.schema";
-import { IMongodbDocument } from "src/shared/interface/mongo.interface";
 
-export type DeliveryDocument = Delivery & IMongodbDocument;
+export type DeliveryDocument = HydratedDocument<Delivery>;
 
 @Schema({
   timestamps: true

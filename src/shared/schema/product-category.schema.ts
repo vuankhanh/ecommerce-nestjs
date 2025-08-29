@@ -5,11 +5,12 @@ import { ObjectId } from 'mongodb';
 
 import { VietnameseAccentUtil } from "../util/vietnamese-accent.util";
 import { Album } from "src/shared/schema/album.schema";
-import { IMongodbDocument } from "../interface/mongo.interface";
 import { TLanguage } from "../interface/lang.interface";
+import { IProductCategoryDetailPopulated, IProductCategoryPopulated } from "../interface/product-category-response.interface";
 
-export type ProductCategoryDocument = Product_Category & IMongodbDocument;
-
+export type ProductCategoryDocument = HydratedDocument<Product_Category>;
+export type ProductCategoryPopulatedDocument = HydratedDocument<IProductCategoryPopulated>;
+export type ProductCategoryDetailPopulatedDocument = HydratedDocument<IProductCategoryDetailPopulated>;
 @Schema({ timestamps: true })
 export class Product_Category implements IProductCategory {
   @Prop({

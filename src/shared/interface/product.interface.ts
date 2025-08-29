@@ -1,6 +1,5 @@
 import { Types } from "mongoose";
 import { Album } from "../schema/album.schema";
-import { Product } from "../schema/product.schema";
 import { Product_Category } from "../schema/product-category.schema";
 import { TLanguage } from "./lang.interface";
 

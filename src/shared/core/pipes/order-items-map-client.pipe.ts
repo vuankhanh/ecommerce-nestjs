@@ -26,7 +26,7 @@ export class OrderItemsMapClientPipe implements PipeTransform {
 
     for (const orderItemRequest of orderItemsRequest) {
       if (!orderItemRequest.productId) throw new CustomBadRequestException('Thiếu productId');
-      const product = await this.productService.getDetail({ _id: new Types.ObjectId(orderItemRequest.productId) }, lang);
+      const product = await this.productService.getRawData({ _id: new Types.ObjectId(orderItemRequest.productId) });
       if (!product) throw new CustomBadRequestException(`Sản phẩm với ID ${orderItemRequest.productId} không tồn tại`);
 
       const orderItem: OrderProductItemEntity = new OrderProductItemEntity({

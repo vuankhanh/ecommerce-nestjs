@@ -3,9 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import * as ejs from 'ejs';
 import * as path from 'path';
-import { Order, OrderDocument } from '../order-basic/schema/order.schema';
-import { IUrl } from 'src/shared/interface/configuration.interface';
-import { IOrderPopulated } from 'src/shared/interface/order-response.interface';
+import * as fs from 'fs/promises';
+import { Order, OrderDetailPopulatedDocument } from '../order-basic/schema/order.schema';
 
 @Injectable()
 export class MailSenderService {
@@ -15,15 +14,11 @@ export class MailSenderService {
 
   constructor(
     private readonly configService: ConfigService,
-  ) {
-    console.log(`endpoint: ${this.endpoint}`);
-    
-  }
+  ) { }
 
   private transporter = nodemailer.createTransport({
     host: this.mailConfig.host, // hoặc SMTP server của bạn
     port: this.mailConfig.port,
-    secure: true,
     auth: {
       user: this.mailConfig.user, // email của bạn
       pass: this.mailConfig.password, // dùng app password nếu là Gmail
@@ -47,27 +42,53 @@ export class MailSenderService {
     });
   }
 
-  async sendOrderReceivedEmail(order: OrderDocument) {
-    const data = { order };
-    const html = await this.renderTemplate('order-received', data);
-
-    await this.sendMail(order.customerDetail.email, `Đơn hàng ${order.orderCode} mới đã được tạo thành công`, html);
+  async sendTestEmail(to: string) {
+    try {
+      const templatePath = path.join(process.cwd(), 'template', 'test-mail.html');
+      const html = await fs.readFile(templatePath, 'utf8');
+      await this.sendMail(to, 'Email thử nghiệm', html);
+    } catch (error) {
+      console.error('Error sending test email:');
+      console.error(error);
+    }
   }
 
-  async sendOrderChangedEmail(order: IOrderPopulated, orderChanged: Partial<Order>) {
+  async sendOrderReceivedEmail(order: OrderDetailPopulatedDocument) {
+    const data = { order };
+    try {
+      const html = await this.renderTemplate('order-received', data);
+
+      await this.sendMail(order.customerEmail, `Đơn hàng ${order.orderCode} mới đã được tạo thành công`, html);
+    } catch (error) {
+      console.error('Error sending order received email:');
+      console.error(error);
+    }
+  }
+
+  async sendOrderChangedEmail(order: OrderDetailPopulatedDocument, orderChanged: Partial<Order>) {
     const data = {
       order,
       orderChanged
     };
-    const html = await this.renderTemplate('order-changed', data);
+    try {
+      const html = await this.renderTemplate('order-changed', data);
 
-    await this.sendMail(order.customerDetail.email, `Đơn hàng ${order.orderCode} đã thay đổi`, html);
+      await this.sendMail(order.customerEmail, `Đơn hàng ${order.orderCode} đã thay đổi`, html);
+    } catch (error) {
+      console.error('Error sending order changed email:');
+      console.error(error);
+    }
   }
 
-  async sendOrderCancelledEmail(order: IOrderPopulated) {
+  async sendOrderCancelledEmail(order: OrderDetailPopulatedDocument) {
     const data = { order };
-    const html = await this.renderTemplate('order-canceled', data);
+    try {
+      const html = await this.renderTemplate('order-canceled', data);
 
-    await this.sendMail(order.customerDetail.email, `Đơn hàng ${order.orderCode} đã hủy`, html);
+      await this.sendMail(order.customerEmail, `Đơn hàng ${order.orderCode} đã hủy`, html);
+    } catch (error) {
+      console.error('Error sending order canceled email:');
+      console.error(error);
+    }
   }
 }

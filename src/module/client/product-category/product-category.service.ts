@@ -1,21 +1,20 @@
-import { FilterQuery, FlattenMaps } from 'mongoose';
+import { Document, FilterQuery, FlattenMaps, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
 import { IPaging } from 'src/shared/interface/paging.interface';
-import { Product_Category, ProductCategoryDocument } from 'src/shared/schema/product-category.schema';
+import { Product_Category, ProductCategoryDetailPopulatedDocument, ProductCategoryDocument, ProductCategoryPopulatedDocument } from 'src/shared/schema/product-category.schema';
 import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
 import { Album } from '../../../shared/schema/album.schema';
 import { Product } from 'src/shared/schema/product.schema';
-import { HydratedDocument } from 'mongoose';
 import { TLanguage } from 'src/shared/interface/lang.interface';
 
-export class ProductCategoryService implements IBasicService<Product_Category> {
+export class ProductCategoryService implements IBasicService<Product_Category, ProductCategoryPopulatedDocument, ProductCategoryDetailPopulatedDocument> {
   constructor(
     @InjectModel(Product_Category.name) private readonly productCategoryModel: Model<Product_Category>,
   ) { }
 
-  async create(data: Product_Category): Promise<HydratedDocument<Product_Category>> {
+  async create(data: Product_Category): Promise<ProductCategoryDocument> {
     // Validate circular reference nếu có parentId
     if (data.parentId) {
       const isValid = await this.validateParentId(null, data.parentId.toString());
@@ -34,7 +33,7 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
     lang: TLanguage,
     page: number,
     size: number,
-  ): Promise<{ data: FlattenMaps<Product_Category>[]; paging: IPaging }> {
+  ): Promise<{ data: FlattenMaps<ProductCategoryPopulatedDocument>[]; paging: IPaging }> {
     filterQuery.isActive = true;
     const countTotal = await this.productCategoryModel.countDocuments(filterQuery);
     const skip = (page - 1) * size;
@@ -87,10 +86,14 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
     return { data, paging };
   }
 
+  getRawData(filterQuery: FilterQuery<Product_Category>): Promise<ProductCategoryDocument> {
+    throw new Error('Method not implemented.');
+  }
+
   async getDetail(
     filterQuery: FilterQuery<Product_Category>,
     lang: TLanguage
-  ): Promise<ProductCategoryDocument> {
+  ): Promise<ProductCategoryDetailPopulatedDocument> {
     const [data] = await this.productCategoryModel.aggregate([
       {
         $match: filterQuery
@@ -136,6 +139,7 @@ export class ProductCategoryService implements IBasicService<Product_Category> {
         $addFields: {
           name: { $ifNull: ["$name." + lang, "$name.vi"] },
           description: { $ifNull: ["$description." + lang, "$description.vi"] },
+          "parent.name": { $ifNull: ["$parent.name." + lang, "$parent.name.vi"] },
           "parent.description": { $ifNull: ["$parent.description." + lang, "$parent.description.vi"] },
           productCount: { $size: '$products' }
         }

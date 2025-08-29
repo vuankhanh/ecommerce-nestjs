@@ -3,9 +3,8 @@ import { HydratedDocument } from "mongoose";
 import { Media } from "./media.schema";
 import { IAlbum } from "src/shared/interface/media.interface";
 import { PurposeOfMedia } from "src/constant/media.constant";
-import { IMongodbDocument } from "../interface/mongo.interface";
 
-export type AlbumDocument = Album & IMongodbDocument;
+export type AlbumDocument = HydratedDocument<Album>;
 
 @Schema({ timestamps: true })
 export class Album implements IAlbum {

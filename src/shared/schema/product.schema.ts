@@ -7,10 +7,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { Product_Category } from './product-category.schema';
 import { Album } from 'src/shared/schema/album.schema';
 import { VietnameseAccentUtil } from '../util/vietnamese-accent.util';
-import { IMongodbDocument } from '../interface/mongo.interface';
 import { TLanguage } from '../interface/lang.interface';
+import { IProductDetailPopulated, IProductPopulated } from '../interface/product-response.interface';
 
-export type ProductDocument = Product & IMongodbDocument;
+export type ProductDocument = HydratedDocument<Product>;
+export type ProductPopulatedDocument = HydratedDocument<IProductPopulated>;
+export type ProductDetailPopulatedDocument = HydratedDocument<IProductDetailPopulated>;
 
 @Schema({ timestamps: true })
 export class Product implements IProduct {

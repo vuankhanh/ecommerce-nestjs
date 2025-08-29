@@ -10,13 +10,7 @@ export interface IOrderCreateRequest {
   delivery: IDelivery;
 }
 
-export interface IOrderUpdateRequest extends Partial<IOrderCreateRequest> {
-  orderItems?: IOrderItemsRequest[];
-  paymentMethod?: TPaymentMethod;
-  deliveryFee?: number;
-  discount?: number;
-  delivery?: IDelivery;
-}
+export interface IOrderUpdateRequest extends Omit<Partial<IOrderCreateRequest>, 'note'> { }
 
 export interface IOrderItemsRequest {
   productId: string;

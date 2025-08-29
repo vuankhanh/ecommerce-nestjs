@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { HydratedDocument, Types } from "mongoose";
 import { OrderStatus } from "src/constant/order.constant";
 import { IOrder, TOrderStatus } from "src/shared/interface/order.interface";
 import { TPaymentMethod } from "src/shared/interface/payment.interface";
@@ -9,12 +9,13 @@ import { PaymentMethod } from "src/constant/payment.constant";
 import { IDelivery } from "src/shared/interface/delivery.interface";
 import { Account } from "src/module/auth/schemas/account.schema";
 import { OrderProductItemEntity } from "../entity/order-product-item.entity";
-import { IOrderPopulated } from "src/shared/interface/order-response.interface";
-import { IMongodbDocument } from "src/shared/interface/mongo.interface";
+import { IOrderPopulated, IOrderDetailPopulated } from "src/shared/interface/order-response.interface";
 import { TLanguage } from "src/shared/interface/lang.interface";
 import { Language } from "src/constant/lang.constant";
 
-export type OrderDocument = IOrderPopulated & IMongodbDocument;
+export type OrderDocument = HydratedDocument<Order>;
+export type OrderPopulatedDocument = HydratedDocument<IOrderPopulated>;
+export type OrderDetailPopulatedDocument = HydratedDocument<IOrderDetailPopulated>;
 
 @Schema({ timestamps: true })
 export class Order implements IOrder {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicService } from 'src/shared/interface/basic_service.interface';
-import { Product, ProductDocument } from '../../../shared/schema/product.schema';
+import { Product, ProductDetailPopulatedDocument, ProductDocument, ProductPopulatedDocument } from '../../../shared/schema/product.schema';
 import { FilterQuery, FlattenMaps, Model } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,23 +8,21 @@ import { Album } from '../../../shared/schema/album.schema';
 import { Product_Category } from 'src/shared/schema/product-category.schema';
 import { ProductCategoryService } from '../product-category/product-category.service';
 import { CustomNotFoundException } from 'src/shared/core/exception/custom-exception';
-import { HydratedDocument } from 'mongoose';
 import { TLanguage } from 'src/shared/interface/lang.interface';
 
 @Injectable()
-export class ProductService implements IBasicService<Product> {
+export class ProductService implements IBasicService<Product, ProductPopulatedDocument, ProductDetailPopulatedDocument> {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
     private readonly productCategoryService: ProductCategoryService
   ) { }
 
-  async create(data: Product): Promise<HydratedDocument<Product>> {
-    const product = new this.productModel(data);
-    await product.save();
+  async create(data: Product): Promise<ProductDocument> {
+    const product = await this.productModel.create(data);
     return product;
   }
 
-  async getAll(filterQuery: FilterQuery<Product>, lang: TLanguage, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
+  async getAll(filterQuery: FilterQuery<Product>, lang: TLanguage, page: number, size: number): Promise<{ data: FlattenMaps<ProductPopulatedDocument[]>; paging: IPaging; }> {
     const countTotal = await this.productModel.countDocuments(filterQuery);
     const productAggregate = await this.productModel.aggregate(
       [
@@ -92,7 +90,11 @@ export class ProductService implements IBasicService<Product> {
     return metaData;
   }
 
-  async getProductsByCategorySlug(categorySlug: string, lang: TLanguage, page: number, size: number): Promise<{ data: FlattenMaps<Product>[]; paging: IPaging; }> {
+  async getRawData(filterQuery: FilterQuery<Product>): Promise<ProductDocument> {
+    throw new Error('Method not implemented.');
+  }
+
+  async getProductsByCategorySlug(categorySlug: string, lang: TLanguage, page: number, size: number): Promise<{ data: FlattenMaps<ProductPopulatedDocument>[]; paging: IPaging; }> {
     const productCategory = await this.productCategoryService.getDetail({ slug: categorySlug }, lang);
     if (!productCategory) {
       throw new CustomNotFoundException('Không tìm thấy danh mục sản phẩm');
@@ -104,7 +106,7 @@ export class ProductService implements IBasicService<Product> {
     return this.getAll(filterQuery, lang, page, size);
   }
 
-  async getDetail(filterQuery: FilterQuery<Product>, lang: TLanguage): Promise<ProductDocument> {
+  async getDetail(filterQuery: FilterQuery<Product>, lang: TLanguage): Promise<ProductDetailPopulatedDocument> {
     return await this.tranformToDetaiData(filterQuery, lang);
   }
 
@@ -120,7 +122,7 @@ export class ProductService implements IBasicService<Product> {
     return await this.productModel.findOneAndDelete(filterQuery);
   }
 
-  private async tranformToDetaiData(filterQuery: FilterQuery<Product>, lang: TLanguage): Promise<ProductDocument> {
+  private async tranformToDetaiData(filterQuery: FilterQuery<Product>, lang: TLanguage): Promise<ProductDetailPopulatedDocument> {
     return await this.productModel.aggregate(
       [
         { $match: filterQuery },
@@ -158,6 +160,7 @@ export class ProductService implements IBasicService<Product> {
             shortDescription: { $ifNull: ["$shortDescription." + lang, "$shortDescription.vi"] },
             description: { $ifNull: ["$description." + lang, "$description.vi"] },
             'productCategory.name': { $ifNull: ["$productCategory.name." + lang, "$productCategory.name.vi"] },
+            'productCategory.description': { $ifNull: ["$productCategory.description." + lang, "$productCategory.description.vi"] },
             'album.mediaItems': { $size: { $ifNull: ['$albumDetail.media', []] } }
           }
         },
