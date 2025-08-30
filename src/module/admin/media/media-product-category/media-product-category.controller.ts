@@ -1,4 +1,20 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { MediaProductCategoryService } from './media-product-category.service';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
@@ -18,7 +34,10 @@ import { PurposeOfMedia } from 'src/constant/media.constant';
 import { Album } from '../../../../shared/schema/album.schema';
 import { ValidateModifyProductCategoryAlbumGuard } from './guards/validate_modify_product_category_album.guard';
 import { ParseObjectIdArrayPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
-import { ProductCategoryModifyItemIndexChangeDto, ProductCategoryModifyRemoveFilesDto } from './dto/product_category_modify.dto';
+import {
+  ProductCategoryModifyItemIndexChangeDto,
+  ProductCategoryModifyRemoveFilesDto,
+} from './dto/product_category_modify.dto';
 import { UserRole } from 'src/constant/user.constant';
 
 @Controller()
@@ -28,18 +47,22 @@ import { UserRole } from 'src/constant/user.constant';
 @UseInterceptors(FormatResponseInterceptor)
 export class MediaProductCategoryController {
   constructor(
-    private readonly mediaProductCategoryService: MediaProductCategoryService
-  ) { }
+    private readonly mediaProductCategoryService: MediaProductCategoryService,
+  ) {}
 
   @Get()
   async getAll(
     @Query('name') name: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
   ) {
     const filterQuery = {};
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
-    const metaData = await this.mediaProductCategoryService.getAll(filterQuery, page, size);
+    const metaData = await this.mediaProductCategoryService.getAll(
+      filterQuery,
+      page,
+      size,
+    );
 
     return metaData;
   }
@@ -47,7 +70,7 @@ export class MediaProductCategoryController {
   @Get('detail')
   async getDetail(
     @Query('id', new ParseObjectIdPipe()) id?: string,
-    @Query('slug') slug?: string
+    @Query('slug') slug?: string,
   ) {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
@@ -59,25 +82,28 @@ export class MediaProductCategoryController {
   @Get('main')
   async getMainProductCategory(
     @Query('id', new ParseObjectIdPipe()) id?: string,
-    @Query('slug') slug?: string
+    @Query('slug') slug?: string,
   ) {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
 
-    return await this.mediaProductCategoryService.getMainProductCategory(filterQuery);
+    return await this.mediaProductCategoryService.getMainProductCategory(
+      filterQuery,
+    );
   }
 
   @Post()
   @UseGuards(ValidateCreateProductCategoryAlbumGuard)
   @UseInterceptors(
     FileInterceptor('file', memoryStorageMulterOptions),
-    FileProccedInterceptor
+    FileProccedInterceptor,
   )
   async create(
     @Req() req: Request,
     @Query('name') name: string,
-    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia
+    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe)
+    media: IMedia,
   ) {
     console.log(req.query);
     const customParams = req['customParams'];
@@ -95,10 +121,11 @@ export class MediaProductCategoryController {
       media: [newMedia],
       relativePath,
       thumbnailUrl: media.thumbnailUrl,
-      mainMedia: 0
-    }
+      mainMedia: 0,
+    };
     const albumDoc: Album = new Album(album);
-    const createdAlbum = await this.mediaProductCategoryService.create(albumDoc);
+    const createdAlbum =
+      await this.mediaProductCategoryService.create(albumDoc);
     return createdAlbum;
   }
 
@@ -106,10 +133,11 @@ export class MediaProductCategoryController {
   @UseGuards(ValidateModifyProductCategoryAlbumGuard)
   @UseInterceptors(
     FileInterceptor('file', memoryStorageMulterOptions),
-    FileProccedInterceptor
+    FileProccedInterceptor,
   )
   async addNewFiles(
-    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia,
+    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe)
+    media: IMedia,
     @Query('id', new ParseObjectIdPipe()) id?: string,
     @Query('slug') slug?: string,
   ) {
@@ -118,27 +146,41 @@ export class MediaProductCategoryController {
     else if (slug) filterQuery['slug'] = slug;
 
     const newMedia: Media = new Media(media);
-    const updatedAlbums = await this.mediaProductCategoryService.addNewFiles(filterQuery, newMedia);
+    const updatedAlbums = await this.mediaProductCategoryService.addNewFiles(
+      filterQuery,
+      newMedia,
+    );
     return updatedAlbums;
   }
 
   @Patch('remove-files')
   async removeFiles(
-    @Body(new ValidationPipe({ transform: true }), new ParseObjectIdArrayPipe('filesWillRemove')) body: ProductCategoryModifyRemoveFilesDto,
+    @Body(
+      new ValidationPipe({ transform: true }),
+      new ParseObjectIdArrayPipe('filesWillRemove'),
+    )
+    body: ProductCategoryModifyRemoveFilesDto,
     @Query('id', new ParseObjectIdPipe()) id?: string,
     @Query('slug') slug?: string,
   ) {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
-    
-    const updatedAlbums = await this.mediaProductCategoryService.removeFiles(filterQuery, body.filesWillRemove);
+
+    const updatedAlbums = await this.mediaProductCategoryService.removeFiles(
+      filterQuery,
+      body.filesWillRemove,
+    );
     return updatedAlbums;
   }
 
   @Patch('item-index-change')
   async itemIndexChange(
-    @Body(new ValidationPipe({ transform: true }), new ParseObjectIdArrayPipe('newItemIndexChange')) body: ProductCategoryModifyItemIndexChangeDto,
+    @Body(
+      new ValidationPipe({ transform: true }),
+      new ParseObjectIdArrayPipe('newItemIndexChange'),
+    )
+    body: ProductCategoryModifyItemIndexChangeDto,
     @Query('id', new ParseObjectIdPipe()) id?: string,
     @Query('slug') slug?: string,
   ) {
@@ -146,7 +188,11 @@ export class MediaProductCategoryController {
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
 
-    const updatedAlbums = await this.mediaProductCategoryService.itemIndexChange(filterQuery, body.newItemIndexChange);
+    const updatedAlbums =
+      await this.mediaProductCategoryService.itemIndexChange(
+        filterQuery,
+        body.newItemIndexChange,
+      );
     return updatedAlbums;
   }
 

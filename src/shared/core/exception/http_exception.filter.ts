@@ -1,4 +1,10 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, BadRequestException } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  BadRequestException,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { CustomLoggerService } from 'src/module/custom_logger/custom_logger.service';
 
@@ -17,18 +23,21 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const exceptionResponse = exception.getResponse();
 
-    if (exception instanceof BadRequestException && typeof exceptionResponse === 'object') {
+    if (
+      exception instanceof BadRequestException &&
+      typeof exceptionResponse === 'object'
+    ) {
       const responseObject = exceptionResponse as any;
 
       // Lấy danh sách lỗi từ ValidationPipe
       const validationErrors = responseObject.message || [];
-      if(Array.isArray(validationErrors)) {
+      if (Array.isArray(validationErrors)) {
         // Loại bỏ tên trường cha (nếu có)
         errors = validationErrors.map((error: string) => {
           const dotIndex = error.indexOf('.');
           return dotIndex !== -1 ? error.substring(dotIndex + 1) : error; // Loại bỏ phần trước dấu chấm
         });
-  
+
         message = 'Yêu cầu không hợp lệ'; // Thay đổi thông báo tổng quát
       }
     }

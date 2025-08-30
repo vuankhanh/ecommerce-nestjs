@@ -5,7 +5,7 @@ export class ChangeUploadfileNamePipe implements PipeTransform {
   transform(file: Express.Multer.File) {
     return {
       ...file,
-      originalname: `${Date.now()}-${file.originalname}`
+      originalname: `${Date.now()}-${file.originalname}`,
     };
   }
 }
@@ -14,12 +14,12 @@ export class ChangeUploadfileNamePipe implements PipeTransform {
 export class ChangeUploadfilesNamePipe implements PipeTransform {
   transform(files: Array<Express.Multer.File>) {
     console.log(files);
-    
-    return files.map(file => {
+
+    return files.map((file) => {
       return {
         ...file,
-        originalname: `${Date.now()}-${file.originalname}`
-      }
+        originalname: `${Date.now()}-${file.originalname}`,
+      };
     });
   }
 }

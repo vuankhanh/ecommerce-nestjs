@@ -10,12 +10,12 @@ import { ProductService } from './product.service';
       {
         name: Product.name,
         schema: ProductSchema,
-        collection: Product.name.toLowerCase()
-      }
-    ])
+        collection: Product.name.toLowerCase(),
+      },
+    ]),
   ],
   controllers: [ProductController],
   providers: [ProductService],
-  exports: [ProductService]
+  exports: [ProductService],
 })
-export class ProductModule { }
+export class ProductModule {}

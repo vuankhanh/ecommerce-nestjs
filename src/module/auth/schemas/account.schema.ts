@@ -1,13 +1,13 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
-import { AuthenticationProvider, UserRole } from "src/constant/user.constant";
-import { IAcctountResponse, IUser } from "src/shared/interface/user.interface";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+import { AuthenticationProvider, UserRole } from 'src/constant/user.constant';
+import { IAcctountResponse, IUser } from 'src/shared/interface/user.interface';
 
 export type AccountDocument = HydratedDocument<IAcctountResponse>;
 
 @Schema({
   collection: 'account',
-  timestamps: true
+  timestamps: true,
 })
 export class Account implements IUser {
   @Prop({
@@ -54,11 +54,7 @@ export class Account implements IUser {
   })
   createdByProvider: `${AuthenticationProvider}`;
 
-  constructor(
-    email: string,
-    name: string,
-    avatar: string = '',
-  ) {
+  constructor(email: string, name: string, avatar: string = '') {
     this.email = email;
     this.name = name;
     this.avatar = avatar;

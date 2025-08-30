@@ -1,18 +1,24 @@
-import { Injectable } from "@nestjs/common";
-import { imageTypes, videoTypes } from "src/constant/file.constanst";
-import { Readable, Stream, Writable } from "stream";
+import { Injectable } from '@nestjs/common';
+import { imageTypes, videoTypes } from 'src/constant/file.constanst';
+import { Readable, Writable } from 'stream';
 
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-const ffprobePath = require("@ffprobe-installer/ffprobe").path;
-const ffmpeg = require('fluent-ffmpeg');
+import * as ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+import * as ffprobeInstaller from '@ffprobe-installer/ffprobe';
+import * as ffmpeg from 'fluent-ffmpeg';
+
+const ffmpegPath = ffmpegInstaller.path;
+const ffprobePath = ffprobeInstaller.path;
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
 @Injectable()
 export class VideoConverterUtil {
-  constructor() { }
+  constructor() {}
 
-  static convert(file: Express.Multer.File, extension: string = videoTypes.webm.extension) {
+  static convert(
+    file: Express.Multer.File,
+    extension: string = videoTypes.webm.extension,
+  ) {
     // Create a Readable stream from the file buffer
     const stream = new Readable();
     stream.push(file.buffer);
@@ -28,7 +34,16 @@ export class VideoConverterUtil {
       },
     });
 
-    const outputWebmOption = ['-f', extension, '-c:v', 'libvpx-vp9', '-b:v', '1M', '-acodec', 'libvorbis'];
+    const outputWebmOption = [
+      '-f',
+      extension,
+      '-c:v',
+      'libvpx-vp9',
+      '-b:v',
+      '1M',
+      '-acodec',
+      'libvorbis',
+    ];
     return new Promise<Buffer>((resolve, reject) => {
       ffmpeg(stream)
         .outputOptions(outputWebmOption)
@@ -41,11 +56,13 @@ export class VideoConverterUtil {
         })
         .output(output) // Output to the stream buffer
         .run();
-    })
-
+    });
   }
 
-  static generateThumbnail(video: Buffer, extension: string = imageTypes.webp.extension) {
+  static generateThumbnail(
+    video: Buffer,
+    extension: string = imageTypes.webp.extension,
+  ) {
     return new Promise<Buffer>((resolve, reject) => {
       // Create a Readable stream from the file buffer
       const stream = new Readable();
@@ -73,9 +90,10 @@ export class VideoConverterUtil {
           resolve(result);
         })
         .on('error', (error: Error) => {
-          reject(error)
-        }).output(output) // Output to the stream buffer
+          reject(error);
+        })
+        .output(output) // Output to the stream buffer
         .run();
-    })
+    });
   }
 }

@@ -1,7 +1,7 @@
 export enum AuthenticationProvider {
   LOCAL = 'local',
   GOOGLE = 'google',
-  FACEBOOK = 'facebook'
+  FACEBOOK = 'facebook',
 }
 
 export enum UserRole {

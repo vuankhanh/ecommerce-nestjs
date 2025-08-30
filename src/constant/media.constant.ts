@@ -3,7 +3,7 @@ export enum PurposeOfMedia {
   LOGO = 'logo',
   SLIDE_SHOW = 'slide-show',
   PROMOTION = 'promotion',
-  
+
   //Product
   PRODUCT = 'product',
   PRODUCT_CATEGORY = 'product-category',
@@ -25,12 +25,12 @@ export enum MediaMimeType {
   PNG = 'image/png',
   WEBP = 'image/webp',
   GIF = 'image/gif',
-  
+
   // Videos
   MP4 = 'video/mp4',
   WEBM = 'video/webm',
   MOV = 'video/mov',
-  
+
   // Documents
   PDF = 'application/pdf',
 }

@@ -1,12 +1,15 @@
-import { FileUtil } from "../util/file.util";
+import { FileUtil } from '../util/file.util';
 
 export class FileHelper {
-  static async removeMediaFiles(rootPath: string, mediaUrls: Array<{ url: string, thumbnailUrl: string }>) {
+  static async removeMediaFiles(
+    rootPath: string,
+    mediaUrls: Array<{ url: string; thumbnailUrl: string }>,
+  ) {
     try {
       for (let i = 0; i < mediaUrls.length; i++) {
         const mediaUrl = mediaUrls[i];
         const url = rootPath + '/' + mediaUrl.url;
-        const thumbnailUrl = rootPath +'/' +mediaUrl.thumbnailUrl;
+        const thumbnailUrl = rootPath + '/' + mediaUrl.thumbnailUrl;
         await FileUtil.remove(url);
         await FileUtil.remove(thumbnailUrl);
       }

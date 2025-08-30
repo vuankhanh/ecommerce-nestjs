@@ -1,6 +1,6 @@
-import { Types } from "mongoose";
-import { TLanguage } from "src/shared/interface/lang.interface";
-import { IOrderItem } from "src/shared/interface/order.interface";
+import { Types } from 'mongoose';
+import { TLanguage } from 'src/shared/interface/lang.interface';
+import { IOrderItem } from 'src/shared/interface/order.interface';
 
 export class OrderItemEntity implements IOrderItem {
   _id: Types.ObjectId | string;
@@ -13,7 +13,7 @@ export class OrderItemEntity implements IOrderItem {
   quantity: number;
   price: number;
   total: number;
-  
+
   constructor(orderItem: IOrderItem) {
     this._id = new Types.ObjectId();
     this.productId = orderItem.productId;

@@ -6,13 +6,14 @@ import { Album, AlbumDocument } from 'src/shared/schema/album.schema';
 
 @Injectable()
 export class SlideShowService {
-  private readonly filterQuery: FilterQuery<Album> = { purposeOfMedia: PurposeOfMedia.SLIDE_SHOW };
+  private readonly filterQuery: FilterQuery<Album> = {
+    purposeOfMedia: PurposeOfMedia.SLIDE_SHOW,
+  };
   constructor(
-    @InjectModel(Album.name) private slideShowAlbumModel: Model<Album>
-  ) { }
+    @InjectModel(Album.name) private slideShowAlbumModel: Model<Album>,
+  ) {}
 
   async getDetail(): Promise<AlbumDocument> {
-
     return await this.slideShowAlbumModel.findOne(this.filterQuery);
   }
 }

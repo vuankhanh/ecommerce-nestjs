@@ -10,11 +10,11 @@ import { Album, albumSchema } from '../../../../shared/schema/album.schema';
       {
         name: Album.name,
         schema: albumSchema,
-        collection: Album.name.toLowerCase()
-      }
-    ])
+        collection: Album.name.toLowerCase(),
+      },
+    ]),
   ],
   controllers: [MediaPromotionController],
-  providers: [MediaPromotionService]
+  providers: [MediaPromotionService],
 })
-export class MediaPromotionModule { }
+export class MediaPromotionModule {}

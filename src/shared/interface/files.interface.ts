@@ -6,4 +6,4 @@ export interface IFileType {
 export type TProcessedMedia = {
   file: Express.Multer.File;
   thumbnail: Express.Multer.File;
-}
+};

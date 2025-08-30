@@ -1,4 +1,4 @@
-import { CustomerLevel } from "src/constant/customer.constant";
+import { CustomerLevel } from 'src/constant/customer.constant';
 
 export interface ICustomer {
   name: string;

@@ -1,6 +1,15 @@
-import { Controller, DefaultValuePipe, Get, Headers, ParseIntPipe, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  DefaultValuePipe,
+  Get,
+  Headers,
+  ParseIntPipe,
+  Query,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
-import { Product } from '../../../shared/schema/product.schema';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
 import { TLanguage } from 'src/shared/interface/lang.interface';
@@ -12,14 +21,13 @@ import { TLanguage } from 'src/shared/interface/lang.interface';
 @UseInterceptors(FormatResponseInterceptor)
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 export class ProductController {
-  constructor(
-    private readonly productService: ProductService
-  ) { }
+  constructor(private readonly productService: ProductService) {}
 
   @Get()
   async getAll(
     @Query('name') name: string,
-    @Query('productCategoryId', new ParseObjectIdPipe()) productCategoryId: string,
+    @Query('productCategoryId', new ParseObjectIdPipe())
+    productCategoryId: string,
     @Headers('accept-language') lang: TLanguage,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
@@ -37,7 +45,6 @@ export class ProductController {
     @Query('id', new ParseObjectIdPipe()) id?: string,
     @Query('slug') slug?: string,
   ) {
-    
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
@@ -50,8 +57,13 @@ export class ProductController {
     @Headers('accept-language') lang: TLanguage,
     @Query('slug') slug: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
-  ){
-    return await this.productService.getProductsByCategorySlug(slug, lang, page, size);
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
+  ) {
+    return await this.productService.getProductsByCategorySlug(
+      slug,
+      lang,
+      page,
+      size,
+    );
   }
 }

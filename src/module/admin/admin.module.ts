@@ -56,12 +56,12 @@ import { OrderModule } from './order/order.module';
               {
                 path: 'product-category',
                 module: MediaProductCategoryModule,
-              }
-            ]
-          }
-        ]
+              },
+            ],
+          },
+        ],
       },
     ]),
-  ]
+  ],
 })
-export class AdminModule { }
+export class AdminModule {}

@@ -1,7 +1,10 @@
 import * as fs from 'fs';
 
 export class FileUtil {
-  static async read(filePath: string, encoding: BufferEncoding = 'utf8'): Promise<string> {
+  static async read(
+    filePath: string,
+    encoding: BufferEncoding = 'utf8',
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       fs.readFile(filePath, { encoding }, (err, data) => {
         if (err) {
@@ -13,7 +16,10 @@ export class FileUtil {
     });
   }
 
-  static write(filePath: string, data: string | NodeJS.ArrayBufferView): Promise<string> {
+  static write(
+    filePath: string,
+    data: string | NodeJS.ArrayBufferView,
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       fs.writeFile(filePath, data, (err) => {
         if (err) {

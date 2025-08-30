@@ -19,6 +19,6 @@ import { MediaProductCategoryModule } from './media-product-category/media-produ
     MediaSlideShowModule,
     MediaProductModule,
     MediaProductCategoryModule,
-  ]
+  ],
 })
-export class MediaModule { }
+export class MediaModule {}

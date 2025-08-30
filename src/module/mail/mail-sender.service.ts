@@ -12,9 +12,7 @@ export class MailSenderService {
   private readonly shop = this.configService.get('shop');
   private readonly endpoint: string = this.configService.get('endpoint');
 
-  constructor(
-    private readonly configService: ConfigService,
-  ) { }
+  constructor(private readonly configService: ConfigService) {}
 
   private transporter = nodemailer.createTransport({
     host: this.mailConfig.host, // hoặc SMTP server của bạn
@@ -25,11 +23,23 @@ export class MailSenderService {
     },
   });
 
-  private async renderTemplate(templateName: string, data: any): Promise<string> {
+  private async renderTemplate(
+    templateName: string,
+    data: any,
+  ): Promise<string> {
     const frefixStatic = `${this.endpoint}/static`;
-    const templateData = Object.assign({}, data, { frefixStatic }, { shop: this.shop });
+    const templateData = Object.assign(
+      {},
+      data,
+      { frefixStatic },
+      { shop: this.shop },
+    );
 
-    const templatePath = path.join(process.cwd(), 'template', `${templateName}.ejs`);
+    const templatePath = path.join(
+      process.cwd(),
+      'template',
+      `${templateName}.ejs`,
+    );
     return ejs.renderFile(templatePath, templateData);
   }
 
@@ -44,7 +54,11 @@ export class MailSenderService {
 
   async sendTestEmail(to: string) {
     try {
-      const templatePath = path.join(process.cwd(), 'template', 'test-mail.html');
+      const templatePath = path.join(
+        process.cwd(),
+        'template',
+        'test-mail.html',
+      );
       const html = await fs.readFile(templatePath, 'utf8');
       await this.sendMail(to, 'Email thử nghiệm', html);
     } catch (error) {
@@ -58,22 +72,33 @@ export class MailSenderService {
     try {
       const html = await this.renderTemplate('order-received', data);
 
-      await this.sendMail(order.customerEmail, `Đơn hàng ${order.orderCode} mới đã được tạo thành công`, html);
+      await this.sendMail(
+        order.customerEmail,
+        `Đơn hàng ${order.orderCode} mới đã được tạo thành công`,
+        html,
+      );
     } catch (error) {
       console.error('Error sending order received email:');
       console.error(error);
     }
   }
 
-  async sendOrderChangedEmail(order: OrderPlainEntity, orderChanged: Partial<OrderPlainEntity>) {
+  async sendOrderChangedEmail(
+    order: OrderPlainEntity,
+    orderChanged: Partial<OrderPlainEntity>,
+  ) {
     const data = {
       order,
-      orderChanged
+      orderChanged,
     };
     try {
       const html = await this.renderTemplate('order-changed', data);
 
-      await this.sendMail(order.customerEmail, `Đơn hàng ${order.orderCode} đã thay đổi`, html);
+      await this.sendMail(
+        order.customerEmail,
+        `Đơn hàng ${order.orderCode} đã thay đổi`,
+        html,
+      );
     } catch (error) {
       console.error('Error sending order changed email:');
       console.error(error);
@@ -85,7 +110,11 @@ export class MailSenderService {
     try {
       const html = await this.renderTemplate('order-canceled', data);
 
-      await this.sendMail(order.customerEmail, `Đơn hàng ${order.orderCode} đã hủy`, html);
+      await this.sendMail(
+        order.customerEmail,
+        `Đơn hàng ${order.orderCode} đã hủy`,
+        html,
+      );
     } catch (error) {
       console.error('Error sending order canceled email:');
       console.error(error);

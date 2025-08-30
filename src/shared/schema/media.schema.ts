@@ -1,17 +1,17 @@
-import { Prop, Schema } from "@nestjs/mongoose";
-import { HydratedDocument, Types } from "mongoose";
-import { MediaFormat } from "src/constant/media.constant";
-import { IMedia } from "src/shared/interface/media.interface";
+import { Prop, Schema } from '@nestjs/mongoose';
+import { HydratedDocument, Types } from 'mongoose';
+import { MediaFormat } from 'src/constant/media.constant';
+import { IMedia } from 'src/shared/interface/media.interface';
 
 export type MediaDocument = HydratedDocument<Media>;
 
 @Schema({
-  timestamps: true
+  timestamps: true,
 })
 export class Media implements IMedia {
   @Prop({
     type: Types.ObjectId,
-    default: () => new Types.ObjectId()
+    default: () => new Types.ObjectId(),
   })
   _id?: Types.ObjectId;
 
@@ -23,30 +23,30 @@ export class Media implements IMedia {
 
   @Prop({
     type: String,
-    required: true
+    required: true,
   })
   thumbnailUrl: string;
 
   @Prop({
     type: String,
-    required: true
+    required: true,
   })
   name: string;
 
   @Prop({
-    type: String
+    type: String,
   })
   description: string;
 
   @Prop({
-    type: String
+    type: String,
   })
   alternateName: string;
 
   @Prop({
     type: String,
     enum: Object.values(MediaFormat),
-    required: true
+    required: true,
   })
   type: `${MediaFormat}`;
 

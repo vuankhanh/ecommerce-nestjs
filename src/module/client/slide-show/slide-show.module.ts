@@ -10,11 +10,11 @@ import { Album, albumSchema } from 'src/shared/schema/album.schema';
       {
         name: Album.name,
         schema: albumSchema,
-        collection: Album.name.toLowerCase()
-      }
+        collection: Album.name.toLowerCase(),
+      },
     ]),
   ],
   controllers: [SlideShowController],
-  providers: [SlideShowService]
+  providers: [SlideShowService],
 })
-export class SlideShowModule { }
+export class SlideShowModule {}

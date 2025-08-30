@@ -1,5 +1,5 @@
-import { IOrderItem } from "../interface/order.interface";
-import { OrderItemEntity } from "src/module/order-basic/entity/order-item.entity";
+import { IOrderItem } from '../interface/order.interface';
+import { OrderItemEntity } from 'src/module/order-basic/entity/order-item.entity';
 
 export class OrderUtil {
   static calculateSubTotal(orderItems: OrderItemEntity[]): number {
@@ -8,7 +8,7 @@ export class OrderUtil {
   static calculateTotal(
     subTotal: number,
     deliveryFee: number,
-    discount: number
+    discount: number,
   ): number {
     let total = subTotal;
     total += deliveryFee;
@@ -18,6 +18,6 @@ export class OrderUtil {
   }
 
   static transformOrderItems(orderItems: IOrderItem[]): OrderItemEntity[] {
-    return orderItems.map(item => new OrderItemEntity(item));
+    return orderItems.map((item) => new OrderItemEntity(item));
   }
 }

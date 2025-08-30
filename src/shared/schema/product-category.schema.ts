@@ -1,16 +1,21 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { IProductCategory } from "../interface/product.interface";
-import { HydratedDocument, Types } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IProductCategory } from '../interface/product.interface';
+import { HydratedDocument, Types } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
-import { VietnameseAccentUtil } from "../util/vietnamese-accent.util";
-import { Album } from "src/shared/schema/album.schema";
-import { TLanguage } from "../interface/lang.interface";
-import { IProductCategoryDetailPopulated, IProductCategoryPopulated } from "../interface/product-category-response.interface";
+import { VietnameseAccentUtil } from '../util/vietnamese-accent.util';
+import { Album } from 'src/shared/schema/album.schema';
+import { TLanguage } from '../interface/lang.interface';
+import {
+  IProductCategoryDetailPopulated,
+  IProductCategoryPopulated,
+} from '../interface/product-category-response.interface';
 
 export type ProductCategoryDocument = HydratedDocument<Product_Category>;
-export type ProductCategoryPopulatedDocument = HydratedDocument<IProductCategoryPopulated>;
-export type ProductCategoryDetailPopulatedDocument = HydratedDocument<IProductCategoryDetailPopulated>;
+export type ProductCategoryPopulatedDocument =
+  HydratedDocument<IProductCategoryPopulated>;
+export type ProductCategoryDetailPopulatedDocument =
+  HydratedDocument<IProductCategoryDetailPopulated>;
 @Schema({ timestamps: true })
 export class Product_Category implements IProductCategory {
   @Prop({
@@ -19,9 +24,10 @@ export class Product_Category implements IProductCategory {
     unique: true,
     trim: true,
     validate: {
-      validator: (name: any) => name && typeof name.vi === 'string' && name.vi.length > 0,
-      message: 'Trường name phải có giá trị cho ngôn ngữ mặc định (vi)'
-    }
+      validator: (name: any) =>
+        name && typeof name.vi === 'string' && name.vi.length > 0,
+      message: 'Trường name phải có giá trị cho ngôn ngữ mặc định (vi)',
+    },
   })
   name: { [key in TLanguage]: string };
 
@@ -43,9 +49,10 @@ export class Product_Category implements IProductCategory {
     type: Object,
     required: false,
     validate: {
-      validator: (desc: any) => desc && typeof desc.vi === 'string' && desc.vi.length > 0,
-      message: 'Trường description phải có giá trị cho ngôn ngữ mặc định (vi)'
-    }
+      validator: (desc: any) =>
+        desc && typeof desc.vi === 'string' && desc.vi.length > 0,
+      message: 'Trường description phải có giá trị cho ngôn ngữ mặc định (vi)',
+    },
   })
   description?: { [key in TLanguage]: string };
 
@@ -59,22 +66,29 @@ export class Product_Category implements IProductCategory {
     this.name = data.name;
     this.slug = this.generateSlug();
     this.description = data.description;
-    this.isActive = data.isActive
+    this.isActive = data.isActive;
   }
 
   private generateSlug(): string {
-    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(this.name.vi);
+    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(
+      this.name.vi,
+    );
     const slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
     return slug;
   }
 
   set updatealbumId(albumId: string) {
-    this.albumId = albumId ? ObjectId.createFromHexString(albumId.toString()) : null;
+    this.albumId = albumId
+      ? ObjectId.createFromHexString(albumId.toString())
+      : null;
   }
 
   set updateParentId(parentId: string) {
-    this.parentId = parentId ? ObjectId.createFromHexString(parentId.toString()) : null;
+    this.parentId = parentId
+      ? ObjectId.createFromHexString(parentId.toString())
+      : null;
   }
 }
 
-export const productCategorySchema = SchemaFactory.createForClass(Product_Category);
+export const productCategorySchema =
+  SchemaFactory.createForClass(Product_Category);

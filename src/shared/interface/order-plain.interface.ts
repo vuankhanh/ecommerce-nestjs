@@ -1,4 +1,4 @@
-import { IOrder, IOrderItem } from "./order.interface";
+import { IOrder, IOrderItem } from './order.interface';
 
 export interface IOrderItemPlain extends Omit<IOrderItem, 'productName'> {
   productName: string;

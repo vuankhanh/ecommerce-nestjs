@@ -1,3 +1,3 @@
-import { Language } from "src/constant/lang.constant";
+import { Language } from 'src/constant/lang.constant';
 
-export type TLanguage = `${Language}`
+export type TLanguage = `${Language}`;

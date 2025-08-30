@@ -1,7 +1,7 @@
-import { Types } from "mongoose";
-import { Album } from "../schema/album.schema";
-import { Product_Category } from "../schema/product-category.schema";
-import { TLanguage } from "./lang.interface";
+import { Types } from 'mongoose';
+import { Album } from '../schema/album.schema';
+import { Product_Category } from '../schema/product-category.schema';
+import { TLanguage } from './lang.interface';
 
 export interface IProductCategory {
   name: { [key in TLanguage]: string };
@@ -28,6 +28,6 @@ export interface IProduct {
   productCategory?: Product_Category;
   inStock: boolean;
   reviews?: IProductReview[];
-  averageRating?: number;   // Tính trung bình từ reviews
+  averageRating?: number; // Tính trung bình từ reviews
   totalReviews?: number;
 }

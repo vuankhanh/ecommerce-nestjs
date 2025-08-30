@@ -16,7 +16,8 @@ export interface Response<T> {
 
 @Injectable()
 export class FormatResponseInterceptor<T>
-  implements NestInterceptor<T, Response<T>> {
+  implements NestInterceptor<T, Response<T>>
+{
   intercept(
     context: ExecutionContext,
     next: CallHandler,
@@ -29,9 +30,9 @@ export class FormatResponseInterceptor<T>
         return {
           statusCode: context.switchToHttp().getResponse().statusCode,
           message: 'success',
-          metaData: data
-        } as Response<T>
-      })
-    )
+          metaData: data,
+        } as Response<T>;
+      }),
+    );
   }
 }

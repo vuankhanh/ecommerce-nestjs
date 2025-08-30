@@ -1,5 +1,8 @@
-import { Controller, Get, Query, UseGuards, UseInterceptors, } from '@nestjs/common';
-import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
+import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
+import {
+  CustomBadRequestException,
+  CustomInternalServerErrorException,
+} from 'src/shared/core/exception/custom-exception';
 
 import { TinhthanhphoComApiService } from './tinhthanhpho_com_api.service';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
@@ -11,23 +14,26 @@ export class TinhthanhphoComApiController {
   constructor(
     private readonly customLoggerService: CustomLoggerService,
     // private readonly supplierService: SupplierService,
-    private readonly tinhthanhphoComApiService: TinhthanhphoComApiService
-  ) { }
+    private readonly tinhthanhphoComApiService: TinhthanhphoComApiService,
+  ) {}
 
   @Get('provinces')
   async getProvinces(
     @Query('keyword') keyword: string = '',
     @Query('size') sizeParam: number = 20,
-    @Query('page') pageParam: number = 1
+    @Query('page') pageParam: number = 1,
   ) {
     try {
       const response = await this.tinhthanhphoComApiService.getProvinces(
         keyword,
         sizeParam,
-        pageParam
+        pageParam,
       );
-      
-      if (!response.success) throw new CustomInternalServerErrorException('Lỗi từ tinhthanhpho.com api');
+
+      if (!response.success)
+        throw new CustomInternalServerErrorException(
+          'Lỗi từ tinhthanhpho.com api',
+        );
       const data = response.data;
       const totalItems = response.metadata.total;
       const size = response.metadata.limit;
@@ -40,11 +46,11 @@ export class TinhthanhphoComApiController {
           size,
           page,
           totalPages,
-        }
+        },
       };
     } catch (error) {
       console.log(error);
-      
+
       throw new CustomInternalServerErrorException(error.message);
     }
   }
@@ -54,7 +60,7 @@ export class TinhthanhphoComApiController {
     @Query('provinceCode') provinceCode: string,
     @Query('keyword') keyword: string = '',
     @Query('size') sizeParam: number = 20,
-    @Query('page') pageParam: number = 1
+    @Query('page') pageParam: number = 1,
   ) {
     if (!provinceCode) {
       throw new CustomBadRequestException('phải có provinceCode');
@@ -64,9 +70,12 @@ export class TinhthanhphoComApiController {
         provinceCode,
         keyword,
         sizeParam,
-        pageParam
+        pageParam,
       );
-      if (!response.success) throw new CustomInternalServerErrorException('Lỗi từ tinhthanhpho.com api');
+      if (!response.success)
+        throw new CustomInternalServerErrorException(
+          'Lỗi từ tinhthanhpho.com api',
+        );
       const data = response.data;
       const totalItems = response.metadata.total;
       const size = response.metadata.limit;
@@ -79,7 +88,7 @@ export class TinhthanhphoComApiController {
           size,
           page,
           totalPages,
-        }
+        },
       };
     } catch (error) {
       throw new CustomInternalServerErrorException(error.message);
@@ -91,7 +100,7 @@ export class TinhthanhphoComApiController {
     @Query('districtCode') districtCode: string,
     @Query('keyword') keyword: string = '',
     @Query('size') sizeParam: number = 20,
-    @Query('page') pageParam: number = 1
+    @Query('page') pageParam: number = 1,
   ) {
     if (!districtCode) {
       throw new CustomBadRequestException('phải có districtCode');
@@ -101,9 +110,12 @@ export class TinhthanhphoComApiController {
         districtCode,
         keyword,
         sizeParam,
-        pageParam
+        pageParam,
       );
-      if (!response.success) throw new CustomInternalServerErrorException('Lỗi từ tinhthanhpho.com api');
+      if (!response.success)
+        throw new CustomInternalServerErrorException(
+          'Lỗi từ tinhthanhpho.com api',
+        );
       const data = response.data;
       const totalItems = response.metadata.total;
       const size = response.metadata.limit;
@@ -116,7 +128,7 @@ export class TinhthanhphoComApiController {
           size,
           page,
           totalPages,
-        }
+        },
       };
     } catch (error) {
       throw new CustomInternalServerErrorException(error.message);

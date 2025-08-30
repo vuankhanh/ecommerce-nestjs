@@ -8,11 +8,15 @@ import { Product_Category } from './product-category.schema';
 import { Album } from 'src/shared/schema/album.schema';
 import { VietnameseAccentUtil } from '../util/vietnamese-accent.util';
 import { TLanguage } from '../interface/lang.interface';
-import { IProductDetailPopulated, IProductPopulated } from '../interface/product-response.interface';
+import {
+  IProductDetailPopulated,
+  IProductPopulated,
+} from '../interface/product-response.interface';
 
 export type ProductDocument = HydratedDocument<Product>;
 export type ProductPopulatedDocument = HydratedDocument<IProductPopulated>;
-export type ProductDetailPopulatedDocument = HydratedDocument<IProductDetailPopulated>;
+export type ProductDetailPopulatedDocument =
+  HydratedDocument<IProductDetailPopulated>;
 
 @Schema({ timestamps: true })
 export class Product implements IProduct {
@@ -21,9 +25,10 @@ export class Product implements IProduct {
     unique: true,
     required: true,
     validate: {
-      validator: (name: any) => name && typeof name.vi === 'string' && name.vi.length > 0,
-      message: 'Trường này phải có giá trị cho ngôn ngữ mặc định (vi)'
-    }
+      validator: (name: any) =>
+        name && typeof name.vi === 'string' && name.vi.length > 0,
+      message: 'Trường này phải có giá trị cho ngôn ngữ mặc định (vi)',
+    },
   })
   name: { [key in TLanguage]: string };
 
@@ -37,7 +42,7 @@ export class Product implements IProduct {
 
   @Prop({
     type: String,
-    required: true
+    required: true,
   })
   code: string;
 
@@ -53,9 +58,10 @@ export class Product implements IProduct {
     type: Object,
     required: true,
     validate: {
-      validator: (desc: any) => desc && typeof desc.vi === 'string' && desc.vi.length > 0,
-      message: 'Description phải có trường vi (ngôn ngữ mặc định)'
-    }
+      validator: (desc: any) =>
+        desc && typeof desc.vi === 'string' && desc.vi.length > 0,
+      message: 'Description phải có trường vi (ngôn ngữ mặc định)',
+    },
   })
   description: { [key in TLanguage]: string };
 
@@ -63,9 +69,10 @@ export class Product implements IProduct {
     type: Object,
     required: true,
     validate: {
-      validator: (desc: any) => desc && typeof desc.vi === 'string' && desc.vi.length > 0,
-      message: 'ShortDescription phải có trường vi (ngôn ngữ mặc định)'
-    }
+      validator: (desc: any) =>
+        desc && typeof desc.vi === 'string' && desc.vi.length > 0,
+      message: 'ShortDescription phải có trường vi (ngôn ngữ mặc định)',
+    },
   })
   shortDescription: { [key in TLanguage]: string };
 
@@ -124,7 +131,9 @@ export class Product implements IProduct {
   }
 
   private generateSlug(): string {
-    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(this.name.vi);
+    const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(
+      this.name.vi,
+    );
     const slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
     return slug;
   }
@@ -138,11 +147,15 @@ export class Product implements IProduct {
   }
 
   set updateAlbumId(albumId: string) {
-    this.albumId = albumId ? ObjectId.createFromHexString(albumId.toString()) : null;
+    this.albumId = albumId
+      ? ObjectId.createFromHexString(albumId.toString())
+      : null;
   }
 
   set updateProductCategoryId(productCategoryId: string) {
-    this.productCategoryId = productCategoryId ? ObjectId.createFromHexString(productCategoryId.toString()) : null;
+    this.productCategoryId = productCategoryId
+      ? ObjectId.createFromHexString(productCategoryId.toString())
+      : null;
   }
 }
 

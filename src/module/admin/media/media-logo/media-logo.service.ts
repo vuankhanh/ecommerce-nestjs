@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { IBasicAdminService } from 'src/shared/interface/basic_admin_service.interface';
 import { Album, AlbumDocument } from '../../../../shared/schema/album.schema';
-import { Document, Types, FilterQuery, FlattenMaps, Model, HydratedDocument } from 'mongoose';
+import { FilterQuery, FlattenMaps, Model, HydratedDocument } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
-import { IMedia } from 'src/shared/interface/media.interface';
 import { Media } from '../../../../shared/schema/media.schema';
 import { PurposeOfMedia } from 'src/constant/media.constant';
 import { FileHelper } from 'src/shared/helper/file.helper';
 
-
 @Injectable()
 export class MediaLogoService implements IBasicAdminService<Album> {
   private albumFoler: string;
-  private readonly filterQuery: FilterQuery<Album> = { purposeOfMedia: PurposeOfMedia.LOGO };
+  private readonly filterQuery: FilterQuery<Album> = {
+    purposeOfMedia: PurposeOfMedia.LOGO,
+  };
   constructor(
     @InjectModel(Album.name) private logoAlbumModel: Model<Album>,
-    private configService: ConfigService
+    private configService: ConfigService,
   ) {
     this.albumFoler = this.configService.get('folder.uploads');
   }
@@ -31,7 +31,7 @@ export class MediaLogoService implements IBasicAdminService<Album> {
     return await newAlbum.save();
   }
 
-  getAll(): Promise<{ data: FlattenMaps<AlbumDocument>[]; paging: IPaging; }> {
+  getAll(): Promise<{ data: FlattenMaps<AlbumDocument>[]; paging: IPaging }> {
     throw new Error('Method not implemented.');
   }
 
@@ -40,10 +40,11 @@ export class MediaLogoService implements IBasicAdminService<Album> {
   }
 
   async getMainLogo(): Promise<FlattenMaps<Media>> {
-    return await this.logoAlbumModel.findOne(this.filterQuery)
+    return await this.logoAlbumModel
+      .findOne(this.filterQuery)
       .select('media thumbnailUrl')
       .populate('media', 'url thumbnailUrl')
-      .then(album => {
+      .then((album) => {
         const mainMediaIndex = album?.mainMedia || 0;
         if (album && album.media.length > 0) {
           return album.media[mainMediaIndex];
@@ -52,11 +53,11 @@ export class MediaLogoService implements IBasicAdminService<Album> {
       });
   }
 
-  replace(filterQuery: FilterQuery<Album>, data: Album): Promise<AlbumDocument> {
+  replace(): Promise<AlbumDocument> {
     throw new Error('Method not implemented.');
   }
 
-  modify(filterQuery: FilterQuery<Album>, data: Partial<Album>): Promise<AlbumDocument> {
+  modify(): Promise<AlbumDocument> {
     throw new Error('Method not implemented.');
   }
 
@@ -67,20 +68,20 @@ export class MediaLogoService implements IBasicAdminService<Album> {
         $push: {
           media: {
             $each: [data],
-            $position: 0
-          }
+            $position: 0,
+          },
         },
         $set: {
           mainMedia: 0,
-          thumbnailUrl: data.thumbnailUrl
-        }
+          thumbnailUrl: data.thumbnailUrl,
+        },
       },
-      { new: true, upsert: true }
+      { new: true, upsert: true },
     );
   }
 
   async remove(): Promise<AlbumDocument> {
-    const album = await this.logoAlbumModel.findOne(this.filterQuery)
+    const album = await this.logoAlbumModel.findOne(this.filterQuery);
     if (album?.relativePath) {
       try {
         await FileHelper.removeFolder(this.albumFoler, album.relativePath);

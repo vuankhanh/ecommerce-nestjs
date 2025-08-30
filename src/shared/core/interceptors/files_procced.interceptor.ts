@@ -1,4 +1,9 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { CustomBadRequestException } from '../exception/custom-exception';
 
@@ -20,15 +25,19 @@ export class FilesProccedInterceptor implements NestInterceptor {
 
     const countKeys = Object.keys(body).length;
     if (countKeys != files.length) {
-      throw new CustomBadRequestException('Số lượng file không khớp với số lượng trường thông tin');
+      throw new CustomBadRequestException(
+        'Số lượng file không khớp với số lượng trường thông tin',
+      );
     }
 
-    const formatKey = Object.keys(body).some(key => {
-      return !(/^file_\d+$/.test(key));
+    const formatKey = Object.keys(body).some((key) => {
+      return !/^file_\d+$/.test(key);
     });
 
     if (formatKey) {
-      throw new CustomBadRequestException('Tên trường thông tin không đúng định dạng');
+      throw new CustomBadRequestException(
+        'Tên trường thông tin không đúng định dạng',
+      );
     }
 
     Object.keys(body).forEach((key, index) => {
@@ -36,9 +45,11 @@ export class FilesProccedInterceptor implements NestInterceptor {
       // Làm sao để lấy ra số trong key để so sánh với index
       const fileIndex = parseInt(key.split('_')[1]);
       if (fileIndex !== index) {
-        throw new CustomBadRequestException(`Trường thông tin ${key} không khớp với file thứ ${index + 1}`);
+        throw new CustomBadRequestException(
+          `Trường thông tin ${key} không khớp với file thứ ${index + 1}`,
+        );
       }
-    })
+    });
 
     const entries = Object.entries(body);
     for (let index = 0; index < entries.length; index++) {
@@ -46,16 +57,21 @@ export class FilesProccedInterceptor implements NestInterceptor {
       let result: any;
       try {
         result = JSON.parse(value as string);
-        
+
         // Check if result is still a string (double-encoded JSON)
         if (typeof result === 'string') {
           result = JSON.parse(result);
         }
-      } catch (error) {
-        throw new CustomBadRequestException(`Trường thông tin ${key} không phải là JSON hợp lệ`);
+      } catch {
+        throw new CustomBadRequestException(
+          `Trường thông tin ${key} không phải là JSON hợp lệ`,
+        );
       }
 
-      if (result.fileName != files[index].originalname) throw new CustomBadRequestException(`Tên file trong trường thông tin ${key} không khớp với tên file đã tải lên`);
+      if (result.fileName != files[index].originalname)
+        throw new CustomBadRequestException(
+          `Tên file trong trường thông tin ${key} không khớp với tên file đã tải lên`,
+        );
       body[key] = result;
     }
   }

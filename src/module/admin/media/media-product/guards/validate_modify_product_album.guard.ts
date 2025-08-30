@@ -1,6 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CustomBadRequestException, CustomInternalServerErrorException } from 'src/shared/core/exception/custom-exception';
+import {
+  CustomBadRequestException,
+  CustomInternalServerErrorException,
+} from 'src/shared/core/exception/custom-exception';
 import { PurposeOfMedia } from 'src/constant/media.constant';
 import { MediaProductService } from '../media-product.service';
 @Injectable()
@@ -8,10 +11,8 @@ export class ValidateModifyProductAlbumGuard implements CanActivate {
   constructor(
     private readonly mediaProductService: MediaProductService,
     private readonly configService: ConfigService,
-  ) { }
-  async canActivate(
-    context: ExecutionContext,
-  ): Promise<boolean> {
+  ) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
     const query = request.query;
@@ -29,10 +30,12 @@ export class ValidateModifyProductAlbumGuard implements CanActivate {
 
     if (!product) {
       throw new CustomBadRequestException('Không tìm thấy Product Album');
-    };
+    }
 
     if (!product.relativePath) {
-      throw new CustomInternalServerErrorException('Không tìm thấy đường dẫn của Product Album');
+      throw new CustomInternalServerErrorException(
+        'Không tìm thấy đường dẫn của Product Album',
+      );
     }
 
     const uploadsFolder = this.configService.get('folder.uploads');

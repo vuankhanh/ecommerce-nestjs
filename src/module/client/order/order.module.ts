@@ -6,11 +6,7 @@ import { ProductModule } from '../product/product.module';
 import { MailModule } from 'src/module/mail/mail.module';
 
 @Module({
-  imports: [
-    OrderBasicModule,
-    ProductModule,
-    MailModule
-  ],
+  imports: [OrderBasicModule, ProductModule, MailModule],
   controllers: [OrderVisitorController, OrderLoyaltyController],
 })
 export class OrderModule {}

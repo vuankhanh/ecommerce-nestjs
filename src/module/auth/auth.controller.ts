@@ -1,4 +1,16 @@
-import { Body, Controller, HttpCode, HttpStatus, Logger, Post, Req, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Logger,
+  Post,
+  Req,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { SignUpDto } from './dto/signup.dto';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/signin.dto';
@@ -6,7 +18,11 @@ import { Account } from './schemas/account.schema';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 
 import { AccountService } from 'src/shared/service/account.service';
-import { CustomConflictException, CustomInternalServerErrorException, CustomUnauthorizedException } from 'src/shared/core/exception/custom-exception';
+import {
+  CustomConflictException,
+  CustomInternalServerErrorException,
+  CustomUnauthorizedException,
+} from 'src/shared/core/exception/custom-exception';
 import { LocalAuthGuard } from 'src/shared/core/guards/auth.guard';
 import { FirebaseAuthGuard } from 'src/shared/core/guards/firebase-auth.guard';
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
@@ -20,11 +36,13 @@ export class AuthController {
   logger: Logger = new Logger(AuthController.name);
   constructor(
     private readonly accountService: AccountService,
-    private readonly authService: AuthService
-  ) { }
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('signup')
-  async signUp(@Body() signUpDto: SignUpDto): Promise<{ accessToken: string, refreshToken: string }> {
+  async signUp(
+    @Body() signUpDto: SignUpDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       this.logger.log('Creating user.');
       const query = { email: signUpDto.email };
@@ -33,10 +51,7 @@ export class AuthController {
         throw new CustomConflictException('Tên đăng nhập đã tồn tại');
       }
 
-      const signUp: Account = new Account(
-        signUpDto.email,
-        signUpDto.name
-      );
+      const signUp: Account = new Account(signUpDto.email, signUpDto.name);
 
       signUp.updatePassword = signUpDto.password;
 
@@ -44,7 +59,7 @@ export class AuthController {
 
       const accessToken = this.authService.createAccessToken(account);
       const refreshToken = await this.authService.createRefreshToken(account);
-      return { accessToken, refreshToken }
+      return { accessToken, refreshToken };
     } catch (error) {
       this.logger.error('Something went wrong in signup:', error);
       throw error;
@@ -53,14 +68,20 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async signIn(@Body() signInDto: SignInDto): Promise<{ accessToken: string, refreshToken: string }> {
+  async signIn(
+    @Body() signInDto: SignInDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       this.logger.log('Signing in user.');
       const { email, password } = signInDto;
-      console.log(signInDto)
-      const account = await this.accountService.validateAccount(email, password);
+      const account = await this.accountService.validateAccount(
+        email,
+        password,
+      );
       if (!account) {
-        throw new CustomUnauthorizedException('Sai tên đăng nhập hoặc mật khẩu');
+        throw new CustomUnauthorizedException(
+          'Sai tên đăng nhập hoặc mật khẩu',
+        );
       }
 
       const accessToken = this.authService.createAccessToken(account);
@@ -74,11 +95,14 @@ export class AuthController {
   }
 
   @Post('refresh_token')
-  async refreshToken(@Body('refreshToken') refreshToken: string): Promise<{ accessToken: string }> {
+  async refreshToken(
+    @Body('refreshToken') refreshToken: string,
+  ): Promise<{ accessToken: string }> {
     try {
       this.logger.log('Refreshing token.');
-      const accessToken = await this.authService.verifyRefreshToken(refreshToken);
-      return { accessToken }
+      const accessToken =
+        await this.authService.verifyRefreshToken(refreshToken);
+      return { accessToken };
     } catch (error) {
       this.logger.error('Something went wrong in refreshToken:', error);
       throw error;
@@ -88,17 +112,17 @@ export class AuthController {
   @Post('firebase-authentication')
   @HttpCode(HttpStatus.OK)
   @UseGuards(FirebaseAuthGuard)
-  async firebaseAuth(
-    @Req() req: Request
-  ) {
+  async firebaseAuth(@Req() req: Request) {
     const user: DecodedIdToken = req['user'];
     const email = user.email;
     const name = user.name;
     const avatar = user.picture;
     const provider = user.firebase.sign_in_provider;
-    
+
     if (provider !== 'google.com' && provider !== 'facebook.com') {
-      throw new CustomUnauthorizedException('Chỉ hỗ trợ đăng nhập bằng Google hoặc Facebook');
+      throw new CustomUnauthorizedException(
+        'Chỉ hỗ trợ đăng nhập bằng Google hoặc Facebook',
+      );
     }
     try {
       const query = { email };
@@ -120,14 +144,14 @@ export class AuthController {
       } else {
         this.logger.log('User already exists:', account);
         if (provider === 'google.com') {
-          if(!account.googleId || account.googleId !== user.uid) {
+          if (!account.googleId || account.googleId !== user.uid) {
             this.logger.log('Updating Google ID for existing user.');
             account.googleId = user.uid;
           }
         }
 
         if (provider === 'facebook.com') {
-          if(!account.facebookId || account.facebookId !== user.uid) {
+          if (!account.facebookId || account.facebookId !== user.uid) {
             this.logger.log('Updating Facebook ID for existing user.');
             account.facebookId = user.uid;
           }
@@ -143,7 +167,9 @@ export class AuthController {
     } catch (error) {
       this.logger.error('Something went wrong in firebaseAuth:', error);
 
-      throw new CustomInternalServerErrorException('Đăng nhập không thành công');
+      throw new CustomInternalServerErrorException(
+        'Đăng nhập không thành công',
+      );
     }
   }
 
@@ -153,8 +179,8 @@ export class AuthController {
   @Roles(UserRole.ADMIN, UserRole.CLIENT)
   config() {
     const config = {
-      serverTime: Date.now()
-    }
+      serverTime: Date.now(),
+    };
 
     return config;
   }

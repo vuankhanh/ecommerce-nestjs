@@ -1,6 +1,6 @@
-import { IsEnum, IsNotEmpty } from "class-validator";
-import { Language } from "src/constant/lang.constant";
-import { TLanguage } from "../interface/lang.interface";
+import { IsEnum, IsNotEmpty } from 'class-validator';
+import { Language } from 'src/constant/lang.constant';
+import { TLanguage } from '../interface/lang.interface';
 
 const allowedLangs = Object.values(Language).join(', ');
 

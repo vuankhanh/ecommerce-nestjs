@@ -1,11 +1,11 @@
-import { IOrder, TOrderStatus } from "src/shared/interface/order.interface";
-import { OrderItemEntity } from "./order-item.entity";
-import { TPaymentMethod } from "src/shared/interface/payment.interface";
-import { Types } from "mongoose";
-import { IDelivery } from "src/shared/interface/delivery.interface";
+import { IOrder, TOrderStatus } from 'src/shared/interface/order.interface';
+import { OrderItemEntity } from './order-item.entity';
+import { TPaymentMethod } from 'src/shared/interface/payment.interface';
+import { Types } from 'mongoose';
+import { IDelivery } from 'src/shared/interface/delivery.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { OrderUtil } from "src/shared/util/order.util";
-import { TLanguage } from "src/shared/interface/lang.interface";
+import { OrderUtil } from 'src/shared/util/order.util';
+import { TLanguage } from 'src/shared/interface/lang.interface';
 
 export class OrderEntity implements IOrder {
   orderCode: string;
@@ -26,7 +26,11 @@ export class OrderEntity implements IOrder {
     this.orderItems = OrderUtil.transformOrderItems(order.orderItems);
     this.status = order.status;
     this.subTotal = OrderUtil.calculateSubTotal(this.orderItems);
-    this.total = OrderUtil.calculateTotal(this.subTotal, order.deliveryFee, order.discount);
+    this.total = OrderUtil.calculateTotal(
+      this.subTotal,
+      order.deliveryFee,
+      order.discount,
+    );
     this.discount = order.discount;
     this.deliveryFee = order.deliveryFee;
     this.paymentMethod = order.paymentMethod;

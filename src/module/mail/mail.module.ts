@@ -11,12 +11,8 @@ import { MailController } from './mail.controller';
       name: 'mail',
     }),
   ],
-  providers: [
-    MailSenderService,
-    MailService,
-    MailProcessor
-  ],
+  providers: [MailSenderService, MailService, MailProcessor],
   exports: [MailService],
   controllers: [MailController],
 })
-export class MailModule { }
+export class MailModule {}

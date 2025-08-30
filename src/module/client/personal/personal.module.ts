@@ -18,12 +18,12 @@ import { AddressModule } from './address/address.module';
           {
             path: 'address',
             module: AddressModule,
-          }
-        ]
-      }
+          },
+        ],
+      },
     ]),
     InfoModule,
     AddressModule,
-  ]
+  ],
 })
-export class PersonalModule { }
+export class PersonalModule {}

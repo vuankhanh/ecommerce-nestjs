@@ -1,4 +1,15 @@
-import { Controller, Get, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { MediaPromotionService } from './media-promotion.service';
 import { ValidateCreatePromotionAlbumGuard } from './guards/validate_create_promotion_album.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -23,9 +34,7 @@ import { UserRole } from 'src/constant/user.constant';
 @UsePipes(ValidationPipe)
 @UseInterceptors(FormatResponseInterceptor)
 export class MediaPromotionController {
-  constructor(
-    private readonly mediaPromotionService: MediaPromotionService
-  ) { }
+  constructor(private readonly mediaPromotionService: MediaPromotionService) {}
 
   @Get()
   async get() {
@@ -42,11 +51,12 @@ export class MediaPromotionController {
   @UseGuards(ValidateCreatePromotionAlbumGuard)
   @UseInterceptors(
     FileInterceptor('file', memoryStorageMulterOptions),
-    FileProccedInterceptor
+    FileProccedInterceptor,
   )
   async create(
     @Req() req: Request,
-    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia
+    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe)
+    media: IMedia,
   ) {
     const relativePath = req['customParams'].relativePath;
     const newMedia: Media = new Media(media);
@@ -57,8 +67,8 @@ export class MediaPromotionController {
       media: [newMedia],
       relativePath,
       thumbnailUrl: media.thumbnailUrl,
-      mainMedia: 0
-    }
+      mainMedia: 0,
+    };
     const albumDoc: Album = new Album(album);
     const createdAlbum = await this.mediaPromotionService.create(albumDoc);
     return createdAlbum;
@@ -68,10 +78,11 @@ export class MediaPromotionController {
   @UseGuards(ValidateModifyPromotionAlbumGuard)
   @UseInterceptors(
     FileInterceptor('file', memoryStorageMulterOptions),
-    FileProccedInterceptor
+    FileProccedInterceptor,
   )
   async insert(
-    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia,
+    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe)
+    media: IMedia,
   ) {
     const newMedia: Media = new Media(media);
 

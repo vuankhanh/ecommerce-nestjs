@@ -1,5 +1,5 @@
-import { IDelivery } from "./delivery.interface";
-import { TPaymentMethod } from "./payment.interface";
+import { IDelivery } from './delivery.interface';
+import { TPaymentMethod } from './payment.interface';
 
 export interface IOrderCreateRequest {
   orderItems: IOrderItemsRequest[];
@@ -10,7 +10,8 @@ export interface IOrderCreateRequest {
   delivery: IDelivery;
 }
 
-export interface IOrderUpdateRequest extends Omit<Partial<IOrderCreateRequest>, 'note'> { }
+export interface IOrderUpdateRequest
+  extends Partial<Omit<IOrderCreateRequest, 'note'>> {}
 
 export interface IOrderItemsRequest {
   productId: string;

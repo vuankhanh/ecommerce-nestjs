@@ -1,21 +1,21 @@
 import {
   BadRequestException,
-  UnauthorizedException, 
-  NotFoundException, 
-  ForbiddenException, 
-  NotAcceptableException, 
-  RequestTimeoutException, 
-  ConflictException, 
-  GoneException, 
-  PayloadTooLargeException, 
-  UnsupportedMediaTypeException, 
-  UnprocessableEntityException, 
-  InternalServerErrorException, 
-  NotImplementedException, 
-  BadGatewayException, 
-  ServiceUnavailableException, 
-  GatewayTimeoutException
-} from "@nestjs/common";
+  UnauthorizedException,
+  NotFoundException,
+  ForbiddenException,
+  NotAcceptableException,
+  RequestTimeoutException,
+  ConflictException,
+  GoneException,
+  PayloadTooLargeException,
+  UnsupportedMediaTypeException,
+  UnprocessableEntityException,
+  InternalServerErrorException,
+  NotImplementedException,
+  BadGatewayException,
+  ServiceUnavailableException,
+  GatewayTimeoutException,
+} from '@nestjs/common';
 
 export class CustomBadRequestException extends BadRequestException {
   constructor(message?: string) {

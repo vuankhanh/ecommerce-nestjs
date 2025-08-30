@@ -1,4 +1,19 @@
-import { Body, Controller, DefaultValuePipe, Get, HttpCode, HttpStatus, ParseIntPipe, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Get,
+  HttpCode,
+  HttpStatus,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { UserRole } from 'src/constant/user.constant';
 import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
 import { Roles } from 'src/shared/core/decorator/roles.decorator';
@@ -9,7 +24,10 @@ import { FilterQuery } from 'mongoose';
 import { Order } from 'src/module/order-basic/schema/order.schema';
 import { OrderStatus } from 'src/constant/order.constant';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
-import { OrderUpdateDto, OrderUpdateStatusDto } from 'src/shared/dto/order-update.dto';
+import {
+  OrderUpdateDto,
+  OrderUpdateStatusDto,
+} from 'src/shared/dto/order-update.dto';
 import { OrderItemsMapAdminPipe } from 'src/shared/core/pipes/order-items-map-admin.pipe';
 import { OrderUtil } from 'src/shared/util/order.util';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
@@ -28,14 +46,14 @@ export class OrderController {
     private readonly orderBasicService: OrderBasicService,
     private readonly orderItemsMapAdminPipe: OrderItemsMapAdminPipe,
     private readonly mailService: MailService,
-  ) { }
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.OK)
   async getAll(
     @Body() body: FilterDto,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
   ) {
     const lang: TLanguage = 'vi';
     const filterQuery: FilterQuery<Order> = {};
@@ -56,9 +74,7 @@ export class OrderController {
   }
 
   @Get('detail')
-  getDetail(
-    @Query('id', new ParseObjectIdPipe()) id: string,
-  ) {
+  getDetail(@Query('id', new ParseObjectIdPipe()) id: string) {
     const lang: TLanguage = 'vi';
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
@@ -75,10 +91,18 @@ export class OrderController {
     const filterQuery: FilterQuery<Order> = {};
     if (id) filterQuery['_id'] = id;
 
-    const order = await this.orderBasicService.modifyStatus(filterQuery, lang, body.status, body.reasonForCancelReason);
+    const order = await this.orderBasicService.modifyStatus(
+      filterQuery,
+      lang,
+      body.status,
+      body.reasonForCancelReason,
+    );
     if (body.status === OrderStatus.CANCELED) {
       const lang: TLanguage = order.lang || 'vi';
-      const orderPlainEntity: OrderPlainEntity = new OrderPlainEntity(order, lang);
+      const orderPlainEntity: OrderPlainEntity = new OrderPlainEntity(
+        order,
+        lang,
+      );
       this.mailService.queueOrderCancelledEmail(orderPlainEntity);
     }
     return order;
@@ -94,10 +118,13 @@ export class OrderController {
     if (id) filterQuery['_id'] = id;
 
     const oldOrder = await this.orderBasicService.getDetail(filterQuery, lang);
-    if (!oldOrder) throw new CustomBadRequestException('Đơn hàng không tồn tại');
+    if (!oldOrder)
+      throw new CustomBadRequestException('Đơn hàng không tồn tại');
 
     if (oldOrder.status != OrderStatus.PENDING) {
-      throw new CustomBadRequestException('Không thể sửa đơn hàng ở trạn thái hiện tại');
+      throw new CustomBadRequestException(
+        'Không thể sửa đơn hàng ở trạn thái hiện tại',
+      );
     }
 
     const oldOrderLang: TLanguage = oldOrder.lang || lang;
@@ -122,8 +149,13 @@ export class OrderController {
       // Tính subTotal từ orderItems và gán lại cho subTotal cũ
       if (body.orderItems) {
         // Gọi pipe transform thủ công
-        orderUpdate.orderItems = await this.orderItemsMapAdminPipe.transform(body.orderItems);
-        orderUpdateForEmail.orderItems = OrderPlainEntity.getOrderItemsPlain(orderUpdate.orderItems, lang);
+        orderUpdate.orderItems = await this.orderItemsMapAdminPipe.transform(
+          body.orderItems,
+        );
+        orderUpdateForEmail.orderItems = OrderPlainEntity.getOrderItemsPlain(
+          orderUpdate.orderItems,
+          lang,
+        );
         const subTotal = OrderUtil.calculateSubTotal(orderUpdate.orderItems);
         orderUpdate.subTotal = subTotal;
         orderUpdateForEmail.subTotal = subTotal;
@@ -148,23 +180,43 @@ export class OrderController {
       // Tính tổng tiền mới
       // Gọi hàm tính tổng tiền từ OrderUtil
       // Gán lại tổng tiền vào orderUpdate
-      const total = OrderUtil.calculateTotal(orderUpdateForEmail.subTotal, orderUpdateForEmail.deliveryFee, orderUpdateForEmail.discount);
+      const total = OrderUtil.calculateTotal(
+        orderUpdateForEmail.subTotal,
+        orderUpdateForEmail.deliveryFee,
+        orderUpdateForEmail.discount,
+      );
       orderUpdate.total = total;
       orderUpdateForEmail.total = total;
     }
     if (body.paymentMethod) {
       orderUpdate.paymentMethod = body.paymentMethod;
-      orderUpdateForEmail.paymentMethod = OrderPlainEntity.getPaymentMethodPlain(body.paymentMethod, oldOrderLang);
+      orderUpdateForEmail.paymentMethod =
+        OrderPlainEntity.getPaymentMethodPlain(
+          body.paymentMethod,
+          oldOrderLang,
+        );
     }
     if (body.delivery) {
       orderUpdate.delivery = body.delivery;
       orderUpdateForEmail.delivery = body.delivery;
-      orderUpdateForEmail.delivery['addressDetail'] = AddressUtil.addressDetail(body.delivery);
+      orderUpdateForEmail.delivery['addressDetail'] = AddressUtil.addressDetail(
+        body.delivery,
+      );
     }
 
-    const order = await this.orderBasicService.updateOrder(filterQuery, lang, orderUpdate);
-    const orderPlainEntity: OrderPlainEntity = new OrderPlainEntity(oldOrder, oldOrderLang);
-    this.mailService.queueOrderChangedEmail(orderPlainEntity, orderUpdateForEmail);
+    const order = await this.orderBasicService.updateOrder(
+      filterQuery,
+      lang,
+      orderUpdate,
+    );
+    const orderPlainEntity: OrderPlainEntity = new OrderPlainEntity(
+      oldOrder,
+      oldOrderLang,
+    );
+    this.mailService.queueOrderChangedEmail(
+      orderPlainEntity,
+      orderUpdateForEmail,
+    );
     return order;
   }
 }

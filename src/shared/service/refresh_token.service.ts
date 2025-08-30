@@ -7,13 +7,17 @@ import { RefreshToken } from 'src/module/auth/schemas/refresh_token.schema';
 export class RefreshTokenService {
   logger: Logger = new Logger(RefreshTokenService.name);
   constructor(
-    @InjectModel(RefreshToken.name) private refreshTokenModel: Model<RefreshToken>,
-  ) { }
-  
+    @InjectModel(RefreshToken.name)
+    private refreshTokenModel: Model<RefreshToken>,
+  ) {}
+
   findOne(accountId: string, refreshToken: string) {
     this.logger.log('Finding refresh token.');
-    let accountIdObj = new Types.ObjectId(accountId);
-    return this.refreshTokenModel.findOne({ accountId: accountIdObj, token: refreshToken });
+    const accountIdObj = new Types.ObjectId(accountId);
+    return this.refreshTokenModel.findOne({
+      accountId: accountIdObj,
+      token: refreshToken,
+    });
   }
 
   create(accountId: Types.ObjectId, token: string, expiresAt: Date) {
@@ -28,12 +32,12 @@ export class RefreshTokenService {
     return this.refreshTokenModel.findOneAndUpdate(
       { accountId },
       { token, expiresAt },
-      { new: true, upsert: true }
+      { new: true, upsert: true },
     );
   }
 
   findOneAndRemove(accountId: Types.ObjectId) {
     this.logger.log('Deleting refresh token.');
-    return this.refreshTokenModel.findOneAndDelete({ accountId })
+    return this.refreshTokenModel.findOneAndDelete({ accountId });
   }
 }

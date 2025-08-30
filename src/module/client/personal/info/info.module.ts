@@ -11,11 +11,11 @@ import { Account, accountSchema } from 'src/module/auth/schemas/account.schema';
       {
         name: Account.name,
         schema: accountSchema,
-        collection: Account.name.toLowerCase()
-      }
+        collection: Account.name.toLowerCase(),
+      },
     ]),
   ],
   controllers: [InfoController],
-  providers: [InfoService, AccountService]
+  providers: [InfoService, AccountService],
 })
-export class InfoModule { }
+export class InfoModule {}

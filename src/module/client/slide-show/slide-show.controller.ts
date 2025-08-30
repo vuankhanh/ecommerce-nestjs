@@ -5,9 +5,7 @@ import { SlideShowService } from './slide-show.service';
 @Controller('slide-show')
 @UseInterceptors(FormatResponseInterceptor)
 export class SlideShowController {
-  constructor(
-    private readonly slideShowService: SlideShowService
-  ) { }
+  constructor(private readonly slideShowService: SlideShowService) {}
 
   @Get()
   async getDetail() {

@@ -5,7 +5,7 @@ let isHandlingRedisError = false;
 export function handleBullQueueError(err: Error) {
   if (isHandlingRedisError) return;
   isHandlingRedisError = true;
-  
+
   if (err.message && err.message.includes('ECONNREFUSED')) {
     console.error('Bull queue error:', err);
     exec('docker start redis', (error, stdout, stderr) => {

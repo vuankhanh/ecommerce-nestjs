@@ -12,10 +12,12 @@ import { Media } from '../../../../shared/schema/media.schema';
 @Injectable()
 export class MediaPromotionService implements IBasicAdminService<Album> {
   private albumFoler: string;
-  private readonly filterQuery: FilterQuery<Album> = { purposeOfMedia: PurposeOfMedia.PROMOTION };
+  private readonly filterQuery: FilterQuery<Album> = {
+    purposeOfMedia: PurposeOfMedia.PROMOTION,
+  };
   constructor(
     @InjectModel(Album.name) private promotionAlbumModel: Model<Album>,
-    private configService: ConfigService
+    private configService: ConfigService,
   ) {
     this.albumFoler = this.configService.get('folder.uploads');
   }
@@ -29,7 +31,10 @@ export class MediaPromotionService implements IBasicAdminService<Album> {
     return createdAlbum.save();
   }
 
-  async getAll(): Promise<{ data: FlattenMaps<AlbumDocument>[]; paging: IPaging; }> {
+  async getAll(): Promise<{
+    data: FlattenMaps<AlbumDocument>[];
+    paging: IPaging;
+  }> {
     throw new Error('Method not implemented.');
   }
 
@@ -38,10 +43,11 @@ export class MediaPromotionService implements IBasicAdminService<Album> {
   }
 
   async getMainLogo(): Promise<FlattenMaps<Media>> {
-    return await this.promotionAlbumModel.findOne(this.filterQuery)
+    return await this.promotionAlbumModel
+      .findOne(this.filterQuery)
       .select('media thumbnailUrl')
       .populate('media', 'url thumbnailUrl')
-      .then(album => {
+      .then((album) => {
         const mainMediaIndex = album?.mainMedia || 0;
         if (album && album.media.length > 0) {
           return album.media[mainMediaIndex];
@@ -51,12 +57,16 @@ export class MediaPromotionService implements IBasicAdminService<Album> {
   }
 
   async replace(data: Album): Promise<AlbumDocument> {
-    const promotion = this.promotionAlbumModel.findOneAndReplace(this.filterQuery, data, { new: true }).exec();
+    const promotion = this.promotionAlbumModel
+      .findOneAndReplace(this.filterQuery, data, { new: true })
+      .exec();
     return promotion as unknown as AlbumDocument;
   }
 
   async modify(data: Partial<Album>): Promise<AlbumDocument> {
-    const promotion = this.promotionAlbumModel.findOneAndUpdate(this.filterQuery, data, { new: true }).exec();
+    const promotion = this.promotionAlbumModel
+      .findOneAndUpdate(this.filterQuery, data, { new: true })
+      .exec();
     return promotion as unknown as AlbumDocument;
   }
 
@@ -67,20 +77,20 @@ export class MediaPromotionService implements IBasicAdminService<Album> {
         $push: {
           media: {
             $each: [data],
-            $position: 0
-          }
+            $position: 0,
+          },
         },
         $set: {
           mainMedia: 0,
-          thumbnailUrl: data.thumbnailUrl
-        }
+          thumbnailUrl: data.thumbnailUrl,
+        },
       },
-      { new: true, upsert: true }
+      { new: true, upsert: true },
     );
   }
 
   async remove(): Promise<AlbumDocument> {
-    const promotion = await this.promotionAlbumModel.findOne(this.filterQuery)
+    const promotion = await this.promotionAlbumModel.findOne(this.filterQuery);
     if (promotion?.relativePath) {
       try {
         await FileHelper.removeFolder(this.albumFoler, promotion.relativePath);
@@ -90,5 +100,4 @@ export class MediaPromotionService implements IBasicAdminService<Album> {
     }
     return await this.promotionAlbumModel.findOneAndDelete(this.filterQuery);
   }
-
 }

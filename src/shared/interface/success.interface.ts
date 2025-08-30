@@ -1,5 +1,5 @@
 export interface Success {
-  message: string,
-  statusCode: number,
-  metaData: any,
+  message: string;
+  statusCode: number;
+  metaData: any;
 }

@@ -12,16 +12,16 @@ import { delivertySchema, Delivery } from './schema/delivery.schema';
       {
         name: Account.name,
         schema: accountSchema,
-        collection: Account.name.toLowerCase()
+        collection: Account.name.toLowerCase(),
       },
       {
         name: Delivery.name,
         schema: delivertySchema,
-        collection: Delivery.name.toLowerCase()
-      }
+        collection: Delivery.name.toLowerCase(),
+      },
     ]),
   ],
   controllers: [AddressController],
   providers: [AddressService, AccountService],
 })
-export class AddressModule { }
+export class AddressModule {}

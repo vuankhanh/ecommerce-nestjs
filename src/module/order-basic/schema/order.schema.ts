@@ -1,21 +1,25 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, Types } from "mongoose";
-import { OrderStatus } from "src/constant/order.constant";
-import { IOrder, TOrderStatus } from "src/shared/interface/order.interface";
-import { TPaymentMethod } from "src/shared/interface/payment.interface";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Types } from 'mongoose';
+import { OrderStatus } from 'src/constant/order.constant';
+import { IOrder, TOrderStatus } from 'src/shared/interface/order.interface';
+import { TPaymentMethod } from 'src/shared/interface/payment.interface';
 
-import { OrderItem } from "./order_product_item.schema";
-import { PaymentMethod } from "src/constant/payment.constant";
-import { IDelivery } from "src/shared/interface/delivery.interface";
-import { Account } from "src/module/auth/schemas/account.schema";
-import { OrderItemEntity } from "../entity/order-item.entity";
-import { IOrderPopulated, IOrderDetailPopulated } from "src/shared/interface/order-response.interface";
-import { TLanguage } from "src/shared/interface/lang.interface";
-import { Language } from "src/constant/lang.constant";
+import { OrderItem } from './order_product_item.schema';
+import { PaymentMethod } from 'src/constant/payment.constant';
+import { IDelivery } from 'src/shared/interface/delivery.interface';
+import { Account } from 'src/module/auth/schemas/account.schema';
+import { OrderItemEntity } from '../entity/order-item.entity';
+import {
+  IOrderPopulated,
+  IOrderDetailPopulated,
+} from 'src/shared/interface/order-response.interface';
+import { TLanguage } from 'src/shared/interface/lang.interface';
+import { Language } from 'src/constant/lang.constant';
 
 export type OrderDocument = HydratedDocument<Order>;
 export type OrderPopulatedDocument = HydratedDocument<IOrderPopulated>;
-export type OrderDetailPopulatedDocument = HydratedDocument<IOrderDetailPopulated>;
+export type OrderDetailPopulatedDocument =
+  HydratedDocument<IOrderDetailPopulated>;
 
 @Schema({ timestamps: true })
 export class Order implements IOrder {
@@ -28,7 +32,7 @@ export class Order implements IOrder {
   @Prop({ type: String, required: true, default: OrderStatus.PENDING })
   status: TOrderStatus;
 
-  @Prop({type: String})
+  @Prop({ type: String })
   reasonForCancellation?: string;
 
   @Prop({ type: Number, required: true })
@@ -48,15 +52,15 @@ export class Order implements IOrder {
 
   @Prop({ type: Types.ObjectId, ref: Account.name })
   accountId?: Types.ObjectId | string;
-  
+
   @Prop({
     type: String,
     enum: Language,
-    required: true
+    required: true,
   })
   lang: TLanguage;
 
-  @Prop({ type: Object})
+  @Prop({ type: Object })
   delivery: IDelivery;
 
   @Prop({ type: String })

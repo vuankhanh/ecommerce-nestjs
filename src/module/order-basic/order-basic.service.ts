@@ -4,97 +4,115 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { IPaging } from 'src/shared/interface/paging.interface';
 import { Template } from 'src/shared/interface/template.interface';
-import { OrderFrom, OrderStatus, OrderStatusTransition } from 'src/constant/order.constant';
+import {
+  OrderFrom,
+  OrderStatus,
+  OrderStatusTransition,
+} from 'src/constant/order.constant';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { Account } from 'src/module/auth/schemas/account.schema';
-import { Order, OrderDocument, OrderPopulatedDocument, OrderDetailPopulatedDocument } from './schema/order.schema';
+import {
+  Order,
+  OrderDocument,
+  OrderPopulatedDocument,
+  OrderDetailPopulatedDocument,
+} from './schema/order.schema';
 import { UserRole } from 'src/constant/user.constant';
-import { CustomBadRequestException, CustomNotFoundException } from 'src/shared/core/exception/custom-exception';
+import {
+  CustomBadRequestException,
+  CustomNotFoundException,
+} from 'src/shared/core/exception/custom-exception';
 import { TOrderStatus } from 'src/shared/interface/order.interface';
 import { TLanguage } from 'src/shared/interface/lang.interface';
 
 @Injectable()
-export class OrderBasicService implements IBasicService<Order, OrderPopulatedDocument, OrderDetailPopulatedDocument> {
+export class OrderBasicService
+  implements
+    IBasicService<Order, OrderPopulatedDocument, OrderDetailPopulatedDocument>
+{
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
-    private configService: ConfigService
-  ) { }
+    private configService: ConfigService,
+  ) {}
 
   async create(data: Order): Promise<OrderDocument> {
     const order = await this.orderModel.create(data);
-    return order
+    return order;
   }
 
-  async getAll(filterQuery: FilterQuery<Order>, lang: TLanguage, page: number, size: number): Promise<{ data: OrderPopulatedDocument[]; paging: IPaging; }> {
+  async getAll(
+    filterQuery: FilterQuery<Order>,
+    lang: TLanguage,
+    page: number,
+    size: number,
+  ): Promise<{ data: OrderPopulatedDocument[]; paging: IPaging }> {
     const countTotal = await this.orderModel.countDocuments(filterQuery);
-    const orderAggregate = await this.orderModel.aggregate(
-      [
-        { $match: filterQuery },
-        {
-          $sort: { createdAt: -1 } // Sắp xếp theo ngày tạo mới nhất
+    const orderAggregate = await this.orderModel.aggregate([
+      { $match: filterQuery },
+      {
+        $sort: { createdAt: -1 }, // Sắp xếp theo ngày tạo mới nhất
+      },
+      {
+        $lookup: {
+          from: Account.name.toLocaleLowerCase(), // Tên của collection Customer
+          localField: 'accountId',
+          foreignField: '_id',
+          as: 'customerDetail',
         },
-        {
-          $lookup: {
-            from: Account.name.toLocaleLowerCase(), // Tên của collection Customer
-            localField: 'accountId',
-            foreignField: '_id',
-            as: 'customerDetail'
-          }
+      },
+      {
+        $unwind: {
+          path: '$customerDetail',
+          preserveNullAndEmptyArrays: true, // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
         },
-        {
-          $unwind: {
-            path: '$customerDetail',
-            preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
-          }
-        },
-        {
-          $addFields: {
-            orderFrom: {
-              $switch: {
-                branches: [
-                  {
-                    case: { $eq: ["$customerDetail.role", UserRole.CLIENT] },
-                    then: OrderFrom.LOYALTY
-                  },
-                  {
-                    case: { $eq: ["$customerDetail.role", UserRole.ADMIN] },
-                    then: OrderFrom.ADMIN
-                  }
-                ],
-                default: OrderFrom.VISITOR
-              }
-            },
-            'subTotal': {
-              $ifNull: [
+      },
+      {
+        $addFields: {
+          orderFrom: {
+            $switch: {
+              branches: [
                 {
-                  $sum: {
-                    $map: {
-                      input: "$orderItems",
-                      as: "item",
-                      in: { $multiply: ["$$item.price", "$$item.quantity"] }
-                    }
-                  }
+                  case: { $eq: ['$customerDetail.role', UserRole.CLIENT] },
+                  then: OrderFrom.LOYALTY,
                 },
-                0
-              ]
-            }
-          }
+                {
+                  case: { $eq: ['$customerDetail.role', UserRole.ADMIN] },
+                  then: OrderFrom.ADMIN,
+                },
+              ],
+              default: OrderFrom.VISITOR,
+            },
+          },
+          subTotal: {
+            $ifNull: [
+              {
+                $sum: {
+                  $map: {
+                    input: '$orderItems',
+                    as: 'item',
+                    in: { $multiply: ['$$item.price', '$$item.quantity'] },
+                  },
+                },
+              },
+              0,
+            ],
+          },
         },
-        { $skip: size * (page - 1) },
-        { $limit: size },
-        {
-          $project: {
-            // orderItems: 0,
-            note: 0,
-            delivery: 0,
-            __v: 0,
-            accountId: 0,
-            customerDetail: 0
-          }
-        }
-      ]
-    );
+      },
+      { $skip: size * (page - 1) },
+      { $limit: size },
+      {
+        $project: {
+          // orderItems: 0,
+          note: 0,
+          delivery: 0,
+          __v: 0,
+          accountId: 0,
+          customerDetail: 0,
+        },
+      },
+    ]);
     const metaData = {
       data: orderAggregate,
       paging: {
@@ -102,7 +120,7 @@ export class OrderBasicService implements IBasicService<Order, OrderPopulatedDoc
         size: size,
         page: page,
         totalPages: Math.ceil(countTotal / size),
-      }
+      },
     };
     return metaData;
   }
@@ -114,17 +132,29 @@ export class OrderBasicService implements IBasicService<Order, OrderPopulatedDoc
     return order;
   }
 
-  async getDetail(filterQuery: FilterQuery<Order>, lang: TLanguage): Promise<OrderDetailPopulatedDocument> {
+  async getDetail(
+    filterQuery: FilterQuery<Order>,
+    lang: TLanguage,
+  ): Promise<OrderDetailPopulatedDocument> {
     return await this.tranformToDetaiData(filterQuery, lang);
   }
 
-  async replace(filterQuery: FilterQuery<Order>, data: Order, lang: TLanguage): Promise<OrderDetailPopulatedDocument> {
+  async replace(
+    filterQuery: FilterQuery<Order>,
+    data: Order,
+    lang: TLanguage,
+  ): Promise<OrderDetailPopulatedDocument> {
     await this.orderModel.findOneAndReplace(filterQuery, data);
     const product = await this.tranformToDetaiData(filterQuery, lang);
     return product;
   }
 
-  async modifyStatus(filterQuery: FilterQuery<Order>, lang: TLanguage, newStatus: TOrderStatus, cancelReason?: string): Promise<OrderDetailPopulatedDocument> {
+  async modifyStatus(
+    filterQuery: FilterQuery<Order>,
+    lang: TLanguage,
+    newStatus: TOrderStatus,
+    cancelReason?: string,
+  ): Promise<OrderDetailPopulatedDocument> {
     const order = await this.orderModel.findOne(filterQuery);
     if (!order) throw new CustomNotFoundException('Đơn hàng không tồn tại');
     const currentStatus = order.status;
@@ -142,7 +172,9 @@ export class OrderBasicService implements IBasicService<Order, OrderPopulatedDoc
 
     if (newStatus === OrderStatus.CANCELED) {
       if (!cancelReason) {
-        throw new CustomBadRequestException('Lý do hủy đơn hàng là bắt buộc khi chuyển sang trạng thái Đã hủy');
+        throw new CustomBadRequestException(
+          'Lý do hủy đơn hàng là bắt buộc khi chuyển sang trạng thái Đã hủy',
+        );
       }
       data.reasonForCancellation = cancelReason;
     }
@@ -151,13 +183,18 @@ export class OrderBasicService implements IBasicService<Order, OrderPopulatedDoc
     return await this.tranformToDetaiData(filterQuery, lang);
   }
 
-  async updateOrder(filterQuery: FilterQuery<Order>, lang: TLanguage, updateOrder: Partial<Order>): Promise<OrderDetailPopulatedDocument> {
-
-    await this.orderModel.findOneAndUpdate(filterQuery, updateOrder, { new: true });
+  async updateOrder(
+    filterQuery: FilterQuery<Order>,
+    lang: TLanguage,
+    updateOrder: Partial<Order>,
+  ): Promise<OrderDetailPopulatedDocument> {
+    await this.orderModel.findOneAndUpdate(filterQuery, updateOrder, {
+      new: true,
+    });
     return await this.tranformToDetaiData(filterQuery, lang);
   }
 
-  async modify(filterQuery: FilterQuery<Order>, data: Partial<Order>): Promise<OrderDetailPopulatedDocument> {
+  async modify(): Promise<OrderDetailPopulatedDocument> {
     return;
   }
 
@@ -169,74 +206,79 @@ export class OrderBasicService implements IBasicService<Order, OrderPopulatedDoc
 
     const url = `${protocol}://${host}:${port}/api/print`;
 
-    return await axios.post(url, temp).then(res => res.data);
+    return await axios.post(url, temp).then((res) => res.data);
   }
 
-  async remove(filterQuery: FilterQuery<Order>): Promise<OrderDetailPopulatedDocument> {
+  async remove(
+    filterQuery: FilterQuery<Order>,
+  ): Promise<OrderDetailPopulatedDocument> {
     return null;
   }
 
-  private async tranformToDetaiData(filterQuery: FilterQuery<Order>, lang: TLanguage): Promise<OrderDetailPopulatedDocument> {
-    return await this.orderModel.aggregate(
-      [
+  private async tranformToDetaiData(
+    filterQuery: FilterQuery<Order>,
+    lang?: TLanguage,
+  ): Promise<OrderDetailPopulatedDocument> {
+    return await this.orderModel
+      .aggregate([
         { $match: filterQuery },
         {
           $lookup: {
             from: Account.name.toLowerCase(), // Tên của collection Customer
             localField: 'accountId',
             foreignField: '_id',
-            as: 'customerDetail'
-          }
+            as: 'customerDetail',
+          },
         },
         {
           $unwind: {
             path: '$customerDetail',
-            preserveNullAndEmptyArrays: true // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
-          }
+            preserveNullAndEmptyArrays: true, // Giữ lại tài liệu gốc nếu không có tài liệu nào khớp
+          },
         },
         {
           $addFields: {
-            customerEmail: { $ifNull: ["$customerDetail.email", null] },
-            customerName: { $ifNull: ["$customerDetail.name", null] },
+            customerEmail: { $ifNull: ['$customerDetail.email', null] },
+            customerName: { $ifNull: ['$customerDetail.name', null] },
             orderFrom: {
               $switch: {
                 branches: [
                   {
-                    case: { $eq: ["$customerDetail.role", UserRole.CLIENT] },
-                    then: OrderFrom.LOYALTY
+                    case: { $eq: ['$customerDetail.role', UserRole.CLIENT] },
+                    then: OrderFrom.LOYALTY,
                   },
                   {
-                    case: { $eq: ["$customerDetail.role", UserRole.ADMIN] },
-                    then: OrderFrom.ADMIN
-                  }
+                    case: { $eq: ['$customerDetail.role', UserRole.ADMIN] },
+                    then: OrderFrom.ADMIN,
+                  },
                 ],
-                default: OrderFrom.VISITOR
-              }
+                default: OrderFrom.VISITOR,
+              },
             },
-            'subTotal': {
+            subTotal: {
               $ifNull: [
                 {
                   $sum: {
                     $map: {
-                      input: "$orderItems",
-                      as: "item",
-                      in: { $multiply: ["$$item.price", "$$item.quantity"] }
-                    }
-                  }
+                      input: '$orderItems',
+                      as: 'item',
+                      in: { $multiply: ['$$item.price', '$$item.quantity'] },
+                    },
+                  },
                 },
-                0
-              ]
-            }
-          }
+                0,
+              ],
+            },
+          },
         },
         {
           $project: {
             __v: 0,
             accountId: 0,
-            customerDetail: 0
-          }
-        }
-      ]
-    ).then((data) => data[0])
+            customerDetail: 0,
+          },
+        },
+      ])
+      .then((data) => data[0]);
   }
 }

@@ -1,9 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, Injectable } from '@nestjs/common';
 import { CustomForbiddenException } from '../exception/custom-exception';
 
 @Injectable()
 export class DevOnlyGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
+  canActivate(): boolean {
     if (process.env.NODE_ENV === 'pro') {
       throw new CustomForbiddenException('Chỉ được phép ở chế độ development');
     }

@@ -12,7 +12,7 @@ import { OrderModule } from './order/order.module';
     ProductCategoryModule,
     SlideShowModule,
     PersonalModule,
-    OrderModule
+    OrderModule,
   ],
 })
 export class ClientModule {}

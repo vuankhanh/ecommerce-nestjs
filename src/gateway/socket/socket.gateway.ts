@@ -1,4 +1,8 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CustomLoggerService } from 'src/module/custom_logger/custom_logger.service';
 
@@ -11,7 +15,7 @@ import { CustomLoggerService } from 'src/module/custom_logger/custom_logger.serv
         'http://localhost:4211',
         'https://localhost:4211',
         'http://bep4than.vn',
-        'https://bep4than.vn'
+        'https://bep4than.vn',
       ];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -38,7 +42,9 @@ export class SocketGateway {
 
   @SubscribeMessage('message')
   handleMessage(client: Socket, payload: any): void {
-    this.logger.log(`Message received from ${client.id}: ${JSON.stringify(payload)}`);
+    this.logger.log(
+      `Message received from ${client.id}: ${JSON.stringify(payload)}`,
+    );
     this.server.emit('message', payload);
   }
 }

@@ -7,7 +7,9 @@ export class AcceptLanguageValidationPipe implements PipeTransform {
   transform(value: Language) {
     const allowedLangs = Object.values(Language);
     if (!allowedLangs.includes(value)) {
-      throw new CustomBadRequestException(`accept-language phải là một trong: ${allowedLangs.join(', ')}`);
+      throw new CustomBadRequestException(
+        `accept-language phải là một trong: ${allowedLangs.join(', ')}`,
+      );
     }
     return value;
   }

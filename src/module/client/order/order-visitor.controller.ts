@@ -1,18 +1,33 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Headers, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { FormatResponseInterceptor } from 'src/shared/core/interceptors/format_response.interceptor';
 import { ParseObjectIdPipe } from 'src/shared/core/pipes/parse_objectId_array.pipe';
-import { IFooterTemplate, Template } from 'src/shared/interface/template.interface';
+import {
+  IFooterTemplate,
+  Template,
+} from 'src/shared/interface/template.interface';
 import { ConfigService } from '@nestjs/config';
 import { OrderStatus } from 'src/constant/order.constant';
 import { CustomBadRequestException } from 'src/shared/core/exception/custom-exception';
 import { IOrder } from 'src/shared/interface/order.interface';
-import { ProductService } from '../product/product.service';
 import { OrderBasicService } from 'src/module/order-basic/order-basic.service';
 import { OrderCreateDto } from 'src/module/order-basic/dto/order-create.dto';
 import { OrderItemsMapClientPipe } from 'src/shared/core/pipes/order-items-map-client.pipe';
 import { OrderItemEntity } from 'src/module/order-basic/entity/order-item.entity';
 import { OrderEntity } from 'src/module/order-basic/entity/order.entity';
-import { LangDto } from 'src/shared/dto/lang.dto';
 import { AcceptLanguageValidationPipe } from 'src/shared/core/pipes/accept-language-validation/accept-language-validation.pipe';
 import { Language } from 'src/constant/lang.constant';
 
@@ -23,14 +38,13 @@ export class OrderVisitorController {
   constructor(
     private configService: ConfigService,
     private readonly orderBasicService: OrderBasicService,
-    private readonly productService: ProductService
-  ) { }
+  ) {}
 
   @Get()
   async getAll(
     @Query('name') name: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
   ) {
     const filterQuery = {};
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
@@ -39,9 +53,7 @@ export class OrderVisitorController {
   }
 
   @Get(':id')
-  async getDetail(
-    @Param('id', new ParseObjectIdPipe()) id: string,
-  ) {
+  async getDetail(@Param('id', new ParseObjectIdPipe()) id: string) {
     const filterQuery = { _id: id };
 
     return await this.orderBasicService.getDetail(filterQuery, 'vi');
@@ -51,10 +63,12 @@ export class OrderVisitorController {
   async create(
     @Headers('accept-language') lang: Language,
     @Body() orderCreateDto: OrderCreateDto,
-    @Body('orderItems', OrderItemsMapClientPipe) orderItems: Array<OrderItemEntity>
+    @Body('orderItems', OrderItemsMapClientPipe)
+    orderItems: Array<OrderItemEntity>,
   ) {
-    const validatedLang: Language = new AcceptLanguageValidationPipe().transform(lang);
-    const iOrder : IOrder = {
+    const validatedLang: Language =
+      new AcceptLanguageValidationPipe().transform(lang);
+    const iOrder: IOrder = {
       orderItems: orderItems,
       status: OrderStatus.PENDING,
       paymentMethod: orderCreateDto.paymentMethod,
@@ -62,83 +76,40 @@ export class OrderVisitorController {
       discount: orderCreateDto.discount,
       note: orderCreateDto.note,
       delivery: orderCreateDto.delivery,
-      lang: validatedLang
-    }
+      lang: validatedLang,
+    };
     const order: OrderEntity = new OrderEntity(iOrder);
 
     return await this.orderBasicService.create(order);
   }
 
-  // @Put(':id')
-  // async replace(
-  //   @Param('id', new ParseObjectIdPipe()) id: string,
-  //   @Body() orderDto: OrderDto
-  // ) {
-  //   const filterQuery = { _id: id };
-  //   const order = new Order(orderDto);
-  //   order.updateaccountd = orderDto.accountd;
-
-  //   return await this.orderService.replace(filterQuery, order);
-  // }
-
-  // @Patch(':id')
-  // async modify(
-  //   @Param('id', new ParseObjectIdPipe()) id: string,
-  //   @Body() orderDto: UpdateOrderDto
-  // ) {
-  //   const filterQuery = { _id: id };
-
-  //   const data: UpdateOrderDto = orderDto;
-  //   // Lấy đơn hàng hiện tại từ cơ sở dữ liệu
-  //   const currentOrder = await this.orderService.findById(id);
-
-  //   // Cập nhật các thuộc tính thay đổi
-  //   if (orderDto.orderItems) currentOrder.orderItems = OrderUtil.transformOrderItems(orderDto.orderItems);
-  //   if (orderDto.deliveryFee !== undefined) currentOrder.deliveryFee = orderDto.deliveryFee;
-  //   if (orderDto.discount !== undefined) currentOrder.discount = orderDto.discount;
-
-  //   // Tính lại tổng số nếu các thuộc tính liên quan thay đổi
-  //   if (orderDto.orderItems || orderDto.deliveryFee !== undefined || orderDto.discount !== undefined) {
-  //     const subTotal = OrderUtil.calculateSubTotal(currentOrder.orderItems);
-  //     data.total = OrderUtil.calculateTotal(subTotal, currentOrder.deliveryFee, currentOrder.discount);
-  //   }
-
-  //   if (orderDto.accountd) data.accountId = ObjectId.createFromHexString(orderDto.accountd);
-
-  //   if (orderDto.customerName) {
-  //     data.customerName = orderDto.customerName;
-  //   }
-
-  //   if (orderDto.customerAddress) {
-  //     data.customerAddress = orderDto.customerAddress;
-  //   }
-
-  //   if (orderDto.customerPhoneNumber) {
-  //     data.customerPhoneNumber = orderDto.customerPhoneNumber;
-  //   }
-
-  //   return await this.orderService.modify(filterQuery, data);
-  // }
-
   @Delete(':id')
-  async remove(
-    @Param('id', new ParseObjectIdPipe()) id: string,
-  ) {
+  async remove(@Param('id', new ParseObjectIdPipe()) id: string) {
     const filterQuery = { _id: id };
 
     return await this.orderBasicService.remove(filterQuery);
   }
 
   @Post(':id/print')
-  async print(
-    @Param('id', new ParseObjectIdPipe()) id: string
-  ) {
-    const orderDetail = await this.orderBasicService.getDetail({ _id: id }, 'vi');
-    if (![OrderStatus.CONFIRMED, OrderStatus.SHIPPING, OrderStatus.COMPLETED].includes(orderDetail.status as OrderStatus)) {
-      throw new CustomBadRequestException('Trạng thái của Order phải là CONFIRMED, SHIPPING, hoặc COMPLETED để in');
+  async print(@Param('id', new ParseObjectIdPipe()) id: string) {
+    const orderDetail = await this.orderBasicService.getDetail(
+      { _id: id },
+      'vi',
+    );
+    if (
+      ![
+        OrderStatus.CONFIRMED,
+        OrderStatus.SHIPPING,
+        OrderStatus.COMPLETED,
+      ].includes(orderDetail.status as OrderStatus)
+    ) {
+      throw new CustomBadRequestException(
+        'Trạng thái của Order phải là CONFIRMED, SHIPPING, hoặc COMPLETED để in',
+      );
     }
 
-    const footer: IFooterTemplate = this.configService.get<IFooterTemplate>('brand');
+    const footer: IFooterTemplate =
+      this.configService.get<IFooterTemplate>('brand');
     const template: Template = new Template(orderDetail, footer);
     return await this.orderBasicService.print(template);
   }

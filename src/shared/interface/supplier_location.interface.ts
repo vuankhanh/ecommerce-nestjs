@@ -1,5 +1,5 @@
 // import { IDistrict, IProvince, IWard } from "./vn-public-apis.interface";
-import { IDistrict, IProvince, IWard } from "./tinhthanhpho_com_api.interface";
+import { IDistrict, IProvince, IWard } from './tinhthanhpho_com_api.interface';
 
 export interface ISupplierLocation {
   name: string; // Name of the supplier
@@ -15,7 +15,7 @@ export interface ISupplierLocation {
   position?: {
     lat: string | number; // Latitude for geolocation
     lng: string | number; // Longitude for geolocation
-  },
+  };
   url?: string; // Website URL (optional)
   taxID?: string; // Tax identification number (optional)
   contactPoint?: {

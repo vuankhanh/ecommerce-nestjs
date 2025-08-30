@@ -1,4 +1,9 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { CustomBadRequestException } from '../exception/custom-exception';
 
@@ -15,12 +20,12 @@ export class FileProccedInterceptor implements NestInterceptor {
   }
 
   private validateFileInfoField(body: any, file: Express.Multer.File) {
-
     if (!body || typeof body !== 'object') {
       throw new CustomBadRequestException('Invalid body format');
     }
 
-    if (!body.file_0) throw new CustomBadRequestException('Không có trường thông tin file_0');
+    if (!body.file_0)
+      throw new CustomBadRequestException('Không có trường thông tin file_0');
     console.log(body.file_0);
 
     let result: any;
@@ -31,11 +36,16 @@ export class FileProccedInterceptor implements NestInterceptor {
       if (typeof result === 'string') {
         result = JSON.parse(result);
       }
-    } catch (error) {
-      throw new CustomBadRequestException(`Trường thông tin file_0 không phải là JSON hợp lệ`);
+    } catch {
+      throw new CustomBadRequestException(
+        `Trường thông tin file_0 không phải là JSON hợp lệ`,
+      );
     }
 
-    if (result.fileName != file.originalname) throw new CustomBadRequestException(`Tên file trong trường thông tin file_0 không khớp với tên file đã tải lên`);
+    if (result.fileName != file.originalname)
+      throw new CustomBadRequestException(
+        `Tên file trong trường thông tin file_0 không khớp với tên file đã tải lên`,
+      );
 
     body.file_0 = result;
   }

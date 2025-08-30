@@ -5,13 +5,8 @@ import { VnPublicApisService } from './vn-public-apis.service';
 import { CustomLoggerModule } from '../custom_logger/custom_logger.module';
 
 @Module({
-  imports: [
-    CustomLoggerModule
-  ],
-  providers: [
-    ConfigService,
-    VnPublicApisService
-  ],
+  imports: [CustomLoggerModule],
+  providers: [ConfigService, VnPublicApisService],
   exports: [VnPublicApisService],
   controllers: [VnPublicApisController],
 })

@@ -12,13 +12,13 @@ import { Account, accountSchema } from '../auth/schemas/account.schema';
       {
         name: Order.name,
         schema: orderSchema,
-        collection: Order.name.toLowerCase()
+        collection: Order.name.toLowerCase(),
       },
       {
         name: Account.name,
         schema: accountSchema,
-        collection: Account.name.toLowerCase()
-      }
+        collection: Account.name.toLowerCase(),
+      },
     ]),
   ],
   providers: [OrderBasicService, ConfigService, AccountService],

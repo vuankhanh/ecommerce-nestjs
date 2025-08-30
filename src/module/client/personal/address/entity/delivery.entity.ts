@@ -1,6 +1,6 @@
-import { Types } from "mongoose";
-import { IAddress } from "src/shared/interface/address.interface";
-import { IDelivery } from "src/shared/interface/delivery.interface";
+import { Types } from 'mongoose';
+import { IAddress } from 'src/shared/interface/address.interface';
+import { IDelivery } from 'src/shared/interface/delivery.interface';
 
 export class DeliveryEntity implements IDelivery {
   accountId: Types.ObjectId;
@@ -9,7 +9,12 @@ export class DeliveryEntity implements IDelivery {
   address: IAddress;
   addressDetail: string;
 
-  constructor(accountId: string, name: string, phoneNumber: string, address: IAddress) {
+  constructor(
+    accountId: string,
+    name: string,
+    phoneNumber: string,
+    address: IAddress,
+  ) {
     this.accountId = new Types.ObjectId(accountId);
     this.name = name;
     this.phoneNumber = phoneNumber;

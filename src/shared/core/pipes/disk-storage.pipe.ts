@@ -9,17 +9,17 @@ import { Request } from 'express';
   scope: Scope.REQUEST,
 })
 export class DiskStoragePipe implements PipeTransform {
-  constructor(
-    @Inject(REQUEST) private readonly request: Request
-  ) { }
+  constructor(@Inject(REQUEST) private readonly request: Request) {}
   transform(
-    processedMedia: TProcessedMedia | TProcessedMedia[]
+    processedMedia: TProcessedMedia | TProcessedMedia[],
   ): IMedia | Array<IMedia> {
     const body = this.request.body;
-    if(Array.isArray(processedMedia)){
-      const arryObject = Object.keys(body)
-      return processedMedia.map((media, index) => this.saveToDisk(media, arryObject[index]));
-    }else{
+    if (Array.isArray(processedMedia)) {
+      const arryObject = Object.keys(body);
+      return processedMedia.map((media, index) =>
+        this.saveToDisk(media, arryObject[index]),
+      );
+    } else {
       return this.saveToDisk(processedMedia, body.file_0);
     }
   }
@@ -27,13 +27,13 @@ export class DiskStoragePipe implements PipeTransform {
   private saveToDisk(processedMedia: TProcessedMedia, fileInfo: any): IMedia {
     const customParams = this.request['customParams'];
     const destination = customParams.uploadsFolder;
-    
+
     const relativePath = customParams.relativePath;
 
     const absolutePath = destination + '/' + relativePath;
 
     const file = processedMedia.file;
-    
+
     DiskStorageUtil.saveToDisk(absolutePath, file);
 
     const thumbnail = processedMedia.thumbnail;
@@ -46,7 +46,7 @@ export class DiskStoragePipe implements PipeTransform {
       description: fileInfo.description || '',
       alternateName: fileInfo.alternateName || '',
       type: file.mimetype.includes('image') ? 'image' : 'video',
-    }
+    };
 
     return media;
   }

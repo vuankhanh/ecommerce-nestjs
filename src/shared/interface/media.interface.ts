@@ -1,4 +1,4 @@
-import { MediaFormat, PurposeOfMedia } from "src/constant/media.constant";
+import { MediaFormat, PurposeOfMedia } from 'src/constant/media.constant';
 
 export interface IAlbum {
   name: string;

@@ -1,7 +1,7 @@
-import { IAddress } from "./address.interface";
+import { IAddress } from './address.interface';
 
 export interface IDelivery {
-  name: string,
-  phoneNumber: string,
-  address: IAddress
+  name: string;
+  phoneNumber: string;
+  address: IAddress;
 }

@@ -1,4 +1,4 @@
-import { IDelivery } from "../interface/delivery.interface";
+import { IDelivery } from '../interface/delivery.interface';
 
 export class AddressUtil {
   static addressDetail(delivery: IDelivery): string {

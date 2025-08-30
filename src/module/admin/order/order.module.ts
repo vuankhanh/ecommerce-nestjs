@@ -7,15 +7,8 @@ import { OrderItemsMapAdminPipe } from 'src/shared/core/pipes/order-items-map-ad
 import { MailModule } from 'src/module/mail/mail.module';
 
 @Module({
-  imports: [
-    OrderBasicModule,
-    ProductModule,
-    MailModule,
-  ],
+  imports: [OrderBasicModule, ProductModule, MailModule],
   controllers: [OrderController],
-  providers: [
-    OrderService,
-    OrderItemsMapAdminPipe
-  ]
+  providers: [OrderService, OrderItemsMapAdminPipe],
 })
 export class OrderModule {}

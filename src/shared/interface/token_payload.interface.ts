@@ -1,8 +1,8 @@
-import { UserRole } from "src/constant/user.constant";
+import { UserRole } from 'src/constant/user.constant';
 
 export interface ITokenPayload {
-  username: string,
-  role: `${UserRole}`,
-  iat: number,
-  exp: number
+  username: string;
+  role: `${UserRole}`;
+  iat: number;
+  exp: number;
 }

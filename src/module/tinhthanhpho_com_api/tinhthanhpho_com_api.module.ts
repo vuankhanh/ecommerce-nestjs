@@ -5,13 +5,8 @@ import { TinhthanhphoComApiService } from './tinhthanhpho_com_api.service';
 import { CustomLoggerModule } from '../custom_logger/custom_logger.module';
 
 @Module({
-  imports: [
-    CustomLoggerModule
-  ],
-  providers: [
-    ConfigService,
-    TinhthanhphoComApiService
-  ],
+  imports: [CustomLoggerModule],
+  providers: [ConfigService, TinhthanhphoComApiService],
   exports: [TinhthanhphoComApiService],
   controllers: [TinhthanhphoComApiController],
 })

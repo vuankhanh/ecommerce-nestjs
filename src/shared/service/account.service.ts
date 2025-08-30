@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, HydratedDocument, Model } from 'mongoose';
-import { Account, AccountDocument } from 'src/module/auth/schemas/account.schema';
+import { Account } from 'src/module/auth/schemas/account.schema';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -9,9 +9,11 @@ export class AccountService {
   logger: Logger = new Logger(AccountService.name);
   constructor(
     @InjectModel(Account.name) private accountModel: Model<Account>,
-  ) { }
+  ) {}
 
-  async findOne(query: FilterQuery<Account>): Promise<HydratedDocument<Account>> {
+  async findOne(
+    query: FilterQuery<Account>,
+  ): Promise<HydratedDocument<Account>> {
     return await this.accountModel.findOne(query).select('+password');
   }
 
@@ -33,14 +35,19 @@ export class AccountService {
     return await newUser.save();
   }
 
-  async createNonePasswordAccount(account: Account): Promise<HydratedDocument<Account>> {
+  async createNonePasswordAccount(
+    account: Account,
+  ): Promise<HydratedDocument<Account>> {
     this.logger.log('Creating user without password.');
 
     const newUser = new this.accountModel(account);
     return newUser.save();
   }
 
-  async validateAccount(email: string, password: string): Promise<HydratedDocument<Account> | null> {
+  async validateAccount(
+    email: string,
+    password: string,
+  ): Promise<HydratedDocument<Account> | null> {
     const account = await this.accountModel.findOne({ email });
     if (!account) {
       return Promise.resolve(null);
@@ -55,7 +62,10 @@ export class AccountService {
     return account;
   }
 
-  async createPassword(email: string, newPassword: string): Promise<HydratedDocument<Account>> {
+  async createPassword(
+    email: string,
+    newPassword: string,
+  ): Promise<HydratedDocument<Account>> {
     const account = await this.accountModel.findOne({ email });
     if (!account) {
       return Promise.resolve(null);
@@ -67,7 +77,11 @@ export class AccountService {
     return await account.save();
   }
 
-  async updatePassword(email: string, currentPassword: string, newPassword: string): Promise<HydratedDocument<Account>> {
+  async updatePassword(
+    email: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<HydratedDocument<Account>> {
     const account = await this.validateAccount(email, currentPassword);
     if (!account) {
       return Promise.resolve(null);

@@ -40,10 +40,7 @@ import { join } from 'path';
     I18nModule.forRoot({
       fallbackLanguage: 'vi',
       loaderOptions: { path: join(process.cwd(), '/i18n/'), watch: true },
-      resolvers: [
-        { use: QueryResolver, options: ['lang'] },
-        HeaderResolver,
-      ],
+      resolvers: [{ use: QueryResolver, options: ['lang'] }, HeaderResolver],
     }),
     AdminModule,
     AuthModule,
@@ -51,21 +48,19 @@ import { join } from 'path';
     VnPublicApisModule,
     TinhthanhphoComApiModule,
     ClientModule,
-    MailModule
+    MailModule,
   ],
   providers: [
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
-    SocketGateway
+    SocketGateway,
   ],
 })
 export class AppModule {
   static port: number;
-  constructor(
-    private configService: ConfigService
-  ) {
+  constructor(private configService: ConfigService) {
     AppModule.port = this.configService.get<number>('app.port');
   }
 

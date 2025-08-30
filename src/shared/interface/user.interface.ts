@@ -1,4 +1,4 @@
-import { AuthenticationProvider, UserRole } from "src/constant/user.constant";
+import { AuthenticationProvider, UserRole } from 'src/constant/user.constant';
 
 export interface IUser {
   email: string;
@@ -8,10 +8,8 @@ export interface IUser {
   hasPassword?: boolean;
   name: string;
   avatar?: string;
-  role: `${UserRole}`
+  role: `${UserRole}`;
   createdByProvider: `${AuthenticationProvider}`;
 }
 
-export interface IAcctountResponse extends IUser {
-
-}
+export interface IAcctountResponse extends IUser {}

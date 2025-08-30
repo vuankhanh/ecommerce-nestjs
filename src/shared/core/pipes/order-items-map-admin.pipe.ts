@@ -9,7 +9,9 @@ import { OrderItemEntity } from 'src/module/order-basic/entity/order-item.entity
 export class OrderItemsMapAdminPipe implements PipeTransform {
   constructor(private readonly productService: ProductService) {}
 
-  async transform(orderItemsRequest: IOrderItemsRequest[]): Promise<OrderItemEntity[]> {
+  async transform(
+    orderItemsRequest: IOrderItemsRequest[],
+  ): Promise<OrderItemEntity[]> {
     if (!orderItemsRequest || !Array.isArray(orderItemsRequest)) {
       throw new CustomBadRequestException('orderItems không hợp lệ');
     }
@@ -17,9 +19,15 @@ export class OrderItemsMapAdminPipe implements PipeTransform {
     const mappedOrderItems: Array<OrderItemEntity> = [];
 
     for (const orderItemRequest of orderItemsRequest) {
-      if (!orderItemRequest.productId) throw new CustomBadRequestException('Thiếu productId');
-      const product = await this.productService.getDetail({ _id: new Types.ObjectId(orderItemRequest.productId) });
-      if (!product) throw new CustomBadRequestException(`Sản phẩm với ID ${orderItemRequest.productId} không tồn tại`);
+      if (!orderItemRequest.productId)
+        throw new CustomBadRequestException('Thiếu productId');
+      const product = await this.productService.getDetail({
+        _id: new Types.ObjectId(orderItemRequest.productId),
+      });
+      if (!product)
+        throw new CustomBadRequestException(
+          `Sản phẩm với ID ${orderItemRequest.productId} không tồn tại`,
+        );
 
       const orderItem: OrderItemEntity = new OrderItemEntity({
         productId: orderItemRequest.productId,
@@ -33,7 +41,7 @@ export class OrderItemsMapAdminPipe implements PipeTransform {
       });
       mappedOrderItems.push(orderItem);
     }
-    
+
     return mappedOrderItems;
   }
 }

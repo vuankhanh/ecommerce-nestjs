@@ -1,4 +1,10 @@
-import { registerDecorator, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments } from 'class-validator';
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+  ValidationArguments,
+} from 'class-validator';
 
 @ValidatorConstraint({ async: false })
 export class IsValidConstraint implements ValidatorConstraintInterface {
@@ -7,13 +13,16 @@ export class IsValidConstraint implements ValidatorConstraintInterface {
     return validateFn(value);
   }
 
-  defaultMessage(args: ValidationArguments) {
+  defaultMessage() {
     return 'Validation failed!';
   }
 }
 
-export function IsValid(validateFn: (value: any) => boolean, validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+export function IsValid(
+  validateFn: (value: any) => boolean,
+  validationOptions?: ValidationOptions,
+) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
@@ -37,8 +46,11 @@ export class IsEnumConstraint implements ValidatorConstraintInterface {
   }
 }
 
-export function IsEnum(validValues: any[], validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+export function IsEnum(
+  validValues: any[],
+  validationOptions?: ValidationOptions,
+) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,

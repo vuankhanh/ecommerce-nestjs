@@ -9,7 +9,7 @@ export interface IConfiguration {
   client: IUrl;
   folder?: {
     album: string;
-  }
+  };
 }
 
 export interface IUrl {

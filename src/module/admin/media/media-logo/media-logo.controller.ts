@@ -1,4 +1,15 @@
-import { Controller, Get, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorageMulterOptions } from 'src/constant/file.constanst';
 import { PurposeOfMedia } from 'src/constant/media.constant';
@@ -23,9 +34,7 @@ import { UserRole } from 'src/constant/user.constant';
 @UsePipes(ValidationPipe)
 @UseInterceptors(FormatResponseInterceptor)
 export class MediaLogoController {
-  constructor(
-    private readonly mediaLogoService: MediaLogoService
-  ) { }
+  constructor(private readonly mediaLogoService: MediaLogoService) {}
 
   @Get()
   async get() {
@@ -42,13 +51,14 @@ export class MediaLogoController {
   @UseGuards(ValidateCreateLogoAlbumGuard)
   @UseInterceptors(
     FileInterceptor('file', memoryStorageMulterOptions),
-    FileProccedInterceptor
+    FileProccedInterceptor,
   )
   async create(
     @Req() req: Request,
-    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia
+    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe)
+    media: IMedia,
   ) {
-    const relativePath = req['customParams'].relativePath ;
+    const relativePath = req['customParams'].relativePath;
     const newMedia: Media = new Media(media);
     const album: IAlbum = {
       name: 'Logo',
@@ -57,8 +67,8 @@ export class MediaLogoController {
       media: [newMedia],
       relativePath,
       thumbnailUrl: media.thumbnailUrl,
-      mainMedia: 0
-    }
+      mainMedia: 0,
+    };
     const albumDoc: Album = new Album(album);
     const createdAlbum = await this.mediaLogoService.create(albumDoc);
     return createdAlbum;
@@ -68,10 +78,11 @@ export class MediaLogoController {
   @UseGuards(ValidateModifyLogoAlbumGuard)
   @UseInterceptors(
     FileInterceptor('file', memoryStorageMulterOptions),
-    FileProccedInterceptor
+    FileProccedInterceptor,
   )
   async insert(
-    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe) media: IMedia,
+    @UploadedFile(ChangeUploadfileNamePipe, FileProcessPipe, DiskStoragePipe)
+    media: IMedia,
   ) {
     const newMedia: Media = new Media(media);
 

@@ -1,4 +1,19 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, ParseIntPipe, Patch, Post, Put, Query, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductDto, UpdateProductDto } from './dto/product.dto';
 import { Product } from '../../../shared/schema/product.schema';
@@ -16,15 +31,13 @@ import { VietnameseAccentUtil } from 'src/shared/util/vietnamese-accent.util';
 @UseInterceptors(FormatResponseInterceptor)
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 export class ProductController {
-  constructor(
-    private readonly productService: ProductService
-  ) { }
+  constructor(private readonly productService: ProductService) {}
 
   @Get()
   async getAll(
     @Query('name') name: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number
+    @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,
   ) {
     const filterQuery = {};
     if (name) filterQuery['name'] = { $regex: name, $options: 'i' };
@@ -35,7 +48,7 @@ export class ProductController {
   @Get('detail')
   async getDetail(
     @Query('id', new ParseObjectIdPipe()) id?: string,
-    @Query('slug') slug?: string
+    @Query('slug') slug?: string,
   ) {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
@@ -45,12 +58,11 @@ export class ProductController {
   }
 
   @Post()
-  async create(
-    @Body() productDto: ProductDto
-  ) {
+  async create(@Body() productDto: ProductDto) {
     const product = new Product(productDto);
     if (productDto.albumId) product.updateAlbumId = productDto.albumId;
-    if (productDto.productCategoryId) product.updateProductCategoryId = productDto.productCategoryId;
+    if (productDto.productCategoryId)
+      product.updateProductCategoryId = productDto.productCategoryId;
 
     return await this.productService.create(product);
   }
@@ -59,7 +71,7 @@ export class ProductController {
   async replace(
     @Body() productDto: ProductDto,
     @Query('id', new ParseObjectIdPipe()) id?: string,
-    @Query('slug') slug?: string
+    @Query('slug') slug?: string,
   ) {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
@@ -67,7 +79,8 @@ export class ProductController {
 
     const product: Product = new Product(productDto);
     if (productDto.albumId) product.updateAlbumId = productDto.albumId;
-    if (productDto.productCategoryId) product.updateProductCategoryId = productDto.productCategoryId;
+    if (productDto.productCategoryId)
+      product.updateProductCategoryId = productDto.productCategoryId;
 
     return await this.productService.replace(filterQuery, product);
   }
@@ -76,17 +89,23 @@ export class ProductController {
   async modify(
     @Body() productDto: UpdateProductDto,
     @Query('id', new ParseObjectIdPipe()) id?: string,
-    @Query('slug') slug?: string
+    @Query('slug') slug?: string,
   ) {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;
     else if (slug) filterQuery['slug'] = slug;
 
     const data: Partial<Product> = productDto;
-    if (productDto.albumId) data.albumId = ObjectId.createFromHexString(productDto.albumId);
-    if (productDto.productCategoryId) data.productCategoryId = ObjectId.createFromHexString(productDto.productCategoryId);
+    if (productDto.albumId)
+      data.albumId = ObjectId.createFromHexString(productDto.albumId);
+    if (productDto.productCategoryId)
+      data.productCategoryId = ObjectId.createFromHexString(
+        productDto.productCategoryId,
+      );
     if (productDto.name) {
-      const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(productDto.name.vi);
+      const nonAaccentVName = VietnameseAccentUtil.toNonAccentVietnamese(
+        productDto.name.vi,
+      );
       data.slug = VietnameseAccentUtil.replaceSpaceToDash(nonAaccentVName);
     }
 
@@ -96,7 +115,7 @@ export class ProductController {
   @Delete()
   async delete(
     @Query('id', new ParseObjectIdPipe()) id?: string,
-    @Query('slug') slug?: string
+    @Query('slug') slug?: string,
   ) {
     const filterQuery = {};
     if (id) filterQuery['_id'] = id;

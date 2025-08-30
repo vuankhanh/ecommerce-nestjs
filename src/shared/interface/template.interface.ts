@@ -1,6 +1,4 @@
-import { Order } from "src/module/order-basic/schema/order.schema";
-import { ICustomer } from "./customer.interface";
-import { IOrder } from "./order.interface";
+import { Order } from 'src/module/order-basic/schema/order.schema';
 
 export interface ITemplate {
   order: Order;

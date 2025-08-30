@@ -9,7 +9,7 @@ export class MailProcessor {
   @Process('send')
   async handleSendMail(job: Job) {
     console.log(`Processing mail job: ${job.id}, type: ${job.data.type}`);
-    
+
     const { type, order, orderChanged } = job.data;
     switch (type) {
       case 'order-received':
