@@ -1,51 +1,27 @@
-## Cấu hình biến môi trường (.env)
+# Ecommerce Nestjs
 
-```bash
-ACCESS_TOKEN_LIFE
-ACCESS_TOKEN_SECRET
-ALBUM_FOLDER
-DEV_APP_PORT
-DEV_DB_PROTOCOL
-DEV_DB_HOST
-DEV_DB_NAME
-DEV_DB_PORT
-DEV_PRINTER_HOST
-DEV_PRINTER_PORT
-DEV_PRINTER_PROTOCOL
-DEV_CLIENT_HOST
-DEV_CLIENT_PORT
-DEV_CLIENT_PROTOCOL
-PRO_APP_PORT
-PRO_DB_PROTOCOL
-PRO_DB_HOST
-PRO_DB_NAME
-PRO_DB_PORT
-PRO_PRINTER_HOST
-PRO_PRINTER_PORT
-PRO_PRINTER_PROTOCOL
-PRO_CLIENT_HOST
-PRO_CLIENT_PORT
-PRO_CLIENT_PROTOCOL
-REFRESH_TOKEN_LIFE
-REFRESH_TOKEN_SECRET
+This project is the server-side component of an ecommerce system, built with NestJS. It provides RESTful APIs for both clients and administrators. Clients can register, log in, browse products, place orders, and make payments. Administrators can manage products, orders, users, and access reporting features.
 
-UPLOAD_FOLDER
+## Main Technologies Used
 
-VN_PUBLIC_API_PROTOCOL
-VN_PUBLIC_API_HOST
-VN_PUBLIC_API_PORT
+- **NestJS**: Main server-side framework (`@nestjs/*` packages).
+- **MongoDB & Mongoose**: NoSQL database and ODM.
+- **JWT**: Authentication with JSON Web Tokens.
+- **Bull & @nestjs/bull**: Queue management for background jobs.
+- **Socket.IO**: Real-time communication via WebSocket.
+- **Class-validator & class-transformer**: Input validation and transformation.
+- **Nodemailer**: Sending emails.
+- **Firebase Admin**: Integration with Firebase services.
+- **Sharp, fluent-ffmpeg, pdf-to-printer, puppeteer**: Image, video, PDF, and browser automation utilities.
+- **Winston**: Logging.
+- **nestjs-i18n**: Internationalization (i18n).
+- **EJS**: Templating engine.
+- **Axios**: HTTP client for external APIs.
+- **Cheerio**: HTML parsing.
+- **Prettier, ESLint, Jest, Supertest**: Code formatting, linting, unit and e2e testing.
+- **TypeScript**: Main programming language.
 
-GOOGLE_CLIENT_ID
-GOOGLE_CLIENT_SECRET
-FACEBOOK_APP_ID
-FACEBOOK_APP_SECRET
+These technologies together provide a robust, scalable, and maintainable backend for the ecommerce
 
-MAIL_APPLICATION_HOST
-MAIL_APPLICATION_PORT
-MAIL_APPLICATION_USER
-MAIL_APPLICATIOM_PASSWOR
-
-SHOP_NAME
-SHOP_ADDRESS
-SHOP_PHONE
-```
+## SonarQube Report
+![SonarQube Report](./readme-media/report/sonar-qube-report.png)
