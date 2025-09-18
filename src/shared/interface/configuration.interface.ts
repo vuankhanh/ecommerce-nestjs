@@ -1,4 +1,5 @@
 export interface IConfiguration {
+  isProduction: boolean;
   app: {
     port: number;
   };

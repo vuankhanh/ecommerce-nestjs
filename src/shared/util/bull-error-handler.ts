@@ -2,8 +2,8 @@ import { exec } from 'child_process';
 
 let isHandlingRedisError = false;
 
-export function handleBullQueueError(err: Error) {
-  if (isHandlingRedisError) return;
+export function handleBullQueueError(err: Error, isProduction: boolean) {
+  if (isHandlingRedisError || !isProduction) return;
   isHandlingRedisError = true;
 
   if (err.message && err.message.includes('ECONNREFUSED')) {

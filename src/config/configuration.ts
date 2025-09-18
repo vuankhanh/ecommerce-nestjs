@@ -6,6 +6,7 @@ import {
 
 export default () => {
   const dev: IConfiguration = {
+    isProduction: false,
     app: {
       port: Number(process.env.DEV_APP_PORT) || 3004,
     },
@@ -34,6 +35,7 @@ export default () => {
   };
 
   const pro: IConfiguration = {
+    isProduction: true,
     app: {
       port: Number(process.env.PRO_APP_PORT),
     },

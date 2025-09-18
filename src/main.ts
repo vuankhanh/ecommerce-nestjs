@@ -14,7 +14,8 @@ async function bootstrap() {
   // Lấy queue (ví dụ: mail)
   const mailQueue = app.get<Queue>(getQueueToken('mail'));
 
-  mailQueue.on('error', handleBullQueueError);
+  const isProduction: boolean = configService.get<boolean>('isProduction');
+  mailQueue.on('error', (error: Error)=>handleBullQueueError(error, isProduction));
 
   app.enableCors();
   app.setGlobalPrefix('api');
